@@ -1,0 +1,823 @@
+:root {
+	--bg: #f7f8fa;
+	--ink: #0f172a;
+	--muted: #6b7280;
+	--line: #e5e7eb;
+	--card: #fff;
+	--brand: #111827
+}
+
+* {
+	box-sizing: border-box
+}
+
+html, body {
+	margin: 0
+}
+
+body {
+	font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+		Noto Sans KR, Helvetica, Arial, 'Apple SD Gothic Neo', 'Malgun Gothic',
+		sans-serif;
+	background: var(--bg);
+	color: var(--ink)
+}
+
+a {
+	text-decoration: none;
+	color: inherit
+}
+
+img {
+	display: block;
+	max-width: 100%
+}
+
+.container {
+	width: min(1200px, calc(100% - 48px));
+	margin: 0 auto
+}
+
+.header {
+	position: sticky;
+	top: 0;
+	background: #fff;
+	border-bottom: 1px solid var(--line);
+	z-index: 20
+}
+
+.header .bar {
+	height: 64px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 800
+}
+
+.brand .logo {
+	width: 28px;
+	height: 28px;
+	border-radius: 8px;
+	background: #111827;
+	color: #fff;
+	display: grid;
+	place-items: center
+}
+
+.nav {
+	display: flex;
+	gap: 18px;
+	margin-left: 28px
+}
+
+.nav a {
+	padding: 8px 12px;
+	border-radius: 10px;
+	font-weight: 600;
+	color: #334155
+}
+
+.nav a.active, .nav a:hover {
+	background: #f3f4f6;
+	color: #0f172a
+}
+
+.actions {
+	display: flex;
+	gap: 12px;
+	align-items: center
+}
+
+.iconbtn {
+	width: 36px;
+	height: 36px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: #fff;
+	display: grid;
+	place-items: center;
+	cursor: pointer
+}
+
+.badge {
+	display: inline-flex;
+	gap: 6px;
+	padding: 6px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	background: #111827;
+	color: #fff
+}
+
+.btn {
+	padding: 10px 14px;
+	border-radius: 12px;
+	border: 1px solid var(--line);
+	background: #fff;
+	font-weight: 700;
+	cursor: pointer
+}
+
+.btn.dark {
+	background: #0b1020;
+	color: #fff;
+	border-color: #0b1020
+}
+
+.btn.full {
+	width: 100%
+}
+
+.btn.small {
+	padding: 6px 10px
+}
+
+.page {
+	padding: 24px 0
+}
+
+.card {
+	background: #fff;
+	border: 1px solid var(--line);
+	border-radius: 16px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .04)
+}
+
+.hero {
+	padding: 28px;
+	background: linear-gradient(180deg, #fde7db, #fff);
+	border: 1px solid var(--line)
+}
+
+.grid {
+	display: grid;
+	gap: 18px
+}
+
+.grid.cols-2 {
+	grid-template-columns: repeat(2, 1fr)
+}
+
+.grid.cols-3 {
+	grid-template-columns: repeat(3, 1fr)
+}
+
+.tile .thumb {
+	position: relative;
+	aspect-ratio: 4/3;
+	overflow: hidden;
+	border-top-left-radius: 16px;
+	border-top-right-radius: 16px
+}
+
+.tile .body {
+	padding: 14px 16px;
+	display: grid;
+	gap: 8px
+}
+
+.meta {
+	color: #6b7280;
+	font-size: 14px;
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	flex-wrap: wrap
+}
+
+.small {
+	font-size: 12px;
+	color: #6b7280
+}
+
+.label {
+	display: inline-flex;
+	gap: 6px;
+	padding: 6px 10px;
+	border-radius: 999px;
+	background: #0f172a;
+	color: #fff;
+	font-size: 12px
+}
+
+.section-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 16px 0
+}
+
+.input, textarea, select {
+	width: 100%;
+	padding: 12px 14px;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	background: #fff
+}
+
+.form-row {
+	display: grid;
+	gap: 10px;
+	margin: 10px 0
+}
+
+.row {
+	display: flex;
+	gap: 10px;
+	align-items: center
+}
+
+.tabbar {
+	display: flex;
+	gap: 6px;
+	background: #eef0f3;
+	border-radius: 12px;
+	padding: 4px;
+	width: max-content
+}
+
+.tab {
+	padding: 8px 16px;
+	border-radius: 10px;
+	cursor: pointer
+}
+
+.tab.active {
+	background: #fff;
+	border: 1px solid var(--line)
+}
+
+.segment {
+	display: none
+}
+
+.segment.active {
+	display: block
+}
+
+.list-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 10px;
+	border-bottom: 1px solid var(--line)
+}
+
+.mpp-grid {
+	display: grid;
+	grid-template-columns: 280px 1fr;
+	gap: 18px
+}
+
+.avatar {
+	width: 96px;
+	height: 96px;
+	border-radius: 50%;
+	background: #111827;
+	color: #fff;
+	display: grid;
+	place-items: center;
+	font-weight: 900;
+	font-size: 28px;
+	margin: 10px auto
+}
+
+@media ( max-width :1024px) {
+	.grid.cols-3 {
+		grid-template-columns: repeat(2, 1fr)
+	}
+	.mpp-grid {
+		grid-template-columns: 1fr
+	}
+}
+
+@media ( max-width :640px) {
+	.grid.cols-2, .grid.cols-3 {
+		grid-template-columns: 1fr
+	}
+	.nav {
+		display: none
+	}
+}
+
+/* ===== Restored hero & card grid ===== */
+.container.wide {
+	max-width: 1160px;
+	margin: 0 auto;
+	padding: 0 16px;
+}
+
+.hero {
+	background: #fff;
+	border-radius: 14px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+	padding: 28px 32px;
+	margin: 20px 0 28px;
+}
+
+.hero h1 {
+	font-size: 28px;
+	margin: 4px 0 6px;
+	font-weight: 800;
+	letter-spacing: -0.3px;
+}
+
+.hero p {
+	color: #6b7280;
+	margin: 0 0 16px;
+}
+
+.hero .row {
+	display: flex;
+	gap: 8px;
+}
+
+.section {
+	margin: 26px 0;
+}
+
+.section h3 {
+	margin: 0 0 10px;
+	font-size: 18px;
+}
+
+.grid.cards {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+}
+
+.card.recipe {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border-radius: 14px;
+	background: #fff;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+}
+
+.card.recipe .thumb {
+	width: 100%;
+	aspect-ratio: 16/10;
+	overflow: hidden;
+	background: #eef1f4;
+}
+
+.card.recipe .thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.card.recipe .body {
+	padding: 12px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.card.recipe .meta {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	color: #6b7280;
+	font-size: 12px;
+}
+
+.card.recipe .label {
+	font-size: 11px;
+	background: #111827;
+	color: #fff;
+	border-radius: 999px;
+	padding: 4px 8px;
+}
+
+.card.recipe .label.green {
+	background: #10b981;
+}
+
+.card.recipe .cta {
+	margin-top: 10px;
+	display: flex;
+	gap: 8px;
+}
+
+.card.recipe .cta .btn {
+	flex: 1;
+}
+
+.btn.dark {
+	background: #0b1020;
+	color: #fff;
+	border: none;
+}
+
+.btn.dark:hover {
+	opacity: .92;
+}
+
+@media ( max-width : 980px) {
+	.grid.cards {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media ( max-width : 640px) {
+	.grid.cards {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* === MYPAGE LAYOUT FIX === */
+.mpp-grid {
+	display: grid;
+	grid-template-columns: 260px 1fr;
+	align-items: start;
+	gap: 24px;
+	margin-top: 24px;
+}
+
+/* 좌측 프로필 카드 */
+.mpp-grid aside.card {
+	text-align: center;
+	padding: 24px !important;
+	position: sticky;
+	top: 100px;
+	height: fit-content;
+}
+
+.mpp-grid .avatar {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	background: #111827;
+	color: #fff;
+	display: grid;
+	place-items: center;
+	font-size: 32px;
+	margin: 0 auto 10px;
+}
+
+/* 우측 메인 컨텐츠 */
+.mpp-grid section.list-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.mpp-grid section.list-stack .card {
+	border-radius: 14px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, .05);
+	border: 1px solid var(--line);
+	background: #fff;
+}
+
+/* 내부 섹션 정렬 */
+.section-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid var(--line);
+	padding-bottom: 6px;
+	margin-bottom: 10px;
+}
+
+/* 좋아요한 레시피 카드 (3열) */
+.grid.cols-3 {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 16px;
+}
+
+.grid.cols-3 .card.tile {
+	padding: 0;
+	overflow: hidden;
+}
+
+.grid.cols-3 .thumb img {
+	width: 100%;
+	height: 160px;
+	object-fit: cover;
+	display: block;
+}
+
+.grid.cols-3 .body {
+	padding: 10px;
+}
+
+/* 반응형 */
+@media ( max-width : 900px) {
+	.mpp-grid {
+		grid-template-columns: 1fr;
+	}
+	.mpp-grid aside.card {
+		position: static;
+	}
+}
+
+/* === MYPAGE ONLY – actions/overlap/modal (scoped) === */
+#mypage .profile .actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-top: 8px;
+}
+
+#mypage .profile .actions .btn {
+	background: #0b0f1a;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	height: 36px;
+	padding: 0 12px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+#mypage .profile .actions .btn.danger {
+	background: #dc2626;
+}
+
+#mypage .profile .actions .btn.ghost {
+	background: #fff;
+	color: #111;
+	border: 1px solid var(--line);
+}
+
+/* 주문내역 – '상세 보기' 겹침 방지 + 정렬 */
+#mypage .orders .list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+#mypage .orders .item {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 12px 14px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: #fff;
+}
+
+#mypage .orders .item .left {
+	min-width: 0;
+}
+
+#mypage .orders .item .right {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+#mypage .orders .item .link {
+	position: static !important;
+	transform: none !important;
+	margin: 0 !important;
+	flex: 0 0 auto;
+	padding: 6px 12px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	background: #0b0f1a;
+	color: #fff;
+	font-weight: 700;
+}
+
+/* 정보수정 모달 */
+#mypage #editModal.hidden {
+	display: none;
+}
+
+#mypage #editModal .modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, .35);
+}
+
+#mypage #editModal .modal-body {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 16px;
+}
+
+#mypage #editModal .panel {
+	background: #fff;
+	width: 100%;
+	max-width: 480px;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+}
+
+#mypage #editModal .modal-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 16px;
+	border-bottom: 1px solid var(--line);
+	font-weight: 800;
+}
+
+#mypage #editModal .modal-close {
+	border: none;
+	background: #fff;
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+#mypage #editModal .modal-content {
+	padding: 16px;
+	display: grid;
+	gap: 10px;
+}
+
+#mypage #editModal .field {
+	display: grid;
+	gap: 6px;
+}
+
+#mypage #editModal .field>span {
+	font-weight: 700;
+	font-size: 13px;
+}
+
+#mypage #editModal .field>input {
+	height: 40px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	padding: 0 10px;
+	outline: none;
+}
+
+#mypage #editModal .divider {
+	height: 1px;
+	background: var(--line);
+	margin: 6px 0;
+}
+
+#mypage #editModal .modal-foot {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	padding: 14px 16px;
+	border-top: 1px solid var(--line);
+}
+
+#mypage #editModal .btn.save-profile {
+	background: #0b0f1a;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	height: 36px;
+	padding: 0 12px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+#mypage #editModal .btn.modal-cancel {
+	background: #fff;
+	color: #111;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	height: 36px;
+	padding: 0 12px;
+	font-weight: 700;
+}
+
+/* === KookPang: Profile Edit Modal (card) === */
+/* appended without removing existing rules */
+#kpEditModal.hidden {
+	display: none;
+}
+
+#kpEditModal .kp-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, .38);
+}
+
+#kpEditModal .kp-modal-wrap {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 16px;
+	z-index: 9999;
+}
+
+#kpEditModal .kp-card {
+	width: 100%;
+	max-width: 480px;
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 14px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, .12);
+	overflow: hidden;
+}
+
+#kpEditModal .kp-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 16px;
+	border-bottom: 1px solid #e5e7eb;
+	font-weight: 800;
+}
+
+#kpEditModal .kp-close {
+	border: none;
+	background: #fff;
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+#kpEditModal .kp-body {
+	padding: 16px;
+	display: grid;
+	gap: 10px;
+}
+
+#kpEditModal .kp-field {
+	display: grid;
+	gap: 6px;
+}
+
+#kpEditModal .kp-field>span {
+	font-size: 13px;
+	font-weight: 700;
+}
+
+#kpEditModal .kp-field>input {
+	height: 40px;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	padding: 0 10px;
+	outline: none;
+}
+
+#kpEditModal .kp-foot {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	padding: 14px 16px;
+	border-top: 1px solid #e5e7eb;
+}
+
+#kpEditModal .kp-btn {
+	height: 36px;
+	padding: 0 12px;
+	border-radius: 8px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+#kpEditModal .kp-btn.primary {
+	background: #0b0f1a;
+	color: #fff;
+	border: 1px solid #0b0f1a;
+}
+
+#kpEditModal .kp-btn.ghost {
+	background: #fff;
+	color: #111;
+	border: 1px solid #e5e7eb;
+}
+
+/* cart badge */
+.cart-badge {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	background: #ef4444;
+	color: #fff;
+	border-radius: 999px;
+	min-width: 18px;
+	height: 18px;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 0 4px;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 18px;
+	box-shadow: 0 0 0 2px #fff
+}
