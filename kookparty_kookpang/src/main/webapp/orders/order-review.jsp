@@ -9,6 +9,7 @@
       <title>주문 확인</title>
       <link rel="stylesheet" href="${path}/css/styles.css">
       <style>
+      
         .ov-wrap {
           max-width: 1100px;
           margin: 0 auto;
@@ -109,17 +110,12 @@
       </script>
       <script src="${path}/js/config.js"></script>
       <script src="${path}/js/order-review.js"></script>
-      <script src="${path}/js/kp-flow.js"></script>
-      <script>const PAGE_ACTIVE = ""</script>
-      <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/seed.js"></script>
     </head>
 
     <body>
       <!-- header시작 -->
       <jsp:include page="../common/header.jsp"></jsp:include>
       <!-- header끝 -->
-      <script>document.addEventListener("DOMContentLoaded", () => { initHeader(PAGE_ACTIVE || ""); });</script>
 
       <div class="ov-wrap">
         <div class="ov-title">주문 확인</div>

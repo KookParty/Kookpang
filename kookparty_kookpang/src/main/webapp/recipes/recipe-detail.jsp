@@ -11,7 +11,8 @@
       <style>
         body {
           background: #f7f8fa;
-          font-family: ui-sans-serif, system-ui, AppleSDGothicNeo, 'Noto Sans KR', Arial
+          font-family: ui-sans-serif, system-ui, AppleSDGothicNeo, 'Noto Sans KR',
+            Arial
         }
 
         .wrap {
@@ -219,60 +220,32 @@
         const CONTEXT_PATH = "${pageContext.request.contextPath}";
       </script>
       <script src="${path}/js/config.js"></script>
-      <script>
-        let KP_CART = 'kp_cart';
-        function price(n) { return (Number(n) || 0).toLocaleString() + '원' }
-        function get(k) { return JSON.parse(localStorage.getItem(k) || '[]') }
-        function set(k, v) { localStorage.setItem(k, JSON.stringify(v)) }
-        function addSelected() {
-          const checked = [...document.querySelectorAll('.ing [type=checkbox]:checked')];
-          if (!checked.length) { alert('재료를 선택해주세요.'); return; }
-          const cart = get(KP_CART);
-          checked.forEach(ch => {
-            const row = ch.closest('.row');
-            const id = row.dataset.id, title = row.dataset.title, priceVal = Number(row.dataset.price || 0);
-            const i = cart.findIndex(x => x.id === id);
-            if (i > -1) cart[i].qty = (cart[i].qty || 1) + 1;
-            else cart.push({ id, title, price: priceVal, qty: 1 });
-          });
-          set(KP_CART, cart);
-          alert('선택한 재료를 장바구니에 담았습니다.');
-          location.href = '${path}/orders/order-review.jsp';
-        }
-        function sum() {
-          let s = 0;
-          document.querySelectorAll('.ing .row input[type=checkbox]:checked').forEach(cb => {
-            const r = cb.closest('.row');
-            s += Number(r?.dataset?.price || 0);
-          });
-          document.getElementById('sum').textContent = price(s);
-        }
-        document.addEventListener('DOMContentLoaded', sum);
-      </script>
-      <script>const PAGE_ACTIVE = ""</script>
-      <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/seed.js"></script>
     </head>
 
     <body>
       <!-- header시작 -->
       <jsp:include page="../common/header.jsp"></jsp:include>
       <!-- header끝 -->
-      <script>document.addEventListener("DOMContentLoaded", () => { initHeader(PAGE_ACTIVE || ""); });</script>
-
       <div class="wrap">
-        <div style="margin-bottom:10px;"><a class="ghost-link muted2" href="${path}/recipes/recipes.jsp">← 목록으로</a>
+        <div style="margin-bottom: 10px;">
+          <a class="ghost-link muted2" href="${path}/recipes/recipes.jsp">←
+            목록으로</a>
         </div>
         <div class="hero">
           <img src="${path}/assets/img/kimchi.jpg" alt="김치찌개">
-          <div style="flex:1">
+          <div style="flex: 1">
             <div class="title">김치찌개</div>
-            <div class="meta"><span>⏱ 30분</span><span>👥 4인분</span><span>❤️ 1,247</span></div>
-            <div class="row" style="gap:8px;margin-top:8px"><button class="btn" id="likeBtn" style="padding:8px 12px">♡
-                좋아요</button><button class="btn" id="variantBtn" style="padding:8px 12px;background:#eef1f4;color:#111">+
-                변형
-                레시피 추가</button></div>
-            <div class="muted2" style="text-align:center;margin-top:6px">* 조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다</div>
+            <div class="meta">
+              <span>⏱ 30분</span><span>👥 4인분</span><span>❤️ 1,247</span>
+            </div>
+            <div class="row" style="gap: 8px; margin-top: 8px">
+              <button class="btn" id="likeBtn" style="padding: 8px 12px">♡
+                좋아요</button>
+              <button class="btn" id="variantBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">+
+                변형 레시피 추가</button>
+            </div>
+            <div class="muted2" style="text-align: center; margin-top: 6px">*
+              조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다</div>
           </div>
         </div>
 
@@ -285,74 +258,89 @@
 
         <div id="panel-ingredients" class="panel active">
           <div class="card ing">
-            <div class="head"><span>🧾</span> 필요한 재료 <span class="muted">(필요한 만큼 선택)</span></div>
+            <div class="head">
+              <span>🧾</span> 필요한 재료 <span class="muted">(필요한 만큼 선택)</span>
+            </div>
             <div class="row" data-id="pork" data-title="돼지고기 (삼겹살)" data-price="15000">
               <input type="checkbox">
-              <div class="name">돼지고기 (삼겹살) <span class="badge">필수</span>
+              <div class="name">
+                돼지고기 (삼겹살) <span class="badge">필수</span>
                 <div class="sub">300g</div>
               </div>
               <div class="right">15,000원</div>
             </div>
             <div class="row" data-id="kimchi" data-title="김치" data-price="8000">
               <input type="checkbox">
-              <div class="name">김치 <span class="badge">필수</span>
+              <div class="name">
+                김치 <span class="badge">필수</span>
                 <div class="sub">1개</div>
               </div>
               <div class="right">8,000원</div>
             </div>
             <div class="row" data-id="tofu" data-title="두부" data-price="2500">
               <input type="checkbox">
-              <div class="name">두부 <span class="badge">필수</span>
+              <div class="name">
+                두부 <span class="badge">필수</span>
                 <div class="sub">1개</div>
               </div>
               <div class="right">2,500원</div>
             </div>
             <div class="row" data-id="greenonion" data-title="대파" data-price="1500">
               <input type="checkbox">
-              <div class="name">대파 <span class="badge">필수</span>
+              <div class="name">
+                대파 <span class="badge">필수</span>
                 <div class="sub">2개</div>
               </div>
               <div class="right">1,500원</div>
             </div>
             <div class="row" data-id="onion" data-title="양파" data-price="3000">
               <input type="checkbox">
-              <div class="name">양파<div class="sub">0.5</div>
+              <div class="name">
+                양파
+                <div class="sub">0.5</div>
               </div>
               <div class="right">3,000원</div>
             </div>
             <div class="row" data-id="garlic" data-title="마늘" data-price="4000">
               <input type="checkbox">
-              <div class="name">마늘 <span class="badge">조미료</span>
+              <div class="name">
+                마늘 <span class="badge">조미료</span>
                 <div class="sub">3</div>
               </div>
               <div class="right">4,000원</div>
             </div>
             <div class="row" data-id="soy" data-title="간장" data-price="5000">
               <input type="checkbox">
-              <div class="name">간장 <span class="badge">조미료</span>
+              <div class="name">
+                간장 <span class="badge">조미료</span>
                 <div class="sub">2</div>
               </div>
               <div class="right">5,000원</div>
             </div>
             <div class="row" data-id="sesame" data-title="참기름" data-price="8000">
               <input type="checkbox">
-              <div class="name">참기름 <span class="badge">조미료</span>
+              <div class="name">
+                참기름 <span class="badge">조미료</span>
                 <div class="sub">1</div>
               </div>
               <div class="right">8,000원</div>
             </div>
             <div class="footer">
-              <div class="total">총 금액 <span id="sum">0원</span></div>
-              <div class="btn" onclick="addSelected()">🛒 선택한 재료 모두 장바구니에 담기</div>
+              <div class="total">
+                총 금액 <span id="sum">0원</span>
+              </div>
+              <div class="btn" onclick="addSelected()">🛒 선택한 재료 모두 장바구니에
+                담기</div>
             </div>
-            <div class="muted2" style="text-align:center;margin-top:6px">* 조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다</div>
+            <div class="muted2" style="text-align: center; margin-top: 6px">*
+              조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다</div>
           </div>
         </div>
 
         <div id="panel-steps" class="panel">
-          <div class="card" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px">
-            <h3 style="margin:0 0 10px;">조리 방법</h3>
-            <ol style="display:flex;flex-direction:column;gap:12px; margin-left:18px">
+          <div class="card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px">
+            <h3 style="margin: 0 0 10px;">조리 방법</h3>
+            <ol style="display: flex; flex-direction: column; gap: 12px; margin-left: 18px">
               <li>돼지고기를 한 입 크기로 썰어 준비합니다.</li>
               <li>김치는 적당한 크기로 썰고, 두부는 도톰하게 썰어둡니다.</li>
               <li>팬에 기름을 두르고 돼지고기를 볶아줍니다.</li>
@@ -364,35 +352,45 @@
         </div>
 
         <div id="panel-variants" class="panel">
-          <div class="card" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px">
-            <div class="muted" style="margin-bottom:8px">다른 사용자의 변형 레시피들입니다</div>
-            <div class="grid" style="gap:12px">
-              <div class="card" style="padding:14px">
-                <div style="font-weight:700">치즈 김치찌개</div>
+          <div class="card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px">
+            <div class="muted" style="margin-bottom: 8px">다른 사용자의 변형
+              레시피들입니다</div>
+            <div class="grid" style="gap: 12px">
+              <div class="card" style="padding: 14px">
+                <div style="font-weight: 700">치즈 김치찌개</div>
                 <div class="muted2">치즈를 추가한 더 묵직한 맛</div>
-                <div class="actions-row"><button class="btn" style="padding:8px 12px">변형 레시피 보기</button></div>
+                <div class="actions-row">
+                  <button class="btn" style="padding: 8px 12px">변형 레시피 보기</button>
+                </div>
               </div>
-              <div class="card" style="padding:14px">
-                <div style="font-weight:700">참치 김치찌개</div>
+              <div class="card" style="padding: 14px">
+                <div style="font-weight: 700">참치 김치찌개</div>
                 <div class="muted2">참치를 더해 감칠맛 업</div>
-                <div class="actions-row"><button class="btn" style="padding:8px 12px">변형 레시피 보기</button></div>
+                <div class="actions-row">
+                  <button class="btn" style="padding: 8px 12px">변형 레시피 보기</button>
+                </div>
               </div>
             </div>
-            <div class="muted2" style="text-align:center;margin-top:6px">* 조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다</div>
+            <div class="muted2" style="text-align: center; margin-top: 6px">*
+              조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다</div>
           </div>
         </div>
 
         <div id="panel-reviews" class="panel">
-          <div class="card" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px">
-            <h3 style="margin:0 0 10px;">리뷰 작성하기</h3>
+          <div class="card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px">
+            <h3 style="margin: 0 0 10px;">리뷰 작성하기</h3>
             <div class="stars" id="starBox" aria-label="평점 선택">
-              <button data-v="1">★</button><button data-v="2">★</button><button data-v="3">★</button><button
-                data-v="4">★</button><button data-v="5">★</button>
+              <button data-v="1">★</button>
+              <button data-v="2">★</button>
+              <button data-v="3">★</button>
+              <button data-v="4">★</button>
+              <button data-v="5">★</button>
             </div>
             <textarea id="reviewText" rows="4" placeholder="이 레시피에 대한 경험을 공유해주세요..." class="input"
-              style="margin:10px 0"></textarea>
+              style="margin: 10px 0"></textarea>
             <input id="photoUrl" class="input" placeholder="이미지 URL을 입력하세요 (선택)">
-            <div class="actions-row" style="margin-top:10px"><button class="btn" id="submitReview">리뷰 등록하기</button>
+            <div class="actions-row" style="margin-top: 10px">
+              <button class="btn" id="submitReview">리뷰 등록하기</button>
             </div>
           </div>
           <div id="reviewList"></div>
@@ -405,10 +403,12 @@
 
 
       <script>
-        KP_CART = 'kp_cart';
+        const KP_CART = 'kp_cart';
         const qs = (s, r = document) => r.querySelector(s);
         const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
-
+        function price(n) {
+          return (Number(n) || 0).toLocaleString() + '원'
+        }
         function sum() {
           let s = 0;
           qsa('.ing .row input[type=checkbox]:checked').forEach(cb => {
@@ -450,7 +450,7 @@
           });
           sum();
 
-          // Add to cart
+          // Add to cart //변형시켜서 Ajax로 insertCart...
           window.addSelected = function () {
             const checked = qsa('.ing [type=checkbox]:checked');
             if (!checked.length) { alert('재료를 선택해주세요.'); return; }
@@ -470,6 +470,7 @@
               document.body.appendChild(n); setTimeout(() => { n.remove(); location.href = '${path}/orders/order-review.jsp'; }, 900);
             } catch (_) { location.href = '${path}/orders/order-review.jsp'; }
           }
+
         });
       </script>
 
