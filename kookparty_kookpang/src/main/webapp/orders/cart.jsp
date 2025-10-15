@@ -8,6 +8,11 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <title>장바구니</title>
     <link rel="stylesheet" href="${path}/css/styles.css" />
     <style>
+      .ov-wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px;
+      }
       .ov-grid {
         display: grid;
         grid-template-columns: 2fr 1fr;
@@ -126,12 +131,10 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       const CONTEXT_PATH = "${pageContext.request.contextPath}";
     </script>
     <script src="${path}/js/config.js"></script>
-    <script src="${path}/js/kp-flow.js"></script>
+    <script src="${path}/js/cart.js"></script>
     <script>
       const PAGE_ACTIVE = "";
     </script>
-    <script src="${path}/js/app.js"></script>
-    <script src="${path}/js/seed.js"></script>
   </head>
 
   <body>
@@ -140,120 +143,98 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <!-- header끝 -->
 
     <main class="container wide page">
-      <div class="ov-title">장바구니</div>
+      <div class="ov-wrap">
+        <div class="ov-title">장바구니</div>
 
-      <!-- 🛒 장바구니 비었을 때 보이는 영역 -->
-      <section
-        id="emptyState"
-        class="ov-card"
-        style="display: none; padding: 48px 24px; text-align: center; margin-bottom: 16px"
-      >
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; justify-content: flex-start">
-          <a href="${path}/recipes/recipes.jsp" class="btn" style="background: #f3f4f6; color: #111">← 쇼핑 계속하기</a>
-        </div>
-        <div style="max-width: 520px; margin: 0 auto">
-          <div style="font-size: 56px; opacity: 0.5; line-height: 1.1">🛒</div>
-          <h2 style="margin: 10px 0 6px; font-size: 22px">장바구니가 비어있습니다</h2>
-          <p class="muted" style="margin: 0 0 16px">맛있는 요리를 위한 재료들을 담아보세요</p>
-          <div style="display: flex; gap: 8px; justify-content: center">
-            <a href="${path}/recipes/recipes.jsp" class="btn">레시피 보러가기</a>
-            <a
-              href="${path}/orders/ingredients.jsp"
-              class="btn"
-              style="background: #fff; color: #111; border: 1px solid #e5e7eb"
-              >식재료 보러가기</a
+        <!-- 🛒 장바구니 비었을 때 보이는 영역 -->
+        <section
+          id="emptyState"
+          class="ov-card"
+          style="display: none; padding: 48px 24px; text-align: center; margin-bottom: 16px"
+        >
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; justify-content: flex-start">
+            <a href="${path}/recipes/recipes.jsp" class="btn" style="background: #f3f4f6; color: #111"
+              >← 쇼핑 계속하기</a
             >
           </div>
-        </div>
-      </section>
+          <div style="max-width: 520px; margin: 0 auto">
+            <div style="font-size: 56px; opacity: 0.5; line-height: 1.1">🛒</div>
+            <h2 style="margin: 10px 0 6px; font-size: 22px">장바구니가 비어있습니다</h2>
+            <p class="muted" style="margin: 0 0 16px">맛있는 요리를 위한 재료들을 담아보세요</p>
+            <div style="display: flex; gap: 8px; justify-content: center">
+              <a href="${path}/recipes/recipes.jsp" class="btn">레시피 보러가기</a>
+              <a
+                href="${path}/orders/ingredients.jsp"
+                class="btn"
+                style="background: #fff; color: #111; border: 1px solid #e5e7eb"
+                >식재료 보러가기</a
+              >
+            </div>
+          </div>
+        </section>
 
-      <!-- ✅ 장바구니가 있을 때만 보이는 주문/결제/배송/혜택 -->
-      <section id="cartState">
-        <div class="ov-grid">
-          <section class="ov-card2">
-            <div id="ov-items">
-              <!-- 장바구니 아이템 반복 -->
-              <div class="ov-row2">
-                <div class="cart-img">
-                  <img src="../assets/img/beef.jpg" alt="" />
+        <!-- ✅ 장바구니가 있을 때만 보이는 주문/결제/배송/혜택 -->
+        <section id="cartState">
+          <div class="ov-grid">
+            <section class="ov-card2">
+              <div id="ov-items">
+                <!-- 장바구니 아이템 반복 -->
+                <div class="ov-row2">
+                  <div class="cart-img">
+                    <img src="../assets/img/beef.jpg" alt="" />
+                  </div>
+                  <div>
+                    <div style="font-weight: 700">아이템1</div>
+                    <div class="small" style="color: #6b7280">10,000원 / 1포기</div>
+                  </div>
+                  <div class="ov-qty">
+                    <button>-</button>
+                    <span>1</span>
+                    <button>+</button>
+                    <span><b>30,000원</b></span>
+                    <button class="ov-del" title="삭제" data-del="">🗑</button>
+                  </div>
                 </div>
-                <div>
-                  <div style="font-weight: 700">아이템1</div>
-                  <div class="small" style="color: #6b7280">10,000원 / 1포기</div>
-                </div>
-                <div class="ov-qty">
-                  <button data-minus="">-</button>
-                  <span>1</span>
-                  <button data-plus="">+</button>
-                  <span><b>30,000원</b></span>
-                  <button class="ov-del" title="삭제" data-del="">🗑</button>
-                </div>
+                <!-- 장바구니 아이템 반복 -->
               </div>
-              <!-- 장바구니 아이템 반복 -->
-            </div>
-          </section>
-          <aside class="ov-card ov-aside">
-            <div class="ov-sec-title">결제 정보</div>
-            <div class="ov-row"><span>상품 금액</span><b id="ov-price">10,000원</b></div>
-            <div class="ov-row"><span>배송비</span><b id="ov-ship">3,000원</b></div>
-            <div class="ov-row" style="border-top: 1px solid #e5e7eb"></div>
-            <div class="ov-row">
-              <span style="font-weight: 800">총 결제 금액</span><b id="ov-total" style="font-size: 18px">13,000원</b>
-            </div>
-            <button
-              id="ov-pay"
-              class="ov-badge"
-              style="margin-top: 12px; width: 100%; justify-content: center"
-              onclick="order()"
-            >
-              결제하기
-            </button>
-          </aside>
-        </div>
+            </section>
+            <aside class="ov-card ov-aside">
+              <div class="ov-sec-title">결제 정보</div>
+              <div class="ov-row"><span>상품 금액</span><b id="ov-price">10,000원</b></div>
+              <div class="ov-row"><span>배송비</span><b id="ov-ship">3,000원</b></div>
+              <div class="ov-row" style="border-top: 1px solid #e5e7eb"></div>
+              <div class="ov-row">
+                <span style="font-weight: 800">총 결제 금액</span><b id="ov-total" style="font-size: 18px">13,000원</b>
+              </div>
+              <button
+                id="ov-pay"
+                class="ov-badge"
+                style="margin-top: 12px; width: 100%; justify-content: center"
+                onclick="order()"
+              >
+                결제하기
+              </button>
+            </aside>
+          </div>
 
-        <div class="ov-grid" style="margin-top: 16px">
-          <section></section>
-          <aside class="ov-card">
-            <div class="ov-sec-title">주문 혜택</div>
-            <div class="ov-row" style="border-bottom: none; display: block; color: #6b7280">
-              • 50,000원 이상 무료배송<br />• 신선식품 당일 발송<br />• 레시피 기반 맞춤 포장
-            </div>
-          </aside>
-        </div>
-      </section>
+          <div class="ov-grid" style="margin-top: 16px">
+            <section></section>
+            <aside class="ov-card">
+              <div class="ov-sec-title">주문 혜택</div>
+              <div class="ov-row" style="border-bottom: none; display: block; color: #6b7280">
+                • 50,000원 이상 무료배송<br />• 신선식품 당일 발송<br />• 레시피 기반 맞춤 포장
+              </div>
+            </aside>
+          </div>
+        </section>
+      </div>
     </main>
     <!-- footer 시작 -->
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
     <script>
-      (function () {
-        const CART_KEY = "kp_cart";
-        function getCart() {
-          try {
-            return JSON.parse(localStorage.getItem(CART_KEY) || "[]");
-          } catch (_) {
-            return [];
-          }
-        }
-        function toggleEmptyState() {
-          const has = getCart().length > 0;
-          const empty = document.getElementById("emptyState");
-          const cart = document.getElementById("cartState");
-          if (empty) {
-            empty.style.display = has ? "none" : "block";
-          }
-          if (cart) {
-            cart.style.display = has ? "" : "none";
-          }
-          try {
-            window.kpUpdateCartBadge && window.kpUpdateCartBadge();
-          } catch (_) {}
-        }
-        document.addEventListener("DOMContentLoaded", toggleEmptyState);
-        window.addEventListener("storage", toggleEmptyState);
-      })();
-      const order = function () {
-        location.href = "${path}/orders/order-review.jsp";
+      window.onload = function () {
+        getCart();
       };
     </script>
   </body>
