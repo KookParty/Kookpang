@@ -5,7 +5,6 @@ import kookparty.kookpang.common.RecipeType;
 
 public class RecipeDTO {
 	private long recipeId;
-	private long userId;
 	private String title;
 	private String description;
 	private String thumbnailUrl;
@@ -15,16 +14,17 @@ public class RecipeDTO {
 	private String way; // 조리 방법
 	private String category; // 요리 종류
 	private long parentRecipeId;
+	private long userId;
 	private String createdAt;
 	
 	public RecipeDTO() {}
 	
 	/**
-	 * 회원의 변형 레시피 작성 시 (조리방법, 요리종류 미포함)
+	 * 회원의 변형 레시피 등록 시 (조리방법, 요리종류 미포함)
 	 * recipeType: RecipeType.VARIANT
 	 */
-	public RecipeDTO(long userId, String title, String description, String thumbnailUrl, int cookingTime,
-			Difficulty difficulty, long parentRecipeId, String createdAt) {
+	public RecipeDTO(String title, String description, String thumbnailUrl, int cookingTime,
+			Difficulty difficulty, long parentRecipeId, long userId, String createdAt) {
 		this.userId = userId;
 		this.title = title;
 		this.description = description;
@@ -37,11 +37,11 @@ public class RecipeDTO {
 	}
 
 	/** 
-	 * 회원의 변형 레시피 작성 시 (조리방법, 요리종류 포함)
+	 * 회원의 변형 레시피 등록 시 (조리방법, 요리종류 포함)
 	 */
-	public RecipeDTO(long userId, String title, String description, String thumbnailUrl, int cookingTime,
-			Difficulty difficulty, String way, String category, long parentRecipeId, String createdAt) {
-		this(userId, title, description, thumbnailUrl, cookingTime, difficulty, parentRecipeId, createdAt);
+	public RecipeDTO(String title, String description, String thumbnailUrl, int cookingTime,
+			Difficulty difficulty, String way, String category, long parentRecipeId, long userId, String createdAt) {
+		this(title, description, thumbnailUrl, cookingTime, difficulty, parentRecipeId, userId, createdAt);
 		this.way = way;
 		this.category = category;
 	}
@@ -49,9 +49,9 @@ public class RecipeDTO {
 	/**
 	 * 모든 멤버필드 들어간 생성자 (fetch용)
 	 */
-	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl, int cookingTime,
+	public RecipeDTO(long recipeId, String title, String description, String thumbnailUrl, int cookingTime,
 			Difficulty difficulty, RecipeType recipeType, String way, String category, long parentRecipeId,
-			String createdAt) {
+			long userId, String createdAt) {
 		this.recipeId = recipeId;
 		this.userId = userId;
 		this.title = title;
