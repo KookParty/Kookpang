@@ -1,6 +1,8 @@
-/Servers/
+/build/
 web.xml
 context.xml
+.classpath
+.project
 
 ### Eclipse ###
 .metadata
