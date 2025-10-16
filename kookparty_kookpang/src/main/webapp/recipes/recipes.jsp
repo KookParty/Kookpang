@@ -12,30 +12,107 @@
         const CONTEXT_PATH = "${pageContext.request.contextPath}";
       </script>
       <script src="${path}/js/config.js"></script>
-      <script>const PAGE_ACTIVE = 'recipes'</script>
-      <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/data.js"></script>
-      <script src="${path}/js/seed.js"></script>
     </head>
 
     <body>
       <!-- header시작 -->
       <jsp:include page="../common/header.jsp"></jsp:include>
       <!-- header끝 -->
-      <script>document.addEventListener('DOMContentLoaded', () => { initHeader(PAGE_ACTIVE); });</script>
       <main class="container page">
         <h1 style="text-align:center">레시피 모음</h1>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin:8px 0"><button class="btn">인기순</button><button
             class="btn">모든 난이도 ▾</button></div>
-        <section class="grid cols-2" id="list"></section>
+        <section class="grid cols-2" id="list">
+          <!-- 반복 시작 -->
+          <article class="card tile">
+            <div class="thumb">
+              <img src="${path}/assets/img/bulgogi.jpg">
+            </div>
+            <div class="body">
+              <div class="meta">
+                <span class="label">공식 레시피</span>
+                <span class="label green">쉬움</span>
+              </div>
+              <h3 style="margin:8px 0">불고기</h3>
+              <p class="small">달콤짭짤한 한국 전통 불고기</p>
+              <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <a class="btn dark full" href="recipe-detail.jsp?id=bulgogi">레시피 보기</a>
+                <button class="btn" style="margin-left:8px" data-add-recipe="bulgogi">담기</button>
+                <button class="btn small" data-like="bulgogi">♡</button>
+              </div>
+            </div>
+          </article>
+          <!-- 반복 끝 -->
+          <article class="card tile">
+            <div class="thumb">
+              <img src="${path}/assets/img/bulgogi.jpg">
+            </div>
+            <div class="body">
+              <div class="meta">
+                <span class="label">공식 레시피</span>
+                <span class="label green">쉬움</span>
+              </div>
+              <h3 style="margin:8px 0">불고기</h3>
+              <p class="small">달콤짭짤한 한국 전통 불고기</p>
+              <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <a class="btn dark full" href="recipe-detail.jsp?id=bulgogi">레시피 보기</a>
+                <button class="btn" style="margin-left:8px" data-add-recipe="bulgogi">담기</button>
+                <button class="btn small" data-like="bulgogi">♡</button>
+              </div>
+            </div>
+          </article>
+          <article class="card tile">
+            <div class="thumb">
+              <img src="${path}/assets/img/bulgogi.jpg">
+            </div>
+            <div class="body">
+              <div class="meta">
+                <span class="label">공식 레시피</span>
+                <span class="label green">쉬움</span>
+              </div>
+              <h3 style="margin:8px 0">불고기</h3>
+              <p class="small">달콤짭짤한 한국 전통 불고기</p>
+              <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <a class="btn dark full" href="recipe-detail.jsp?id=bulgogi">레시피 보기</a>
+                <button class="btn" style="margin-left:8px" data-add-recipe="bulgogi">담기</button>
+                <button class="btn small" data-like="bulgogi">♡</button>
+              </div>
+            </div>
+          </article>
+          <article class="card tile">
+            <div class="thumb">
+              <img src="${path}/assets/img/bulgogi.jpg">
+            </div>
+            <div class="body">
+              <div class="meta">
+                <span class="label">공식 레시피</span>
+                <span class="label green">쉬움</span>
+              </div>
+              <h3 style="margin:8px 0">불고기</h3>
+              <p class="small">달콤짭짤한 한국 전통 불고기</p>
+              <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <a class="btn dark full" href="recipe-detail.jsp?id=bulgogi">레시피 보기</a>
+                <button class="btn" style="margin-left:8px" data-add-recipe="bulgogi">담기</button>
+                <button class="btn small" data-like="bulgogi">♡</button>
+              </div>
+            </div>
+          </article>
+          <!-- 반복 -->
+        </section>
       </main>
       <!-- footer 시작 -->
       <jsp:include page="../common/footer.jsp"></jsp:include>
       <!-- footer 끝 -->
+      <!--
       <script>
         const likes = new Set(S.get(KP_KEYS.LIKES, [])), list = document.getElementById('list');
         RECIPES.forEach(r => {
-          const el = document.createElement('article'); el.className = 'card tile';
+          const el = document.createElement('article');
+          el.className = 'card tile';
           el.innerHTML = `
           <div class="thumb">
             <img src='../${"${r.img}"}''>
@@ -58,6 +135,7 @@
         });
         document.addEventListener('click', e => { const id = e.target?.dataset?.like; if (!id) return; const arr = S.get(KP_KEYS.LIKES, []); const i = arr.indexOf(id); if (i >= 0) { arr.splice(i, 1); e.target.textContent = '♡' } else { arr.push(id); e.target.textContent = '♥' } S.set(KP_KEYS.LIKES, arr) });
       </script>
+      -->
     </body>
 
     </html>

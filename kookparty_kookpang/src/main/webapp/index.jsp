@@ -12,19 +12,12 @@
         const CONTEXT_PATH = "${pageContext.request.contextPath}";
       </script>
       <script src="${path}/js/config.js"></script>
-      <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/data.js"></script>
-      <script src="${path}/js/seed.js"></script>
-
     </head>
 
     <body>
       <!-- header시작 -->
       <jsp:include page="common/header.jsp"></jsp:include>
       <!-- header끝 -->
-      <script>document.addEventListener('DOMContentLoaded', () => { initHeader('home'); });</script>
-
-
       <main class="container wide page">
         <section class="hero">
           <h1>맛있는 요리의 시작</h1>
@@ -36,18 +29,72 @@
 
         <section class="section">
           <h3>인기 레시피</h3>
-          <div id="popular" class="grid cards"></div>
+          <div id="popular" class="grid cards">
+            <!-- 카드 반복 -->
+            <article class="card recipe">
+              <div class="thumb"><img src="${path}/assets/img/bulgogi.jpg" alt="불고기"></div>
+              <div class="body">
+                <div class="meta"><span class="label">공식레시피</span><span class="label red">어려움</span></div>
+                <b>불고기</b>
+                <p class="small" style="margin:0;color:#6b7280">달콤짭짤한 한국 전통 불고기</p>
+                <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
+                <div class="cta">
+                  <a class="btn dark" href="${path}/recipes/recipe-detail.jsp?id=bulgogi">레시피 보기</a>
+                </div>
+              </div>
+            </article>
+            <article class="card recipe">
+              <div class="thumb"><img src="${path}/assets/img/bulgogi.jpg" alt="불고기"></div>
+              <div class="body">
+                <div class="meta"><span class="label">공식레시피</span><span class="label red">어려움</span></div>
+                <b>불고기</b>
+                <p class="small" style="margin:0;color:#6b7280">달콤짭짤한 한국 전통 불고기</p>
+                <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
+                <div class="cta">
+                  <a class="btn dark" href="${path}/recipes/recipe-detail.jsp?id=bulgogi">레시피 보기</a>
+                </div>
+              </div>
+            </article>
+            <article class="card recipe">
+              <div class="thumb"><img src="${path}/assets/img/bulgogi.jpg" alt="불고기"></div>
+              <div class="body">
+                <div class="meta"><span class="label">공식레시피</span><span class="label red">어려움</span></div>
+                <b>불고기</b>
+                <p class="small" style="margin:0;color:#6b7280">달콤짭짤한 한국 전통 불고기</p>
+                <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
+                <div class="cta">
+                  <a class="btn dark" href="${path}/recipes/recipe-detail.jsp?id=bulgogi">레시피 보기</a>
+                </div>
+              </div>
+            </article>
+            <!-- 카드 반복 -->
+          </div>
         </section>
 
         <section class="section">
           <h3>인기 변형 레시피</h3>
-          <div id="variants" class="grid cards"></div>
+          <div id="variants" class="grid cards">
+            <!-- 카드 반복 -->
+            <article class="card recipe">
+              <div class="thumb"><img src="${path}/assets/img/kimchi.jpg" alt="김치찌개"></div>
+              <div class="body">
+                <div class="meta"><span class="label">변형레시피</span><span class="label green">쉬움</span></div>
+                <b>김치찌개</b>
+                <p class="small" style="margin:0;color:#6b7280">한국인의 소울푸드, 얼큰하고 시원한 김치찌개</p>
+                <div class="meta">⏱️ 30분 · 👥 4인분 · ❤ 1247</div>
+                <div class="cta">
+                  <a class="btn dark" href="${path}/recipes/recipe-detail.jsp?id=kimchi">레시피 보기</a>
+                </div>
+              </div>
+            </article>
+            <!-- 카드 반복 -->
+          </div>
         </section>
       </main>
       <!-- footer 시작 -->
       <jsp:include page="common/footer.jsp"></jsp:include>
       <!-- footer 끝 -->
-
+      <!--
       <script>
         function card(r) {
           return `
@@ -73,6 +120,7 @@
           v.innerHTML = RECIPES.slice(0, 3).map(card).join('');
         })();
       </script>
+      -->
     </body>
 
     </html>

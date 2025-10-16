@@ -14,15 +14,12 @@
       <script src="${path}/js/config.js"></script>
       <script>const PAGE_ACTIVE = 'board'</script>
       <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/seed.js"></script>
     </head>
 
     <body>
       <!-- header include -->
       <jsp:include page="../common/header.jsp"></jsp:include>
       <!-- header include -->
-
-      <script>document.addEventListener('DOMContentLoaded', () => { initHeader(PAGE_ACTIVE); });</script>
       <main class="container page">
         <h2>자유게시판</h2>
         <p class="small">요리 팁과 경험을 나누어보세요</p>

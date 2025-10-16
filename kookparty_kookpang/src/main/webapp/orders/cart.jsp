@@ -5,7 +5,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>주문 확인</title>
+    <title>장바구니</title>
     <link rel="stylesheet" href="${path}/css/styles.css" />
     <style>
       .ov-wrap {
@@ -13,11 +13,16 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         margin: 0 auto;
         padding: 24px;
       }
-
       .ov-grid {
         display: grid;
         grid-template-columns: 2fr 1fr;
         gap: 16px;
+      }
+
+      .ov-card2 {
+        border: 0px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
       }
 
       .ov-card {
@@ -31,12 +36,23 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         font-size: 22px;
         font-weight: 800;
         margin: 6px 0 14px 0;
+        padding: 0px 20px;
       }
 
       .ov-sec-title {
         font-size: 16px;
         font-weight: 700;
         margin: 4px 0 10px 0;
+      }
+
+      .ov-row2 {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        border: 1px solid #f2f3f5;
+        border-radius: 8px;
       }
 
       .ov-row {
@@ -97,6 +113,14 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         font-size: 14px;
       }
 
+      .cart-img {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
       @media (max-width: 900px) {
         .ov-grid {
           grid-template-columns: 1fr;
@@ -108,94 +132,93 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     </script>
     <script src="${path}/js/config.js"></script>
     <script src="${path}/js/cart.js"></script>
+    <script>
+      const PAGE_ACTIVE = "";
+    </script>
   </head>
 
   <body>
     <!-- header시작 -->
     <jsp:include page="../common/header.jsp"></jsp:include>
     <!-- header끝 -->
+
     <main class="container wide page">
       <div class="ov-wrap">
-        <div class="ov-title">주문 확인</div>
+        <div class="ov-title">장바구니</div>
+
+        <!-- 🛒 장바구니 비었을 때 보이는 영역 -->
+        <section
+          id="emptyState"
+          class="ov-card"
+          style="display: none; padding: 48px 24px; text-align: center; margin-bottom: 16px"
+        >
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; justify-content: flex-start">
+            <a href="${path}/recipes/recipes.jsp" class="btn" style="background: #f3f4f6; color: #111"
+              >← 쇼핑 계속하기</a
+            >
+          </div>
+          <div style="max-width: 520px; margin: 0 auto">
+            <div style="font-size: 56px; opacity: 0.5; line-height: 1.1">🛒</div>
+            <h2 style="margin: 10px 0 6px; font-size: 22px">장바구니가 비어있습니다</h2>
+            <p class="muted" style="margin: 0 0 16px">맛있는 요리를 위한 재료들을 담아보세요</p>
+            <div style="display: flex; gap: 8px; justify-content: center">
+              <a href="${path}/recipes/recipes.jsp" class="btn">레시피 보러가기</a>
+              <a
+                href="${path}/orders/ingredients.jsp"
+                class="btn"
+                style="background: #fff; color: #111; border: 1px solid #e5e7eb"
+                >식재료 보러가기</a
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- ✅ 장바구니가 있을 때만 보이는 주문/결제/배송/혜택 -->
         <section id="cartState">
           <div class="ov-grid">
-            <section class="ov-card">
-              <div class="ov-sec-title">
-                주문 상품 <span id="ov-count" style="color: #6b7280; font-weight: 600"></span>
-              </div>
+            <section class="ov-card2">
               <div id="ov-items">
-                <!-- 주문 상품 목록 반복 -->
-                <div class="ov-row">
+                <!-- 장바구니 아이템 반복 -->
+                <div class="ov-row2">
+                  <div class="cart-img">
+                    <img src="../assets/img/beef.jpg" alt="" />
+                  </div>
                   <div>
-                    <div style="font-weight: 700">상품명</div>
+                    <div style="font-weight: 700">아이템1</div>
                     <div class="small" style="color: #6b7280">10,000원 / 1포기</div>
                   </div>
                   <div class="ov-qty">
-                    <button data-minus="">-</button>
-                    <span>2</span>
-                    <button data-plus="">+</button>
-                    <span><b>20,000원</b></span>
+                    <button>-</button>
+                    <span>1</span>
+                    <button>+</button>
+                    <span><b>30,000원</b></span>
                     <button class="ov-del" title="삭제" data-del="">🗑</button>
                   </div>
                 </div>
-                <!-- 주문 상품 목록 반복 끝 -->
+                <!-- 장바구니 아이템 반복 -->
               </div>
             </section>
             <aside class="ov-card ov-aside">
               <div class="ov-sec-title">결제 정보</div>
-              <div class="ov-row"><span>상품 금액</span><b id="ov-price">0원</b></div>
+              <div class="ov-row"><span>상품 금액</span><b id="ov-price">10,000원</b></div>
               <div class="ov-row"><span>배송비</span><b id="ov-ship">3,000원</b></div>
               <div class="ov-row" style="border-top: 1px solid #e5e7eb"></div>
               <div class="ov-row">
-                <span style="font-weight: 800">총 결제 금액</span><b id="ov-total" style="font-size: 18px">0원</b>
+                <span style="font-weight: 800">총 결제 금액</span><b id="ov-total" style="font-size: 18px">13,000원</b>
               </div>
-              <button id="ov-pay" class="ov-badge" style="margin-top: 12px; width: 100%; justify-content: center">
+              <button
+                id="ov-pay"
+                class="ov-badge"
+                style="margin-top: 12px; width: 100%; justify-content: center"
+                onclick="order()"
+              >
                 결제하기
               </button>
             </aside>
           </div>
 
           <div class="ov-grid" style="margin-top: 16px">
-            <section class="ov-card">
-              <div class="ov-sec-title">배송 정보</div>
-              <div class="ov-row" style="border-bottom: none; display: block">
-                <div class="ov-ship" id="ov-shipinfo" style="line-height: 1.8">
-                  <!-- 선택형 주소: 하드코딩된 주소 목록과 '직접 입력' 옵션 -->
-                  <form id="ship-select-form">
-                    <div style="margin-bottom: 8px">
-                      <label style="display: block; margin-bottom: 6px"
-                        ><input type="radio" name="ship_choice" value="addr1" checked /> 받는 분: <b>테스트</b> /
-                        연락처: <b>010-1234-5678</b><br />주소: <b>서울시 강남구 테헤란로 123번길 45</b></label
-                      >
-                      <label style="display: block; margin-bottom: 6px"
-                        ><input type="radio" name="ship_choice" value="custom" /> 직접 입력</label
-                      >
-                    </div>
-                    <div id="ship-custom-area" style="margin-top: 8px">
-                      <div style="display: flex; gap: 8px; margin-bottom: 8px">
-                        <input id="custom-name" class="input" placeholder="받는 분 이름" style="flex: 1" />
-                        <input id="custom-phone" class="input" placeholder="연락처" style="width: 160px" />
-                      </div>
-                      <div style="margin-bottom: 8px">
-                        <textarea
-                          id="custom-address"
-                          class="input"
-                          placeholder="배송지 주소를 입력하세요"
-                          style="width: 100%; height: 76px"
-                        ></textarea>
-                      </div>
-                      <div style="display: flex; gap: 8px; justify-content: flex-end">
-                        <button type="button" id="custom-cancel" class="btn">취소</button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-                <div class="ov-note">
-                  • 신선식품 특성상 주문 후 취소/교환/환불이 어려울 수 있습니다.<br />
-                  • 배송은 주문일 기준 1-2일 소요됩니다.
-                </div>
-              </div>
-            </section>
+            <section></section>
             <aside class="ov-card">
               <div class="ov-sec-title">주문 혜택</div>
               <div class="ov-row" style="border-bottom: none; display: block; color: #6b7280">
@@ -210,12 +233,9 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
     <script>
-      document.getElementById("ov-pay").addEventListener("click", () => {
-        //결제 api 호출(ajax)
-        //결제 성공시 주문 pk받아서 다음 페이지로
-        const id = 1; //임시
-        location.href = CONTEXT_PATH + "/orders/order-result.jsp?id=" + id;
-      });
+      window.onload = function () {
+        getCart();
+      };
     </script>
   </body>
 </html>

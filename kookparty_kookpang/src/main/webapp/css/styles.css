@@ -11,8 +11,13 @@
 	box-sizing: border-box
 }
 
+html {
+	overflow-y: scroll; 
+}
+
 html, body {
 	margin: 0
+	
 }
 
 body {
@@ -39,6 +44,8 @@ img {
 }
 
 .header {
+	width: 100%;
+	left: 0;
 	position: sticky;
 	top: 0;
 	background: #fff;
@@ -401,6 +408,10 @@ img {
 
 .card.recipe .label.green {
 	background: #10b981;
+}
+
+.label.red {
+	background: red;
 }
 
 .card.recipe .cta {
