@@ -1,61 +1,112 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-  <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-    <!doctype html>
-    <html lang="ko">
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
+uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>식재료 쇼핑</title>
+    <link rel="stylesheet" href="${path}/css/styles.css" />
+    <script type="text/javascript">
+      const CONTEXT_PATH = "${pageContext.request.contextPath}";
+    </script>
+    <script src="${path}/js/config.js"></script>
+    <script>
+      const PAGE_ACTIVE = "ingredients";
+    </script>
+    <script src="${path}/js/app.js"></script>
+    <script src="${path}/js/data.js"></script>
+    <script src="${path}/js/seed.js"></script>
+  </head>
 
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>식재료 쇼핑</title>
-      <link rel="stylesheet" href="${path}/css/styles.css">
-      <script type="text/javascript">
-        const CONTEXT_PATH = "${pageContext.request.contextPath}";
-      </script>
-      <script src="${path}/js/config.js"></script>
-      <script>const PAGE_ACTIVE = 'ingredients'</script>
-      <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/data.js"></script>
-      <script src="${path}/js/seed.js"></script>
-    </head>
+  <body>
+    <!-- header시작 -->
+    <jsp:include page="../common/header.jsp"></jsp:include>
+    <!-- header끝 -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        try {
+          initHeader("ingredients");
+        } catch (_) {}
+      });
+    </script>
 
-    <body>
-      <!-- header시작 -->
-      <jsp:include page="../common/header.jsp"></jsp:include>
-      <!-- header끝 -->
-      <script>
-        document.addEventListener('DOMContentLoaded', () => { try { initHeader('ingredients'); } catch (_) { } });
-      </script>
+    <main class="container page">
+      <h1 style="text-align: center; margin: 0 0 6px">식재료 쇼핑</h1>
+      <p class="small" style="text-align: center; margin: 0 0 12px">신선하고 좋은 품질의 식재료를 만나보세요</p>
 
-      <main class="container page">
-        <h1 style="text-align:center;margin:0 0 6px">식재료 쇼핑</h1>
-        <p class="small" style="text-align:center;margin:0 0 12px">신선하고 좋은 품질의 식재료를 만나보세요</p>
+      <!-- 필터 -->
+      <div class="section-head" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+        <input id="q" class="input" placeholder="식재료를 검색해보세요..." style="flex: 1; min-width: 240px" />
+        <select id="cat" class="input" style="width: 160px">
+          <option value="">카테고리 전체</option>
+          <option value="육류">육류</option>
+          <option value="채소">채소</option>
+          <option value="양념">양념</option>
+          <option value="김치류">김치류</option>
+        </select>
+        <select id="sort" class="input" style="width: 140px">
+          <option value="popular">인기순</option>
+          <option value="price-asc">낮은 가격</option>
+          <option value="price-desc">높은 가격</option>
+        </select>
+        <button id="reset" class="btn">초기화</button>
+      </div>
 
-        <!-- 필터 -->
-        <div class="section-head" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <input id="q" class="input" placeholder="식재료를 검색해보세요..." style="flex:1;min-width:240px">
-          <select id="cat" class="input" style="width:160px">
-            <option value="">카테고리 전체</option>
-            <option value="육류">육류</option>
-            <option value="채소">채소</option>
-            <option value="양념">양념</option>
-            <option value="김치류">김치류</option>
-          </select>
-          <select id="sort" class="input" style="width:140px">
-            <option value="popular">인기순</option>
-            <option value="price-asc">낮은 가격</option>
-            <option value="price-desc">높은 가격</option>
-          </select>
-          <button id="reset" class="btn">초기화</button>
+      <!-- 그리드 -->
+      <section id="grid" class="grid cols-3"></section>
+    </main>
+    <!-- footer 시작 -->
+    <jsp:include page="../common/footer.jsp"></jsp:include>
+    <!-- footer 끝 -->
+    <script>
+      window.onload = function () {
+        initData();
+      };
+
+      const initData = async function () {
+        let ingredients = [];
+        console.log(CONTEXT_PATH + "/ajax");
+        try {
+          const res = await fetch(CONTEXT_PATH + "/ajax", {
+            method: "POST",
+            body: new URLSearchParams({
+              key: "product",
+              methodName: "selectAll",
+            }),
+          });
+          if (res.ok) ingredients = await res.json();
+        } catch (e) {
+          console.error(e);
+        }
+        render(ingredients);
+      };
+
+      const render = function (list) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = list
+          .map(
+            (it) => `
+      <article class="card tile">
+        <div class="thumb">
+          <img src='${path}/${"${it.imageUrl}"}'>
         </div>
+        <div class="body">
+          <div class="meta">
+            <span class="label">${"${it.category}"}</span>
+            <span class="label" style="background:#10b981">테스트</span>
+          </div>
+          <b>${"${it.name || ''}"}</b>
+          <div class="meta"><span>${"${it.price}"}</span><span>1개</span></div>
+          <div class="row"><button class="btn dark full" data-add="${"${it.id}"}">담기</button></div>
+        </div>
+      </article>
+    `
+          )
+          .join("");
+      };
 
-        <!-- 그리드 -->
-        <section id="grid" class="grid cols-3"></section>
-      </main>
-      <!-- footer 시작 -->
-      <jsp:include page="../common/footer.jsp"></jsp:include>
-      <!-- footer 끝 -->
-      <script>
-        (function () {
+      /*(function () {
           const KP_CART = 'kp_cart';
           const KP_ING = 'kp_ingredients';
           const price = n => (Number(n) || 0).toLocaleString() + '원';
@@ -172,7 +223,7 @@
             try { window.kpUpdateCartBadge && window.kpUpdateCartBadge(); } catch (_) { }
           });
         })();
-      </script>
-    </body>
-
-    </html>
+        */
+    </script>
+  </body>
+</html>
