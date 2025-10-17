@@ -40,20 +40,28 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <!-- footer 시작 -->
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
-    <script>
-      document.getElementById("doLogin").addEventListener("click", () => {
-        const e = document.getElementById("email").value.trim(),
-          p = document.getElementById("pass").value.trim();
-        const users = JSON.parse(localStorage.getItem("kp_users") || "[]");
-        const u = users.find((x) => x.email === e && x.password === p);
-        if (u) {
-          localStorage.setItem("kp_user", JSON.stringify(u));
-          const to = new URL(location.href).searchParams.get("redirect") || "${path}/index.jsp";
-          location.href = to;
-        } else {
-          alert("이메일 또는 비밀번호가 올바르지 않습니다.");
-        }
-      });
-    </script>
+<script>
+document.getElementById('doLogin').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const base = (typeof CONTEXT_PATH !== 'undefined') ? CONTEXT_PATH : '';
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('pass').value.trim();
+  try {
+    const r = await fetch(base + '/api/users/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+      body: new URLSearchParams({ email, password: pass }).toString()
+    });
+    const text = await r.text();
+    const j = JSON.parse(text);
+    if (!r.ok || !j.ok) throw new Error(j.msg || '로그인 실패');
+    const to = new URL(location.href).searchParams.get('redirect') || (base + '/index.jsp');
+    location.href = to;
+  } catch (err) {
+    alert(err.message);
+  }
+});
+</script>
   </body>
 </html>

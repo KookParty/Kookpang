@@ -8,8 +8,8 @@ import java.io.IOException;
 import kookparty.kookpang.dto.UserDTO;
 import kookparty.kookpang.service.UserService;
 
-@WebServlet("/api/users/register")
-public class UserController extends HttpServlet {
+@WebServlet("/api/users/login")
+public class UserLoginController extends HttpServlet {
     private final UserService svc = new UserService();
 
     @Override
@@ -21,19 +21,13 @@ public class UserController extends HttpServlet {
 
         String email = req.getParameter("email");
         String password = req.getParameter("password");
-        String name = req.getParameter("name");
-        String nickname = req.getParameter("nickname");
-        String phone = req.getParameter("phone");
-        String address = req.getParameter("address");
 
         try {
-            UserDTO u = svc.register(email, password, name, nickname, phone, address);
-            // 가입 즉시 로그인 세션 부여 (원하면 생략 가능)
+            UserDTO u = svc.login(email, password);
             req.getSession(true).setAttribute("loginUser", u);
-
-            resp.getWriter().write("{\"ok\":true,\"userId\":" + u.getUserId() + "}");
+            resp.getWriter().write("{\"ok\":true}");
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             String msg = e.getMessage().replace("\"", "\\\"");
             resp.getWriter().write("{\"ok\":false,\"msg\":\"" + msg + "\"}");
         }

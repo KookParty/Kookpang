@@ -138,9 +138,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (pass1 !== pass2) return alert('비밀번호가 일치하지 않습니다.');
 
     try {
-      await postForm(base + '/api/users/register', { email, name, nickname, phone, address });
+    	await postForm(base + '/api/users/register', { email, password: pass1, name, nickname, phone, address });
+
       alert('가입 및 로그인 완료!');
-      location.href = base + '/index.jsp'; // 또는 base + '/users/login.jsp'
+      location.href = base + '/user/login.jsp'; // '/users/login.jsp'
     } catch(e){ alert(e.message); }
   });
 });
