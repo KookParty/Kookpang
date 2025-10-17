@@ -43,9 +43,10 @@ public class RecipeDAOImpl implements RecipeDAO {
 			ps.setLong(1, recipDTO.getUserId());
 			ps.setString(2, recipDTO.getTitle());
 			ps.setString(3, recipDTO.getDescription());
-			ps.setString(4, recipDTO.getWay());
-			ps.setString(5, recipDTO.getCategory());
-			
+			ps.setString(4, recipDTO.getThumbnailUrl());
+			ps.setString(5, recipDTO.getWay());
+			ps.setString(6, recipDTO.getCategory());
+
 			result = ps.executeUpdate();
 		}
 		

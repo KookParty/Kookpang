@@ -1,21 +1,28 @@
 package kookparty.kookpang.infra;
 
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import kookparty.kookpang.common.RecipeType;
 import kookparty.kookpang.dto.RecipeDTO;
+import kookparty.kookpang.service.RecipeService;
+import kookparty.kookpang.service.RecipeServiceImpl;
 
 /**
  * 레시피 데이터를 가져오기 위한 클래스
  */
 public class RecipeApiClient {
 	private static String key = "019742b6694d4e8ea36e";
-	private static String start = "1";
-	private static String end = "5";
+	private static String start = "2";
+	private static String end = "2";
 	
 	/**
 	 * 레시피 데이터를 Open API 사용해서 가져온다.
@@ -23,32 +30,28 @@ public class RecipeApiClient {
 	 */
 	public static List<RecipeDTO> fetchRecipes() throws Exception {
 		List<RecipeDTO> recipes = new ArrayList<>();
-		String apiUrl = "http://openapi.foodsafetykorea.go.kr/api/"+key+"/COOKRCP01/json/"+start+"/"+end;
 		
-		// URL 객체 생성
-		URL url = new URL(apiUrl);
+		String url = "http://openapi.foodsafetykorea.go.kr/api/"+key+"/COOKRCP01/json/"+start+"/"+end;
 		
-		// URL과 연결하는 객체 생성
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		// 요청 옵션
-		con.setRequestMethod("GET");
-		con.setRequestProperty("Content-type", "application/json");
+		// gson 라이브러리 사용
+		// json 객체로 변환 (json = {"COOKRCP01": {...}} 로 들어감)
+		JsonObject json = JsonParser.parseReader(new InputStreamReader(new URL(url).openStream())).getAsJsonObject();
+		// COOKRCP01 키에 해당하는 객체 안의 row에 해당하는 객체 배열 꺼냄 (실제 레시피 데이터)
+		JsonArray rows = json.getAsJsonObject("COOKRCP01").getAsJsonArray("row");
 		
-		// 데이터 읽어오기
-		BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-		// StringBuilder 객체에 담기
-		StringBuilder sb = new StringBuilder();
-		String line;
-		while ((line = br.readLine()) != null) {
-			sb.append(line);
+		Gson gson = new Gson();
+		// json 객체 -> recipeDTO 매칭해서 DB에 넣기
+		for (JsonElement e: rows) {
+			// RecipeDTO에서 키와 멤버필드 매핑해놔서 바로 넣어도 됨
+			RecipeDTO recipeDTO = gson.fromJson(e, RecipeDTO.class);
+			recipeDTO.setUserId(1); // TODO: admin user id 으로 설정
+			recipeDTO.setDescription(recipeDTO.getTitle()); // TODO: 일단 제목과 동일하게 설정
+			recipeDTO.setRecipeType(RecipeType.BASE);
+			recipes.add(recipeDTO);
 		}
 		
-		// 리소스 해제
-		br.close();
-		con.disconnect();
 		
-		System.out.println(sb.toString());
 		
-		return null;
+		return recipes;
 	}
 }
