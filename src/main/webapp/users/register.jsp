@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
   <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <!doctype html>
     <html lang="ko">
@@ -65,49 +65,87 @@
         </section>
       </main>
 
-      <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          const usedEmails = new Set((JSON.parse(localStorage.getItem('kp_users') || '[]')).map(u => u.email));
-          const usedNicks = new Set((JSON.parse(localStorage.getItem('kp_users') || '[]')).map(u => u.nickname));
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const $ = s => document.querySelector(s);
+  const base = (typeof CONTEXT_PATH !== 'undefined') ? CONTEXT_PATH : '';
+  const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
-          document.getElementById('checkEmail').addEventListener('click', function () {
-            const v = document.getElementById('email').value.trim();
-            if (!v) return alert('이메일을 입력해주세요.');
-            alert(usedEmails.has(v) ? '이미 사용 중인 이메일입니다.' : '사용 가능한 이메일입니다.');
-          });
+  async function getJSON(url){
+    const r = await fetch(url, { credentials: 'include' });
+    const text = await r.text(); // 방어: 응답이 JSON인지 확인
+    try {
+      const j = JSON.parse(text);
+      if (!r.ok) throw new Error(j.msg || '요청 실패');
+      return j;
+    } catch {
+      throw new Error('서버가 JSON이 아닌 응답을 반환했습니다:\n' + text.slice(0,120));
+    }
+  }
 
-          document.getElementById('checkNick').addEventListener('click', function () {
-            const v = document.getElementById('nick').value.trim();
-            if (!v) return alert('닉네임을 입력해주세요.');
-            alert(usedNicks.has(v) ? '이미 사용 중인 닉네임입니다.' : '사용 가능한 닉네임입니다.');
-          });
+  async function postForm(url, data){
+    const r = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body: new URLSearchParams(data).toString()
+    });
+    const text = await r.text();
+    try {
+      const j = JSON.parse(text);
+      if (!r.ok) throw new Error(j.msg || '요청 실패');
+      return j;
+    } catch {
+      throw new Error('서버가 JSON이 아닌 응답을 반환했습니다:\n' + text.slice(0,120));
+    }
+  }
 
-          document.getElementById('doReg').addEventListener('click', function (e) {
-            e.preventDefault();
-            const u = {
-              email: document.getElementById('email').value.trim(),
-              name: document.getElementById('name').value.trim(),
-              nickname: document.getElementById('nick').value.trim(),
-              password: document.getElementById('pass').value.trim(),
-              address: document.getElementById('addr').value.trim(),
-              phone: document.getElementById('phone').value.trim()
-            };
-            const pass2 = document.getElementById('pass2').value.trim();
+  // 이메일 중복확인
+  $('#checkEmail').addEventListener('click', async () => {
+    const v = $('#email').value.trim();
+    if (!v) return alert('이메일을 입력해주세요.');
+    if (!EMAIL_RE.test(v)) return alert('이메일 형식이 올바르지 않습니다.');
+    try {
+      const j = await getJSON(base + '/api/users/check-email?email=' + encodeURIComponent(v));
+      alert(j.taken ? '이미 사용 중인 이메일입니다.' : '사용 가능한 이메일입니다.');
+    } catch(e){ alert(e.message); }
+  });
 
-            if (!u.email || !u.name || !u.nickname || !u.password) return alert('필수 항목을 입력해주세요.');
-            if (u.password !== pass2) return alert('비밀번호가 일치하지 않습니다.');
-            const users = JSON.parse(localStorage.getItem('kp_users') || '[]');
-            if (users.find(x => x.email === u.email)) return alert('이미 가입된 이메일입니다.');
+  // 닉네임 중복확인
+  $('#checkNick').addEventListener('click', async () => {
+    const v = $('#nick').value.trim();
+    if (!v) return alert('닉네임을 입력해주세요.');
+    try {
+      const j = await getJSON(base + '/api/users/check-nick?nick=' + encodeURIComponent(v));
+      alert(j.taken ? '이미 사용 중인 닉네임입니다.' : '사용 가능한 닉네임입니다.');
+    } catch(e){ alert(e.message); }
+  });
 
-            users.push(u);
-            localStorage.setItem('kp_users', JSON.stringify(users));
-            // 세션 로그인까지 처리
-            localStorage.setItem('kp_user', JSON.stringify(u));
-            alert('가입 및 로그인 완료!');
-            location.href = '${path}/index.jsp';
-          });
-        });
-      </script>
+  // 회원가입
+  $('#doReg').addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const email = $('#email').value.trim();
+    const name = $('#name').value.trim();
+    const nickname = $('#nick').value.trim();
+    const phone = $('#phone').value.trim();
+    const address = $('#addr').value.trim();
+    const pass1 = $('#pass').value.trim();
+    const pass2 = $('#pass2').value.trim();
+
+    if (!email || !name || !nickname || !phone) return alert('필수 항목을 입력해주세요.');
+    if (!EMAIL_RE.test(email)) return alert('이메일 형식이 올바르지 않습니다.');
+    if (pass1 !== pass2) return alert('비밀번호가 일치하지 않습니다.');
+
+    try {
+      await postForm(base + '/api/users/register', { email, name, nickname, phone, address });
+      alert('가입 및 로그인 완료!');
+      location.href = base + '/index.jsp'; // 또는 base + '/users/login.jsp'
+    } catch(e){ alert(e.message); }
+  });
+});
+</script>
+
     </body>
 
     </html>
