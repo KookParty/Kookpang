@@ -1,5 +1,7 @@
 package kookparty.kookpang.service;
 
+import java.util.List;
+
 import kookparty.kookpang.dao.RecipeDAO;
 import kookparty.kookpang.dao.RecipeDAOImpl;
 import kookparty.kookpang.dto.RecipeDTO;
@@ -15,6 +17,12 @@ public class RecipeServiceImpl implements RecipeService {
 	
 	public static RecipeService getInstance() {
 		return instance;
+	}
+	
+	@Override
+	public List<RecipeDTO> selectAll() throws Exception {
+		List<RecipeDTO> list = recipeDAO.selectAll();
+		return list;
 	}
 	
 	@Override

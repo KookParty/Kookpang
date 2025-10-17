@@ -21,8 +21,8 @@ import kookparty.kookpang.service.RecipeServiceImpl;
  */
 public class RecipeApiClient {
 	private static String key = "019742b6694d4e8ea36e";
-	private static String start = "2";
-	private static String end = "2";
+	private static String start = "1";
+	private static String end = "5";
 	
 	/**
 	 * 레시피 데이터를 Open API 사용해서 가져온다.
@@ -49,8 +49,6 @@ public class RecipeApiClient {
 			recipeDTO.setRecipeType(RecipeType.BASE);
 			recipes.add(recipeDTO);
 		}
-		
-		
 		
 		return recipes;
 	}

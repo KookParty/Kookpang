@@ -3,9 +3,13 @@ package kookparty.kookpang.dao;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import kookparty.kookpang.common.RecipeType;
 import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.util.DbUtil;
 
@@ -22,7 +26,6 @@ public class RecipeDAOImpl implements RecipeDAO {
 			//동적으로 가져와서 경로를 설정해야한다.
 			InputStream is = getClass().getClassLoader().getResourceAsStream("dbQuery.properties");
 			proFile.load(is);
-			System.out.println("query.select = " +proFile.getProperty("recipe.select"));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -34,18 +37,48 @@ public class RecipeDAOImpl implements RecipeDAO {
 	}
 	
 	@Override
-	public int insertRecipe(RecipeDTO recipDTO) throws SQLException {
+	public List<RecipeDTO> selectAll() throws SQLException {
+		List<RecipeDTO> list = new ArrayList<>();
+		String sql = proFile.getProperty("recipe.selectAll");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					list.add(new RecipeDTO(
+							rs.getLong(1), 
+							rs.getLong(2),
+							rs.getString(3),
+							rs.getString(4),
+							rs.getString(5),
+							rs.getString(6).toLowerCase().equals("base") ? 
+									RecipeType.BASE : RecipeType.VARIANT,
+							rs.getString(7),
+							rs.getString(8),
+							rs.getInt(9),
+							rs.getString(10)
+							));
+				}
+			}
+		}
+		
+		return list;
+	}
+	
+	@Override
+	public int insertRecipe(RecipeDTO recipeDTO) throws SQLException {
 		int result = 0;
 		String sql = proFile.getProperty("recipe.insertRecipe");
 		
 		try (Connection con = DbUtil.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setLong(1, recipDTO.getUserId());
-			ps.setString(2, recipDTO.getTitle());
-			ps.setString(3, recipDTO.getDescription());
-			ps.setString(4, recipDTO.getThumbnailUrl());
-			ps.setString(5, recipDTO.getWay());
-			ps.setString(6, recipDTO.getCategory());
+			ps.setLong(1, recipeDTO.getUserId());
+			ps.setString(2, recipeDTO.getTitle());
+			ps.setString(3, recipeDTO.getDescription());
+			ps.setString(4, recipeDTO.getThumbnailUrl());
+			ps.setString(5, recipeDTO.getWay());
+			ps.setString(6, recipeDTO.getCategory());
 
 			result = ps.executeUpdate();
 		}

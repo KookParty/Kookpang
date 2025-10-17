@@ -1,7 +1,5 @@
 package kookparty.kookpang.listener;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 import jakarta.servlet.ServletContextEvent;
@@ -11,39 +9,41 @@ import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.infra.RecipeApiClient;
 import kookparty.kookpang.service.RecipeService;
 import kookparty.kookpang.service.RecipeServiceImpl;
-import kookparty.kookpang.util.DbUtil;
 
 /**
  * 레시피 데이터를 API로부터 받아와 초기화하는 리스너
  */
 @WebListener
 public class RecipeDataInitListener implements ServletContextListener {
-
-
 	/**
-     * recipes 테이블이 체크 후 데이터 가져오기
+     * recipes 테이블에 레코드 있는지 체크 후 데이터 가져오기
      */
     public void contextInitialized(ServletContextEvent sce)  { 
-	    
     	try {
-    		Connection con = DbUtil.getConnection();
-			System.out.println("con = " + con);
-			
-			RecipeService service = RecipeServiceImpl.getInstance();
-			List<RecipeDTO> recipes = RecipeApiClient.fetchRecipes();
-			
-			
-			for (RecipeDTO recipe : recipes) {
-				System.out.println(recipe);
-				service.insertRecipe(recipe);
+    		RecipeService service = RecipeServiceImpl.getInstance();
+    		
+			if (service.selectAll() != null) {
+				// recipes 테이블에 레코드가 있을 시
+				System.out.println("recipes 데이터 확인됨");
+				System.out.println("recipes size = " + service.selectAll().size());
+			} else {
+				// recipes 테이블에 레코드가 하나도 없을 시
+				// API로부터 레시피 데이터 가져오기
+				List<RecipeDTO> recipes = RecipeApiClient.fetchRecipes();
 				
-				// 재료ingredients 저장
-				// TODO
-			
-				// 조리법steps 저장
-				// TODO
+				for (RecipeDTO recipe : recipes) {
+					System.out.println(recipe);
+					service.insertRecipe(recipe);
+					
+					// TODO 재료ingredients 저장
+					
+					
+					// TODO 조리법steps 저장
+					 
+				}
+				
+				System.out.println("레시피 데이터 불러오기 완료");
 			}
-			System.out.println("레시피 데이터 불러오기 완료");
 			
 		} catch (Exception e) {
 			e.printStackTrace();

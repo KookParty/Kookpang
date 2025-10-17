@@ -32,7 +32,6 @@ public class RecipeDTO {
 	 */
 	public RecipeDTO(long userId, String title, String description, String thumbnailUrl, String way, String category,
 			long parentRecipeId) {
-		super();
 		this.userId = userId;
 		this.title = title;
 		this.description = description;
@@ -48,7 +47,6 @@ public class RecipeDTO {
 	 */
 	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl,
 			RecipeType recipeType, String way, String category, long parentRecipeId, String createdAt) {
-		super();
 		this.recipeId = recipeId;
 		this.userId = userId;
 		this.title = title;
