@@ -13,6 +13,12 @@ public interface ProductService {
 	 */
 	List<ProductDTO> selectAll() throws SQLException;
 	
+	/**
+	 * 모든 식재료 검색, 페이징
+	 * @param limit
+	 * @param offset
+	 * @return
+	 */
 	List<ProductDTO> selectAllLimit(int limit, int offset);
 	
 	/**
@@ -21,28 +27,41 @@ public interface ProductService {
 	 * @param category
 	 * @param order
 	 * @return
+	 * @throws SQLException 
 	 */
-	List<ProductDTO> selectByOptions(String word, String category, String order);
+	List<ProductDTO> selectByOptions(String word, String category, String order) throws SQLException;
+	
+	/**
+	 * 등록된 식재료의 카테고리를 검색
+	 * @return
+	 * @throws SQLException 
+	 */
+	List<String> selectCategory() throws SQLException;
 	
 	/**
 	 * 식재료 등록(관리자용)
 	 * @param productDTO
 	 * @return
+	 * @throws SQLException 
 	 */
-	int insertProduct(ProductDTO productDTO);
+	int insertProduct(ProductDTO productDTO) throws SQLException;
 	
 	/**
 	 * 식재료 정보 수정(관리자용)
 	 * @param productDTO
 	 * @return
+	 * @throws SQLException 
 	 */
-	int updateProduct(ProductDTO productDTO);
+	int updateProduct(ProductDTO productDTO) throws SQLException;
 	
 	/**
 	 * 식재료 삭제(관리자용)
 	 * @param productId
 	 * @return
+	 * @throws SQLException 
 	 */
-	int deleteProduct(int productId);
+	int deleteProduct(long productId) throws SQLException;
+	
+	
 	
 }

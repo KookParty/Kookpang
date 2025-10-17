@@ -9,7 +9,7 @@
 					<nav class="nav">
 						<a class="active" href="${path}/index.jsp">홈</a>
 						<a href="${path}/recipes/recipes.jsp">레시피</a>
-						<a href="${path}/orders/ingredients.jsp">식재료</a>
+						<a href="${path}/front?key=product&methodName=ingredients">식재료</a>
 						<a href="${path}/boards/board.jsp">자유게시판</a>
 					</nav>
 				</div>

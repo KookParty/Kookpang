@@ -7,7 +7,7 @@ public class CartDTO {
 	private long userId;
 	private long productId;
 	private int count;
-	private LocalDateTime createdAt;
+	private String createdAt;
 
 	public CartDTO() {
 
@@ -22,7 +22,7 @@ public class CartDTO {
 	 * @param count
 	 * @param createdAt
 	 */
-	public CartDTO(long cartId, long userId, long productId, int count, LocalDateTime createdAt) {
+	public CartDTO(long cartId, long userId, long productId, int count, String createdAt) {
 		this.cartId = cartId;
 		this.userId = userId;
 		this.productId = productId;
@@ -87,11 +87,11 @@ public class CartDTO {
 		this.count = count;
 	}
 
-	public LocalDateTime getCreatedAt() {
+	public String getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDateTime createdAt) {
+	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
 	}
 

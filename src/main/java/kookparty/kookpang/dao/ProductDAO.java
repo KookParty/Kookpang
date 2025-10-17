@@ -8,11 +8,13 @@ import kookparty.kookpang.dto.ProductDTO;
 public interface ProductDAO {
 	List<ProductDTO> selectAll() throws SQLException;
 	
-	List<ProductDTO> selectByOptions(String word, String category, String order);
+	List<ProductDTO> selectByOptions(String word, String category, String order) throws SQLException;
 	
-	int insertProduct(ProductDTO productDTO);
+	List<String> selectCategory() throws SQLException;
 	
-	int updateProduct(ProductDTO productDTO);
+	int insertProduct(ProductDTO productDTO) throws SQLException;
 	
-	int deleteProduct(int productId);
+	int updateProduct(ProductDTO productDTO) throws SQLException;
+	
+	int deleteProduct(long productId) throws SQLException;
 }

@@ -20,29 +20,38 @@ public class ProductServiceImpl implements ProductService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	@Override
-	public List<ProductDTO> selectByOptions(String word, String category, String order) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ProductDTO> selectByOptions(String word, String category, String order) throws SQLException {
+		List<ProductDTO> productList = productDAO.selectByOptions(word, category, order);
+		return productList;
+	}
+	
+	@Override
+	public List<String> selectCategory() throws SQLException{
+		List<String> categoryList = productDAO.selectCategory();
+		return categoryList;
 	}
 
 	@Override
-	public int insertProduct(ProductDTO productDTO) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int insertProduct(ProductDTO productDTO) throws SQLException{
+		int result = productDAO.insertProduct(productDTO);
+		return result;
 	}
 
 	@Override
-	public int updateProduct(ProductDTO productDTO) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int updateProduct(ProductDTO productDTO) throws SQLException{
+		int result = productDAO.insertProduct(productDTO);
+		return result;
 	}
 
 	@Override
-	public int deleteProduct(int productId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int deleteProduct(long productId) throws SQLException{
+		int result = productDAO.deleteProduct(productId);
+		return result;
 	}
 
+	
+	
+	
 }

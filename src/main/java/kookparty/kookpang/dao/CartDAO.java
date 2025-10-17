@@ -1,0 +1,42 @@
+package kookparty.kookpang.dao;
+
+import java.util.List;
+
+import kookparty.kookpang.dto.CartDTO;
+
+public interface CartDAO {
+	/**
+	 * userId로 user의 장바구니 목록 불러오기
+	 * @param userId
+	 * @return
+	 */
+	List<CartDTO> selectByUserId(long userId);
+	
+	/**
+	 * 장바구니에 product 담기
+	 * @param cartDTO
+	 * @return
+	 */
+	int insertCart(CartDTO cartDTO);
+	
+	/**
+	 * 장바구니 목록 1개 삭제
+	 * @param cartId
+	 * @return
+	 */
+	int deleteCartByCardId(long cartId);
+	
+	/**
+	 * 유저의 장바구니 목록 전체 삭제
+	 * @param userId
+	 * @return
+	 */
+	int deleteCartByUserId(long userId);
+	
+	/**
+	 * 장바구니 물품 수량 수정
+	 * @param cartDTO
+	 * @return
+	 */
+	int updateCartCount(CartDTO cartDTO);
+}
