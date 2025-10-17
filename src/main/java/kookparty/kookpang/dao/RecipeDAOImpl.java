@@ -40,9 +40,11 @@ public class RecipeDAOImpl implements RecipeDAO {
 		
 		try (Connection con = DbUtil.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setString(1, recipDTO.getTitle());
-			ps.setString(2, recipDTO.getDescription());
-			ps.setInt(3, recipDTO.getCookingTime());
+			ps.setLong(1, recipDTO.getUserId());
+			ps.setString(2, recipDTO.getTitle());
+			ps.setString(3, recipDTO.getDescription());
+			ps.setString(4, recipDTO.getWay());
+			ps.setString(5, recipDTO.getCategory());
 			
 			result = ps.executeUpdate();
 		}
