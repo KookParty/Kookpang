@@ -1,16 +1,25 @@
 package kookparty.kookpang.dto;
 
-import kookparty.kookpang.common.Difficulty;
+import com.google.gson.annotations.SerializedName;
+
 import kookparty.kookpang.common.RecipeType;
 
+/**
+ * 레시피의 정보를 저장하는 DTO
+ * API로부터 정보를 가져올 때 JSON 키 이름과 멤버필드 이름 매핑을 위해 @SerializedName 사용
+ */
 public class RecipeDTO {
 	private long recipeId;
 	private long userId;
+	@SerializedName("RCP_NM")
 	private String title;
 	private String description;
+	@SerializedName("ATT_FILE_NO_MAIN")
 	private String thumbnailUrl;
 	private RecipeType recipeType;
+	@SerializedName("RCP_WAY2")
 	private String way; // 조리 방법
+	@SerializedName("RCP_PAT2")
 	private String category; // 요리 종류
 	private long parentRecipeId;
 	private String createdAt;
