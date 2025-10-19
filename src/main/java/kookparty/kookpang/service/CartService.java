@@ -1,23 +1,27 @@
 package kookparty.kookpang.service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import kookparty.kookpang.dto.CartDTO;
+import kookparty.kookpang.dto.ResponseCartDTO;
 
 public interface CartService {
 	/**
 	 * userId로 user의 장바구니 목록 불러오기
 	 * @param userId
 	 * @return
+	 * @throws SQLException 
 	 */
-	List<CartDTO> selectByUserId(long userId);
+	List<ResponseCartDTO> selectByUserId(long userId) throws SQLException;
 	
 	/**
 	 * 장바구니에 product 담기
 	 * @param cartDTO
 	 * @return
+	 * @throws SQLException 
 	 */
-	int insertCart(CartDTO cartDTO);
+	int insertCart(CartDTO cartDTO) throws SQLException;
 	
 	/**
 	 * 장바구니 목록 1개 삭제

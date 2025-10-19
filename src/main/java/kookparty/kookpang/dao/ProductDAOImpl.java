@@ -15,7 +15,7 @@ import kookparty.kookpang.util.DbUtil;
 
 public class ProductDAOImpl implements ProductDAO {
 	private Properties proFile = new Properties();
-	
+
 	public ProductDAOImpl() {
 		try {
 			InputStream is = getClass().getClassLoader().getResourceAsStream("dbQuery.properties");
@@ -26,38 +26,33 @@ public class ProductDAOImpl implements ProductDAO {
 	}
 
 	@Override
-	public List<ProductDTO> selectAll() throws SQLException{
+	public List<ProductDTO> selectAll() throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		List<ProductDTO> productList = new ArrayList<ProductDTO>();
 		String sql = proFile.getProperty("product.selectAll");
-		
+
 		try {
 			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
 			rs = ps.executeQuery();
-			while(rs.next()) {
-				ProductDTO productDTO = new ProductDTO(rs.getInt("product_id"),
-						rs.getString("name"),
-						rs.getInt("price"),
-						rs.getString("description"),
-						rs.getString("category"),
-						rs.getString("brand"),
-						rs.getString("image_url"),
-						rs.getString("created_at"));
+			while (rs.next()) {
+				ProductDTO productDTO = new ProductDTO(rs.getInt("product_id"), rs.getString("name"),
+						rs.getInt("price"), rs.getString("description"), rs.getString("category"),
+						rs.getString("brand"), rs.getString("image_url"), rs.getString("created_at"));
 				productList.add(productDTO);
 			}
-			
+
 		} finally {
 			DbUtil.dbClose(con, ps, rs);
 		}
-		
+
 		return productList;
 	}
 
 	@Override
-	public List<ProductDTO> selectByOptions(String word, String category, String order) throws SQLException{
+	public List<ProductDTO> selectByOptions(String word, String category, String order) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -67,28 +62,23 @@ public class ProductDAOImpl implements ProductDAO {
 		try {
 			con = DbUtil.getConnection();
 			String orderBy = "desc".equals(order) ? "desc" : "asc";
-			if(category == null || category.isEmpty()) {
+			if (category == null || category.isEmpty()) {
 				preparedSql = proFile.getProperty("product.selectByOptions2");
 				sql = preparedSql + " " + orderBy;
 				ps = con.prepareStatement(sql);
-				ps.setString(1, "%"+word+"%");
-			}else {
+				ps.setString(1, "%" + word + "%");
+			} else {
 				preparedSql = proFile.getProperty("product.selectByOptions1");
 				sql = preparedSql + " " + orderBy;
 				ps = con.prepareStatement(sql);
 				ps.setString(1, category);
-				ps.setString(2, "%"+word+"%");	
+				ps.setString(2, "%" + word + "%");
 			}
 			rs = ps.executeQuery();
-			while(rs.next()) {
-				ProductDTO productDTO = new ProductDTO(rs.getInt("product_id"),
-						rs.getString("name"),
-						rs.getInt("price"),
-						rs.getString("description"),
-						rs.getString("category"),
-						rs.getString("brand"),
-						rs.getString("image_url"),
-						rs.getString("created_at"));
+			while (rs.next()) {
+				ProductDTO productDTO = new ProductDTO(rs.getInt("product_id"), rs.getString("name"),
+						rs.getInt("price"), rs.getString("description"), rs.getString("category"),
+						rs.getString("brand"), rs.getString("image_url"), rs.getString("created_at"));
 				productList.add(productDTO);
 			}
 		} finally {
@@ -96,7 +86,7 @@ public class ProductDAOImpl implements ProductDAO {
 		}
 		return productList;
 	}
-	
+
 	@Override
 	public List<String> selectCategory() throws SQLException {
 		Connection con = null;
@@ -104,28 +94,53 @@ public class ProductDAOImpl implements ProductDAO {
 		ResultSet rs = null;
 		List<String> categoryList = new ArrayList<String>();
 		String sql = proFile.getProperty("product.selectCategory");
-		
+
 		try {
 			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
 			rs = ps.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				categoryList.add(rs.getString("category"));
 			}
 		} finally {
 			DbUtil.dbClose(con, ps, rs);
-		} 
-		
+		}
+
 		return categoryList;
 	}
-	
+
 	@Override
-	public int insertProduct(ProductDTO productDTO) throws SQLException{
+	public ProductDTO selectByProductId(long productId) throws SQLException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ProductDTO productDTO = null;
+		String sql = proFile.getProperty("product.selectByProductId");
+
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setLong(1, productId);
+			rs = ps.executeQuery();
+			if(rs.next()) {
+				productDTO = new ProductDTO(rs.getInt("product_id"), rs.getString("name"),
+						rs.getInt("price"), rs.getString("description"), rs.getString("category"),
+						rs.getString("brand"), rs.getString("image_url"), rs.getString("created_at"));
+			}
+		} finally {
+			DbUtil.dbClose(con, ps, rs);
+		}
+
+		return productDTO;
+	}
+
+	@Override
+	public int insertProduct(ProductDTO productDTO) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		int result = 0;
 		String sql = proFile.getProperty("product.insertProduct");
-		
+
 		try {
 			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
@@ -143,7 +158,7 @@ public class ProductDAOImpl implements ProductDAO {
 	}
 
 	@Override
-	public int updateProduct(ProductDTO productDTO) throws SQLException{
+	public int updateProduct(ProductDTO productDTO) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		int result = 0;
@@ -166,7 +181,7 @@ public class ProductDAOImpl implements ProductDAO {
 	}
 
 	@Override
-	public int deleteProduct(long productId) throws SQLException{
+	public int deleteProduct(long productId) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		int result = 0;
@@ -181,7 +196,5 @@ public class ProductDAOImpl implements ProductDAO {
 		}
 		return result;
 	}
-
-	
 
 }

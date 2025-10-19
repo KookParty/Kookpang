@@ -8,7 +8,8 @@ public class CartDTO {
 	private long productId;
 	private int count;
 	private String createdAt;
-
+	
+	private ProductDTO productDTO;
 	public CartDTO() {
 
 	}
@@ -93,6 +94,15 @@ public class CartDTO {
 
 	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
+	}
+	
+	
+	public ProductDTO getProductDTO() {
+		return productDTO;
+	}
+
+	public void setProductDTO(ProductDTO productDTO) {
+		this.productDTO = productDTO;
 	}
 
 	@Override

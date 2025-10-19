@@ -1,5 +1,6 @@
 package kookparty.kookpang.dao;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import kookparty.kookpang.dto.CartDTO;
@@ -9,15 +10,17 @@ public interface CartDAO {
 	 * userId로 user의 장바구니 목록 불러오기
 	 * @param userId
 	 * @return
+	 * @throws SQLException 
 	 */
-	List<CartDTO> selectByUserId(long userId);
+	List<CartDTO> selectByUserId(long userId) throws SQLException;
 	
 	/**
 	 * 장바구니에 product 담기
 	 * @param cartDTO
 	 * @return
+	 * @throws SQLException 
 	 */
-	int insertCart(CartDTO cartDTO);
+	int insertCart(CartDTO cartDTO) throws SQLException;
 	
 	/**
 	 * 장바구니 목록 1개 삭제
