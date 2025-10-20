@@ -210,6 +210,23 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
     <script>
+      const insertOrder = async function () {
+        let totalPrice = 0; //구해야함
+
+        fetch(CONTEXT_PATH + "/ajax", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          },
+          body: JSON.stringify({
+            key: "order",
+            methodName: "insertOrder",
+            totalPrice: totalPrice,
+            shippingAddress: "", //구해야함
+          }),
+        });
+      };
+
       document.getElementById("ov-pay").addEventListener("click", () => {
         //결제 api 호출(ajax)
         //결제 성공시 주문 pk받아서 다음 페이지로
