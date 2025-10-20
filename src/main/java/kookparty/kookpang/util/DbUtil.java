@@ -22,7 +22,7 @@ public class DbUtil {
 	static {
 		try {
 		  Context initContext = new InitialContext();
-		  ds = (DataSource)initContext.lookup("java:/comp/env/jdbc/mySql");
+		  ds = (DataSource)initContext.lookup("java:comp/env/jdbc/mySql");
 		  
 		} catch (Exception e) {
 			e.printStackTrace();
