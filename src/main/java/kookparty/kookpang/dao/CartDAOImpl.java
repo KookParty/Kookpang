@@ -155,11 +155,37 @@ public class CartDAOImpl implements CartDAO {
 			if(rs.next()) {
 				result = rs.getInt(1);
 			}
-			System.out.println(result);
 		} finally {
 			DbUtil.dbClose(con, ps, rs);
 		}
 		return result;
+	}
+	
+	public CartDTO selectByUserIdAndProductId(long userId, long productId) throws SQLException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		CartDTO cart = null;
+		String sql = proFile.getProperty("cart.selectByUserIdAndProductId");
+		
+		try {
+			con=DbUtil.getConnection();
+			ps=con.prepareStatement(sql);
+			ps.setLong(1, userId);
+			ps.setLong(2, productId);
+			rs=ps.executeQuery();
+			if(rs.next()) {
+				cart = new CartDTO(rs.getLong("cart_id"),
+						rs.getLong("user_id"),
+						rs.getLong("product_id"),
+						rs.getInt("count"),
+						rs.getString("created_at"));
+			}
+		} finally {
+			DbUtil.dbClose(con, ps, rs);
+		}
+		
+		return cart;
 	}
 
 }

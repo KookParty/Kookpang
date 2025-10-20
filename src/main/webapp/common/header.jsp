@@ -28,7 +28,10 @@
   const getCartHeader = async function () {
     const res = await fetch("${path}/ajax", {
       method: "POST",
-      body: new URLSearchParams({ key: "cart", methodName: "countCart" }),
+      body: new URLSearchParams({
+        key: "cart",
+        methodName: "countCart",
+      }),
     });
     if (!res.ok) {
       console.error("Failed to fetch cart header:", res.status, res.statusText);
