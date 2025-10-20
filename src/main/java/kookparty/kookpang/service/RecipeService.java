@@ -13,6 +13,11 @@ public interface RecipeService {
 	List<RecipeDTO> selectAll() throws Exception;
 	
 	/**
+	 * 레시피 상세보기
+	 */
+	RecipeDTO selectById(long recipeId) throws Exception;
+	
+	/**
 	 * 레시피 등록
 	 */
 	void insertRecipe(RecipeDTO recipeDTO) throws Exception;

@@ -48,9 +48,8 @@ public class RecipeDTO {
 		this.parentRecipeId = parentRecipeId;
 	}
 
-
 	/**
-	 * 모든 멤버필드 들어간 생성자
+	 * ingredients와 steps 없는 생성자
 	 */
 	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl,
 			RecipeType recipeType, String way, String category, long parentRecipeId, String createdAt) {
@@ -66,6 +65,26 @@ public class RecipeDTO {
 		this.createdAt = createdAt;
 	}
 	
+	/**
+	 * 모든 멤버필드 들어간 생성자
+	 */
+	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl,
+			RecipeType recipeType, String way, String category, long parentRecipeId, String createdAt,
+			List<IngredientDTO> ingredients, List<StepDTO> steps) {
+		super();
+		this.recipeId = recipeId;
+		this.userId = userId;
+		this.title = title;
+		this.description = description;
+		this.thumbnailUrl = thumbnailUrl;
+		this.recipeType = recipeType;
+		this.way = way;
+		this.category = category;
+		this.parentRecipeId = parentRecipeId;
+		this.createdAt = createdAt;
+		this.ingredients = ingredients;
+		this.steps = steps;
+	}
 
 	public long getRecipeId() {
 		return recipeId;

@@ -7,6 +7,12 @@ import java.util.List;
 import kookparty.kookpang.dto.StepDTO;
 
 public interface StepDAO {
+	
+	/**
+	 * 조리법 조회
+	 */
+
+	List<StepDTO> selectByRecipeId(Connection con, long recipeId) throws SQLException;
 
 	/**
 	 * 조리법 등록

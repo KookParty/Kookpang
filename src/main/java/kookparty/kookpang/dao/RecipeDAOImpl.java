@@ -44,10 +44,45 @@ public class RecipeDAOImpl implements RecipeDAO {
 		
 		try (Connection con = DbUtil.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql)) {
-
+			
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
+					long recipeId = rs.getLong(1);
 					list.add(new RecipeDTO(
+							recipeId, 
+							rs.getLong(2),
+							rs.getString(3),
+							rs.getString(4),
+							rs.getString(5),
+							rs.getString(6).toLowerCase().equals("base") ? 
+									RecipeType.BASE : RecipeType.VARIANT,
+							rs.getString(7),
+							rs.getString(8),
+							rs.getInt(9),
+							rs.getString(10),
+							ingredientDAO.selectByRecipeId(con, recipeId),
+							stepDAO.selectByRecipeId(con, recipeId)
+							));
+					
+				}
+			}
+		}
+		
+		return list;
+	}
+	
+	@Override
+	public RecipeDTO selectById(long recipeId) throws SQLException {
+		RecipeDTO recipeDTO = null;
+		String sql = proFile.getProperty("recipe.selectById");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, recipeId);
+			
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					recipeDTO = new RecipeDTO(
 							rs.getLong(1), 
 							rs.getLong(2),
 							rs.getString(3),
@@ -58,13 +93,16 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getString(7),
 							rs.getString(8),
 							rs.getInt(9),
-							rs.getString(10)
-							));
+							rs.getString(10),
+							ingredientDAO.selectByRecipeId(con, recipeId),
+							stepDAO.selectByRecipeId(con, recipeId)
+							);
+					
 				}
 			}
 		}
 		
-		return list;
+		return recipeDTO;
 	}
 	
 	@Override

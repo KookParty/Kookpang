@@ -110,7 +110,7 @@ prefix="c" %>
                 <p class="small">${"${recipe.RCP_NA_TIP}"}</p>
                 <div class="meta">${"${recipe.RCP_PAT2}"} · ${"${recipe.RCP_WAY2}"} · ❤ 좋아요수TODO</div>
                 <div style="display: flex; gap: 8px; align-items: center">
-                  <a class="btn dark full" href="recipe-detail.jsp?id=${"${recipe.recipeId}"}">레시피 보기</a>
+                  <a class="btn dark full" href='${path}/front?key=recipe&methodName=recipeDetail&recipeId=${"${recipe.recipeId}"}'>레시피 보기</a>
                   <button class="btn small" data-like="${"${recipe.recipeId}"}">♡</button>
                 </div>
               </div>

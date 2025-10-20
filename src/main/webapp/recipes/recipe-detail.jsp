@@ -216,6 +216,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     </style>
     <script type="text/javascript">
       const CONTEXT_PATH = "${pageContext.request.contextPath}";
+      console.log(${recipe});
     </script>
     <script src="${path}/js/config.js"></script>
   </head>
@@ -226,13 +227,13 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <!-- header끝 -->
     <div class="wrap">
       <div style="margin-bottom: 10px">
-        <a class="ghost-link muted2" href="${path}/recipes/recipes.jsp">← 목록으로</a>
+        <a class="ghost-link muted2" href="${path}/front?key=recipe&methodName=recipes">← 목록으로</a>
       </div>
       <div class="hero">
-        <img src="${path}/assets/img/kimchi.jpg" alt="김치찌개" />
+        <img src="${recipe.thumbnailUrl}" alt="${recipe.title}" />
         <div style="flex: 1">
-          <div class="title">김치찌개</div>
-          <div class="meta"><span>⏱ 30분</span><span>👥 4인분</span><span>❤️ 1,247</span></div>
+          <div class="title">${recipe.title}</div>
+          <div class="meta"><span>${recipe.category}</span><span>${recipe.way}</span><span>❤️ 좋아요수TODO</span></div>
           <div class="row" style="gap: 8px; margin-top: 8px">
             <button class="btn" id="likeBtn" style="padding: 8px 12px">♡ 좋아요</button>
             <button class="btn" id="variantBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">

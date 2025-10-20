@@ -81,12 +81,11 @@ public class RecipeApiClient {
 					}
 					
 					// 재료 수량 파싱 "," 또는 줄바꿈으로 나누기
-					items = items.replaceAll("다진 ", "다진");
 					String[] itemArr = items.split(",\\s|\\n");
 					for (String item : itemArr) {
 						if (item.isEmpty()) continue;
 						
-						String[] detail = item.split(" |\\(|\\)");	// 재료 (수량) 형식 (재료에 띄어쓰기 포함 미포함 둘 다 존재)
+						String[] detail = item.split("\\(|\\)");	// 재료 (수량) 형식 (재료에 띄어쓰기 포함 미포함 둘 다 존재)
 						if (detail.length <= 1) continue;	// 수량이 없는 경우: 재료로 언급X
 						IngredientDTO ingredientDTO = new IngredientDTO(recipeDTO.getRecipeId(), detail[0], detail[1]);
 						//ingredientDTO.setProductId(0); // 식재료 id 매핑 나중에

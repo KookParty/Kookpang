@@ -9,8 +9,6 @@ import kookparty.kookpang.exception.DBAccessException;
 
 public class RecipeServiceImpl implements RecipeService {
 	private RecipeDAO recipeDAO = RecipeDAOImpl.getInstance();
-	
-	// singleton
 	private static RecipeService instance = new RecipeServiceImpl();
 	
 	private RecipeServiceImpl() {}
@@ -23,6 +21,12 @@ public class RecipeServiceImpl implements RecipeService {
 	public List<RecipeDTO> selectAll() throws Exception {
 		List<RecipeDTO> list = recipeDAO.selectAll();
 		return list;
+	}
+	
+	@Override
+	public RecipeDTO selectById(long recipeId) throws Exception {
+		RecipeDTO recipeDTO = recipeDAO.selectById(recipeId);
+		return recipeDTO;
 	}
 	
 	@Override

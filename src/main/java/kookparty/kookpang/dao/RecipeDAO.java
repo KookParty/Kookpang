@@ -12,6 +12,8 @@ public interface RecipeDAO {
 	 */
 	List<RecipeDTO> selectAll() throws SQLException;
 	
+	RecipeDTO selectById(long recipeId) throws SQLException;
+	
 	/**
 	 * 레시피 등록
 	 */
