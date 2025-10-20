@@ -63,7 +63,7 @@ document.getElementById('doLogin').addEventListener('click', async (e) => {
       body: new URLSearchParams({ email, password: pass }).toString()
     });
 
-    const text = await r.text();
+    const text = await r.text( );
     const j = JSON.parse(text);
     if (!r.ok || !j.ok) throw new Error(j.msg || '로그인 실패');
 
