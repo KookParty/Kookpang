@@ -26,7 +26,7 @@ public class AjaxDispatcherServlet extends HttpServlet {
  	@Override
 	public void init(ServletConfig config) throws ServletException {
 		ServletContext application = config.getServletContext();
-		map = (Map<String, Controller>) application.getAttribute("ajaxMap");
+		map = (Map<String, Controller>) application.getAttribute("map");
 	}
    
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

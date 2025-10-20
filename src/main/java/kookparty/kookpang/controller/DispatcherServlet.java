@@ -41,7 +41,7 @@ public class DispatcherServlet extends HttpServlet {
 		}
 		
 		if (methodName==null || methodName.equals("")) {
-			methodName="select";
+			methodName="selectAll";
 		}
 		
 		try {
