@@ -14,9 +14,10 @@ import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.util.DbUtil;
 
 public class RecipeDAOImpl implements RecipeDAO {
-	private Properties proFile = new Properties();
+	private IngredientDAO ingredientDAO = IngredientDAOImpl.getInstance();
+	private StepDAO stepDAO = StepDAOImpl.getInstance();
 	
-	// singleton
+	private Properties proFile = new Properties();
 	private static RecipeDAO instance = new RecipeDAOImpl();
 	
 	private RecipeDAOImpl() {
@@ -72,7 +73,10 @@ public class RecipeDAOImpl implements RecipeDAO {
 		String sql = proFile.getProperty("recipe.insertRecipe");
 		
 		try (Connection con = DbUtil.getConnection();
-				PreparedStatement ps = con.prepareStatement(sql)) {
+				PreparedStatement ps = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+			//RETURN_GENERATED_KEYS 옵션을 사용하여 AUTO_INCREMENT 값을 가져온다
+			con.setAutoCommit(false);	// 자동 커밋 해지
+			
 			ps.setLong(1, recipeDTO.getUserId());
 			ps.setString(2, recipeDTO.getTitle());
 			ps.setString(3, recipeDTO.getDescription());
@@ -81,6 +85,39 @@ public class RecipeDAOImpl implements RecipeDAO {
 			ps.setString(6, recipeDTO.getCategory());
 
 			result = ps.executeUpdate();
+			
+			if(result == 0) {
+				con.rollback();
+				throw new SQLException("등록 실패...");
+			}
+			else {
+				try (ResultSet rs = ps.getGeneratedKeys()) {	//ps.getGeneratedKeys()를 사용해 recipe_id 값을 획득한다.
+					if(rs.next()) {
+						recipeDTO.setRecipeId(rs.getLong(1));
+					} else {
+						con.rollback();
+						throw new SQLException("recipe_id 생성 실패");
+					}
+				}
+				
+				int[] results = ingredientDAO.insertIngredients(con, recipeDTO.getRecipeId(), recipeDTO.getIngredients());
+				for (int re : results) {
+					if (re != 1) {
+						con.rollback();
+						throw new SQLException("레시피-재료 등록 실패");
+					}
+				}
+				
+				results = stepDAO.insertSteps(con, recipeDTO.getRecipeId(), recipeDTO.getSteps());
+				for (int re : results) {
+					if (re != 1) {
+						con.rollback();
+						throw new SQLException("레시피-조리법 등록 실패");
+					}
+				}
+				
+				con.commit();
+			}
 		}
 		
 		return result;

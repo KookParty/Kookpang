@@ -22,7 +22,7 @@ public class RecipeDataInitListener implements ServletContextListener {
     	try {
     		RecipeService service = RecipeServiceImpl.getInstance();
     		
-			if (service.selectAll() != null) {
+			if (service.selectAll().size() != 0) {
 				// recipes 테이블에 레코드가 있을 시
 				System.out.println("recipes 데이터 확인됨");
 				System.out.println("recipes size = " + service.selectAll().size());
@@ -32,14 +32,8 @@ public class RecipeDataInitListener implements ServletContextListener {
 				List<RecipeDTO> recipes = RecipeApiClient.fetchRecipes();
 				
 				for (RecipeDTO recipe : recipes) {
-					System.out.println(recipe);
+					//System.out.println(recipe);
 					service.insertRecipe(recipe);
-					
-					// TODO 재료ingredients 저장
-					
-					
-					// TODO 조리법steps 저장
-					 
 				}
 				
 				System.out.println("레시피 데이터 불러오기 완료");

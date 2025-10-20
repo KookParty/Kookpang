@@ -1,5 +1,7 @@
 package kookparty.kookpang.dto;
 
+import java.util.List;
+
 import com.google.gson.annotations.SerializedName;
 
 import kookparty.kookpang.common.RecipeType;
@@ -13,6 +15,7 @@ public class RecipeDTO {
 	private long userId;
 	@SerializedName("RCP_NM")
 	private String title;
+	@SerializedName("RCP_NA_TIP")
 	private String description;
 	@SerializedName("ATT_FILE_NO_MAIN")
 	private String thumbnailUrl;
@@ -23,6 +26,9 @@ public class RecipeDTO {
 	private String category; // 요리 종류
 	private long parentRecipeId;
 	private String createdAt;
+	
+	private List<IngredientDTO> ingredients;
+	private List<StepDTO> steps;
 	
 	public RecipeDTO() {}
 	
@@ -41,6 +47,7 @@ public class RecipeDTO {
 		this.category = category;
 		this.parentRecipeId = parentRecipeId;
 	}
+
 
 	/**
 	 * 모든 멤버필드 들어간 생성자
@@ -139,6 +146,22 @@ public class RecipeDTO {
 
 	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
+	}
+	
+	public List<IngredientDTO> getIngredients() {
+		return ingredients;
+	}
+	
+	public void setIngredients(List<IngredientDTO> ingredients) {
+		this.ingredients = ingredients;
+	}
+	
+	public List<StepDTO> getSteps() {
+		return steps;
+	}
+	
+	public void setSteps(List<StepDTO> steps) {
+		this.steps = steps;
 	}
 
 	@Override
