@@ -84,6 +84,9 @@ public class UserController implements Controller {
     public Object me(HttpServletRequest req, HttpServletResponse resp) {
         HttpSession s = req.getSession(false);
         Object user = (s == null) ? null : s.getAttribute("loginUser");
+        if(user == null){
+            return Map.of("ok", false, "msg", "로그인 상태가 아닙니다.");
+        }
         return Map.of("ok", true, "user", user);
     }
 }
