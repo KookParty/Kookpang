@@ -134,19 +134,20 @@
   }
 
   // 로그아웃
-  function bindLogout() {
-    const $logout = document.getElementById('js-logout-btn');
-    if (!$logout) return;
-    $logout.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-  
-        await callAjax({ key: 'user', methodName: 'logout' });
-      } catch (_) {}
-  
-      location.reload();
-    });
-  }
+function bindLogout() {
+  const $logout = document.getElementById('js-logout-btn');
+  if (!$logout) return;
+  $logout.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try {
+      const res = await callAjax({ key: 'user', methodName: 'logout' });
+      alert(res.msg || '로그아웃되었습니다.');
+      location.reload(); 
+    } catch (err) {
+      alert(err.message || '로그아웃 중 오류가 발생했습니다.');
+    }
+  });
+}
 
   // 로그인하지 않은 상태에서 인증 필요한 버튼(data-need-auth)을 누르면 로그인 페이지로 이동
   function guardAuthLinks() {
