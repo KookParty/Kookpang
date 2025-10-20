@@ -34,7 +34,6 @@ public class StepDAOImpl implements StepDAO {
 		
 		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			for (int i = 0; i < steps.size(); i++) {
-				//System.out.println(steps.get(i).toString());
 				ps.setLong(1, recipeId);
 				ps.setInt(2, i);
 				ps.setString(3, steps.get(i).getDescription());

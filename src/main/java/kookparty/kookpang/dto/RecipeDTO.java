@@ -187,8 +187,13 @@ public class RecipeDTO {
 		builder.append(parentRecipeId);
 		builder.append(", createdAt=");
 		builder.append(createdAt);
-		builder.append("]");
+		builder.append("\ningredients=");
+		builder.append(ingredients);
+		builder.append("\nsteps=");
+		builder.append(steps);
+		builder.append("]\n");
 		return builder.toString();
 	}
+
 	
 }

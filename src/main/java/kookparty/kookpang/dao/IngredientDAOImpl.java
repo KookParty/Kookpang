@@ -34,7 +34,6 @@ public class IngredientDAOImpl implements IngredientDAO {
 		
 		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			for (IngredientDTO ingredientDTO : ingredients) {
-				//System.out.println(ingredientDTO);
 				ps.setLong(1, recipeId);
 				ps.setString(2, ingredientDTO.getName());
 				ps.setString(3, ingredientDTO.getQuantity());

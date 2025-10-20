@@ -81,6 +81,7 @@ public class RecipeApiClient {
 					}
 					
 					// 재료 수량 파싱 "," 또는 줄바꿈으로 나누기
+					items = items.replaceAll("다진 ", "다진");
 					String[] itemArr = items.split(",\\s|\\n");
 					for (String item : itemArr) {
 						if (item.isEmpty()) continue;
@@ -106,7 +107,7 @@ public class RecipeApiClient {
 				if (obj.has(manualKey)) {
 					String manual = obj.get(manualKey).getAsString();
 					String img = obj.get(imgKey).getAsString();
-					if (manual.isEmpty() && img.isEmpty()) break;	// 키에 해당하는 값이 없을 경우 = 조리법 끝남
+					if (manual.isEmpty() && img.isEmpty()) continue;	// API에 MANUAL이 01부터 시작하지 않는 경우 존재
 					manual = manual.replace("\n", " ");
 					steps.add(new StepDTO(manual, img));
 				}

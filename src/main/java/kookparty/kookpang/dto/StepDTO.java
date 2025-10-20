@@ -47,7 +47,7 @@ public class StepDTO {
 		builder.append(description);
 		builder.append(", imageUrl=");
 		builder.append(imageUrl);
-		builder.append("]");
+		builder.append("]\n");
 		return builder.toString();
 	}
 }

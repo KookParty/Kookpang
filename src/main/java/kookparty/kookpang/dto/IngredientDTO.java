@@ -92,7 +92,7 @@ public class IngredientDTO {
 		builder.append(name);
 		builder.append(", quantity=");
 		builder.append(quantity);
-		builder.append("]");
+		builder.append("]\n");
 		return builder.toString();
 	}
 }
