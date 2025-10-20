@@ -29,9 +29,6 @@ public class CartController implements Controller {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		for (ResponseCartDTO responseCartDTO : list) {
-			System.out.println(responseCartDTO);
-		}
 		return list;
 	}
 
@@ -46,13 +43,12 @@ public class CartController implements Controller {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return result;
 	}
 
 	public void insertCart(HttpServletRequest request, HttpServletResponse response) {
 		long productId = Long.parseLong(request.getParameter("productId"));
 		int count = Integer.parseInt(request.getParameter("count"));
-		System.out.println(productId + count);
 		HttpSession session = request.getSession();
 		session.getAttribute("users"); // 세션에서 userId가지고 올 예비용 메서드
 		long userId = 1;
@@ -70,7 +66,7 @@ public class CartController implements Controller {
 	}
 
 	public void deleteCartByCartId(HttpServletRequest request, HttpServletResponse response) {
-		long cartId = Long.parseLong(request.getParameter("cart_id"));
+		long cartId = Long.parseLong(request.getParameter("cartId"));
 		try {
 			int result = cartService.deleteCartByCartId(cartId);
 			if (result == 0) {// 실패시
@@ -101,10 +97,10 @@ public class CartController implements Controller {
 	}
 
 	public void updateCartCount(HttpServletRequest request, HttpServletResponse response) {
-		long cartId = Long.parseLong(request.getParameter("cart_id"));
-		int count = Integer.parseInt(request.getParameter("count"));
+		long productId = Long.parseLong(request.getParameter("cartId"));
+		int count = Integer.parseInt(request.getParameter("newCount"));
 		try {
-			int result = cartService.updateCartCount(new CartDTO(cartId, count));
+			int result = cartService.updateCartCount(new CartDTO(productId, count));
 			if (result == 0) {// 실패시
 
 			} else {// 성공시
@@ -114,5 +110,40 @@ public class CartController implements Controller {
 			e.printStackTrace();
 		}
 	}
+	
+	public void duplicatedCartCount(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		session.getAttribute("login");
+		long userId = 1;
+		long productId = Long.parseLong(request.getParameter("productId"));
+		int count = Integer.parseInt(request.getParameter("newCount"));
+		try {
+			int result = cartService.updateCartCount(userId, productId, count);
+			if (result == 0) {// 실패시
+
+			} else {// 성공시
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public CartDTO duplicateCheck(HttpServletRequest request, HttpServletResponse response) {
+		CartDTO cartDTO = null;
+		long productId = Long.parseLong(request.getParameter("productId"));
+		HttpSession session = request.getSession();
+		session.getAttribute("login");
+		long userId = 1;
+		try {
+			cartDTO = cartService.duplicateCheck(userId, productId);
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		return cartDTO;
+	}
+	
+	
 
 }

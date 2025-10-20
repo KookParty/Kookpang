@@ -47,5 +47,9 @@ public interface CartService {
 	 */
 	int updateCartCount(CartDTO cartDTO) throws SQLException;
 	
+	int updateCartCount(long userId, long productId, int count) throws SQLException;
+	
 	int countCart(long userId) throws SQLException;
+	
+	CartDTO duplicateCheck(long userId, long productId) throws SQLException;
 }

@@ -223,6 +223,14 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             methodName: "insertOrder",
             totalPrice: totalPrice,
             shippingAddress: "", //구해야함
+            itemlist: [
+              //구해야함
+              {
+                productId: 1,
+                quantity: 2,
+                price: 20000,
+              },
+            ],
           }),
         });
       };
