@@ -108,6 +108,7 @@ public class RecipeApiClient {
 					String img = obj.get(imgKey).getAsString();
 					if (manual.isEmpty() && img.isEmpty()) continue;	// API에 MANUAL이 01부터 시작하지 않는 경우 존재
 					manual = manual.replace("\n", " ");
+					manual = manual.replaceAll("^[0-9]+\\.\\s", "");
 					steps.add(new StepDTO(manual, img));
 				}
 			}
