@@ -40,26 +40,27 @@ const showCart = function (list) {
   });
 };
 
-  //ajax로 장바구니 데이터 가져오기
-  const getCart = async function () {
-    let list = [];
-    try {
-      const response = await fetch(conPath + "/ajax", {
-        method: "POST",
-        body: new URLSearchParams({
-          key: "cart",
-          methodName: "selectByUserId",
-        })
-      });
-      if (response.ok) {
-        list = await response.json();
-      }else {
-        console.error("Failed to fetch cart data:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching cart data:", error);
+//ajax로 장바구니 데이터 가져오기
+const getCart = async function () {
+  let list = [];
+  console.log("Fetching cart data...");
+  try {
+    const response = await fetch(conPath + "/ajax", {
+      method: "POST",
+      body: new URLSearchParams({
+        key: "cart",
+        methodName: "selectByUserId",
+      }),
+    });
+    if (response.ok) {
+      list = await response.json();
+    } else {
+      console.error("Failed to fetch cart data:", response.statusText);
     }
-  
+  } catch (error) {
+    console.error("Error fetching cart data:", error);
+  }
+
   // const list = [
   //   {
   //     id: 1,
@@ -80,4 +81,4 @@ const showCart = function (list) {
   // ];
   showCart(list);
   console.log(list);
-}
+};

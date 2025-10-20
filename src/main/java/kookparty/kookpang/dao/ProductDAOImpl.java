@@ -112,13 +112,24 @@ public class ProductDAOImpl implements ProductDAO {
 	@Override
 	public ProductDTO selectByProductId(long productId) throws SQLException {
 		Connection con = null;
+		ProductDTO productDTO = null;
+		try {
+			con = DbUtil.getConnection();
+			productDTO = selectByProductId(productId, con);
+		} finally {
+			DbUtil.dbClose(con, null);
+		}
+
+		return productDTO;
+	}
+	
+	@Override
+	public ProductDTO selectByProductId(long productId, Connection con) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		ProductDTO productDTO = null;
 		String sql = proFile.getProperty("product.selectByProductId");
-
 		try {
-			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
 			ps.setLong(1, productId);
 			rs = ps.executeQuery();
@@ -128,7 +139,7 @@ public class ProductDAOImpl implements ProductDAO {
 						rs.getString("brand"), rs.getString("image_url"), rs.getString("created_at"));
 			}
 		} finally {
-			DbUtil.dbClose(con, ps, rs);
+			DbUtil.dbClose(null, ps, rs);
 		}
 
 		return productDTO;

@@ -23,7 +23,8 @@ public class CartServiceImpl implements CartService {
 		for (CartDTO c : cartList) {
 			long productId = c.getProductId();
 			ProductDTO productDTO = productDAO.selectByProductId(productId);
-			ResponseCartDTO rcDto = new ResponseCartDTO(c.getCartId(), productDTO.getName(),
+			ResponseCartDTO rcDto = new ResponseCartDTO(c.getCartId(), productDTO.getProductId(),
+					productDTO.getName(),
 					productDTO.getPrice(), c.getCount(), productDTO.getImageUrl());
 			list.add(rcDto);
 		}
@@ -37,21 +38,27 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public int deleteCartByCardId(long cartId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int deleteCartByCartId(long cartId) throws SQLException{
+		int result = cartDAO.deleteCartByCartId(cartId);
+		return result;
 	}
 
 	@Override
-	public int deleteCartByUserId(long userId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int deleteCartByUserId(long userId) throws SQLException{
+		int result = cartDAO.deleteCartByUserId(userId);
+		return result;
 	}
 
 	@Override
-	public int updateCartCount(CartDTO cartDTO) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int updateCartCount(CartDTO cartDTO) throws SQLException {
+		int result = cartDAO.updateCartCount(cartDTO);
+		return result;
+	}
+
+	@Override
+	public int countCart(long userId) throws SQLException{
+		int result = cartDAO.countCart(userId);
+		return result;
 	}
 
 }

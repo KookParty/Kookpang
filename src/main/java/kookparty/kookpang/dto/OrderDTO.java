@@ -6,7 +6,7 @@ import java.util.List;
 public class OrderDTO {
 	private long orderId;
 	private long userId;
-	private LocalDateTime createdAt;
+	private String createdAt;
 	private int totalPrice;
 	private String shippingAddress;
 	private boolean status;
@@ -27,7 +27,7 @@ public class OrderDTO {
 	 * @param status
 	 * @param itemList
 	 */
-	public OrderDTO(long orderId, long userId, LocalDateTime createdAt, int totalPrice, String shippingAddress,
+	public OrderDTO(long orderId, long userId, String createdAt, int totalPrice, String shippingAddress,
 			boolean status, List<OrderItemDTO> itemList) {
 		super();
 		this.orderId = orderId;
@@ -48,12 +48,11 @@ public class OrderDTO {
 	 * @param status
 	 * @param itemList
 	 */
-	public OrderDTO(long userId, int totalPrice, String shippingAddress, boolean status, List<OrderItemDTO> itemList) {
+	public OrderDTO(long userId, int totalPrice, String shippingAddress, List<OrderItemDTO> itemList) {
 		super();
 		this.userId = userId;
 		this.totalPrice = totalPrice;
 		this.shippingAddress = shippingAddress;
-		this.status = status;
 		this.itemList = itemList;
 	}
 
@@ -73,11 +72,11 @@ public class OrderDTO {
 		this.userId = userId;
 	}
 
-	public LocalDateTime getCreatedAt() {
+	public String getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDateTime createdAt) {
+	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
 	}
 

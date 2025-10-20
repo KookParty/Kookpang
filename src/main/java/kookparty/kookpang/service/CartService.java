@@ -27,20 +27,25 @@ public interface CartService {
 	 * 장바구니 목록 1개 삭제
 	 * @param cartId
 	 * @return
+	 * @throws SQLException 
 	 */
-	int deleteCartByCardId(long cartId);
+	int deleteCartByCartId(long cartId) throws SQLException;
 	
 	/**
 	 * 유저의 장바구니 목록 전체 삭제
 	 * @param userId
 	 * @return
+	 * @throws SQLException 
 	 */
-	int deleteCartByUserId(long userId);
+	int deleteCartByUserId(long userId) throws SQLException;
 	
 	/**
 	 * 장바구니 물품 수량 수정
 	 * @param cartDTO
 	 * @return
+	 * @throws SQLException 
 	 */
-	int updateCartCount(CartDTO cartDTO);
+	int updateCartCount(CartDTO cartDTO) throws SQLException;
+	
+	int countCart(long userId) throws SQLException;
 }

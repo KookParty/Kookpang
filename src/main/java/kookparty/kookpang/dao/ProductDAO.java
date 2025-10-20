@@ -1,5 +1,6 @@
 package kookparty.kookpang.dao;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface ProductDAO {
 	int updateProduct(ProductDTO productDTO) throws SQLException;
 	
 	int deleteProduct(long productId) throws SQLException;
+
+	ProductDTO selectByProductId(long productId, Connection con) throws SQLException;
 }
