@@ -9,7 +9,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       </div>
       <nav class="nav">
         <a class="active" href="${path}/index.jsp">홈</a>
-        <a href="${path}/recipes/recipes.jsp">레시피</a>
+        <a href="${path}/front?key=recipe&methodName=recipes">레시피</a>
         <a href="${path}/front?key=product&methodName=ingredients">식재료</a>
         <a href="${path}/boards/board.jsp">자유게시판</a>
       </nav>
