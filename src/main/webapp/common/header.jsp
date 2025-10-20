@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+=======
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
+uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+>>>>>>> origin/dev
 <header class="header">
   <div class="container bar wide">
     <div style="display: flex; align-items: center">
@@ -23,6 +28,7 @@
     </div>
   </div>
 </header>
+<<<<<<< HEAD
 
 <script>
   const getCartHeader = async function () {
@@ -66,11 +72,56 @@
   };
   (function () {
     ensureBadge();
+=======
+<script>
+  (function () {
+    const getCartHeader = async function () {
+      const res = await fetch("${path}/ajax", {
+        method: "POST",
+        body: new URLSearchParams({
+          key: "cart",
+          methodName: "countCart",
+        }),
+      });
+      if (!res.ok) {
+        console.error("Failed to fetch cart header:", res.status, res.statusText);
+        return 0;
+      }
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        return Number(text) || 0;
+      }
+    };
+    const cartCount = async function () {
+      const data = await getCartHeader();
+      return data;
+    };
+    const ensureBadge = async function () {
+      var a = document.getElementById("cartBtn");
+      if (!a) return;
+      if (getComputedStyle(a).position === "static") {
+        a.style.position = "relative";
+      }
+      var b = document.getElementById("js-cart-badge");
+      if (!b) {
+        b = document.createElement("span");
+        b.id = "js-cart-badge";
+        b.className = "cart-badge";
+        a.appendChild(b);
+      }
+      var c = await cartCount();
+      b.textContent = c > 0 ? String(c) : "";
+      b.style.display = c > 0 ? "inline-flex" : "none";
+    };
+>>>>>>> origin/dev
     window.kpUpdateCartBadge = ensureBadge;
     document.addEventListener("DOMContentLoaded", ensureBadge);
     window.addEventListener("storage", ensureBadge);
   })();
 </script>
+<<<<<<< HEAD
 
 <!-- 로그인/아웃-->
 <script>
@@ -170,3 +221,5 @@
 })();
 </script>
 
+=======
+>>>>>>> origin/dev
