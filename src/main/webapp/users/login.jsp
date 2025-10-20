@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
-uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -24,6 +24,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         initHeader(PAGE_ACTIVE);
       });
     </script>
+
     <main class="container page">
       <section class="card" style="max-width: 520px; margin: 80px auto; padding: 24px">
         <h3 style="text-align: center; margin-top: 0">로그인</h3>
@@ -37,27 +38,38 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         </p>
       </section>
     </main>
+
     <!-- footer 시작 -->
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
+
 <script>
 document.getElementById('doLogin').addEventListener('click', async (e) => {
   e.preventDefault();
   const base = (typeof CONTEXT_PATH !== 'undefined') ? CONTEXT_PATH : '';
   const email = document.getElementById('email').value.trim();
   const pass  = document.getElementById('pass').value.trim();
+
+  if (!email || !pass) {
+    alert('이메일과 비밀번호를 입력하세요.');
+    return;
+  }
+
   try {
-    const r = await fetch(base + '/api/users/login', {
+	  const r = await fetch(base + '/api/ajax?key=user&methodName=login', {
       method: 'POST',
       credentials: 'include',
       headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
       body: new URLSearchParams({ email, password: pass }).toString()
     });
+
     const text = await r.text();
     const j = JSON.parse(text);
     if (!r.ok || !j.ok) throw new Error(j.msg || '로그인 실패');
+
     const to = new URL(location.href).searchParams.get('redirect') || (base + '/index.jsp');
     location.href = to;
+
   } catch (err) {
     alert(err.message);
   }

@@ -12,6 +12,10 @@ public class UserService {
     public boolean emailTaken(String email) { return email != null && dao.existsByEmail(email); }
     public boolean nickTaken (String nick)  { return nick  != null && dao.existsByNickname(nick); }
     public boolean phoneTaken(String phone) { return phone != null && dao.existsByPhone(phone); }
+    public boolean isValidEmail(String email) {
+        return email != null && EMAIL.matcher(email).matches();
+    }
+
 
     /** 회원가입 */
     public UserDTO register(String email, String password, String name,
