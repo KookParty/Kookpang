@@ -63,4 +63,6 @@ public interface CartDAO {
 	 * @throws SQLException 
 	 */
 	int countCart(long userId) throws SQLException;
+	
+	CartDTO selectByUserIdAndProductId(long userId, long productId) throws SQLException;
 }
