@@ -6,6 +6,7 @@ public class IngredientDTO {
 	private long productId;	// 보류
 	private String name;
 	private String quantity;
+	private int price;
 	
 	public IngredientDTO() {}
 
@@ -13,7 +14,6 @@ public class IngredientDTO {
 	 * products 와 매핑X (API로 레시피 데이터 불러올 시)
 	 */
 	public IngredientDTO(long recipeId, String name, String quantity) {
-		super();
 		this.recipeId = recipeId;
 		this.name = name;
 		this.quantity = quantity;
@@ -23,20 +23,14 @@ public class IngredientDTO {
 	 * products 와 매핑O (레시피 등록 시)
 	 */
 	public IngredientDTO(long recipeId, long productId, String name, String quantity) {
-		super();
-		this.recipeId = recipeId;
+		this(recipeId, name, quantity);
 		this.productId = productId;
-		this.name = name;
-		this.quantity = quantity;
 	}
 
-	public IngredientDTO(long ingredientId, long recipeId, long productId, String name, String quantity) {
-		super();
+	public IngredientDTO(long ingredientId, long recipeId, long productId, String name, String quantity, int price) {
+		this(recipeId, productId, name, quantity);
 		this.ingredientId = ingredientId;
-		this.recipeId = recipeId;
-		this.productId = productId;
-		this.name = name;
-		this.quantity = quantity;
+		this.price = price;
 	}
 
 	public long getIngredientId() {
@@ -77,6 +71,14 @@ public class IngredientDTO {
 
 	public void setQuantity(String quantity) {
 		this.quantity = quantity;
+	}
+	
+	public int getPrice() {
+		return price;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
 	}
 
 	@Override

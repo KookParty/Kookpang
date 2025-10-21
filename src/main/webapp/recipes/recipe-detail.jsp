@@ -220,7 +220,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     </style>
     <script type="text/javascript">
       const CONTEXT_PATH = "${pageContext.request.contextPath}";
-      console.log(${recipe});
     </script>
     <script src="${path}/js/config.js"></script>
   </head>
@@ -259,7 +258,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
       <div id="panel-ingredients" class="panel active">
         <div class="card ing">
-          <div class="head"><span>🧾</span> 필요한 재료 <span class="muted">(필요한 만큼 선택)</span></div>
+          <div class="head row"><span>🧾</span> 필요한 재료 </div>
           <!--재료 반복 시작-->
           <c:choose>
             <c:when test="${empty recipe.ingredients}">
@@ -267,13 +266,23 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </c:when>
           <c:otherwise>
             <c:forEach items="${recipe.ingredients}" var="ingredientDTO">
-            <div class="row" data-id="${ingredientDTO.ingredientId}" data-title="${ingredientDTO.name} (${ingredientDTO.quantity})" data-price="5000">
-              <input type="checkbox" />
-              <div class="name">
-                ${ingredientDTO.name} <span class="badge">필수</span>
-                <!-- <div class="sub">300g</div> -->
-              </div>
-              <div class="right">5,000원</div>
+            <div class="row" data-id="${ingredientDTO.ingredientId}" data-title="${ingredientDTO.name} (${ingredientDTO.quantity})" data-price="${ingredientDTO.price}">
+              <c:choose>
+                <c:when  test="${ingredientDTO.productId != null and ingredientDTO.productId != 0}">
+	              <input type="checkbox" data-product-id="${ingredientDTO.productId}" />              
+                  <div class="name">
+                    ${ingredientDTO.name} <span class="badge">필수</span>
+                    <!-- <div class="sub">300g</div> -->
+                  </div>
+                  <div class="right">${ingredientDTO.price}원</div>
+                </c:when>
+                <c:otherwise>
+                  <div class="name">
+                    ${ingredientDTO.name} <span class="badge">필수</span>
+                    <!-- <div class="sub">300g</div> -->
+                  </div>
+                </c:otherwise>
+              </c:choose>
             </div>
             </c:forEach>
           </c:otherwise>

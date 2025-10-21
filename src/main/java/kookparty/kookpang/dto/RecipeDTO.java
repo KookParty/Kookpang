@@ -71,17 +71,7 @@ public class RecipeDTO {
 	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl,
 			RecipeType recipeType, String way, String category, long parentRecipeId, String createdAt,
 			List<IngredientDTO> ingredients, List<StepDTO> steps) {
-		super();
-		this.recipeId = recipeId;
-		this.userId = userId;
-		this.title = title;
-		this.description = description;
-		this.thumbnailUrl = thumbnailUrl;
-		this.recipeType = recipeType;
-		this.way = way;
-		this.category = category;
-		this.parentRecipeId = parentRecipeId;
-		this.createdAt = createdAt;
+		this(recipeId, userId, title, description, thumbnailUrl, recipeType, way, category, parentRecipeId, createdAt);
 		this.ingredients = ingredients;
 		this.steps = steps;
 	}
