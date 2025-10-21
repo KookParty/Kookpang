@@ -3,6 +3,7 @@ package kookparty.kookpang.service;
 import java.sql.SQLException;
 import java.util.List;
 
+import jakarta.servlet.http.Part;
 import kookparty.kookpang.dto.ProductDTO;
 
 public interface ProductService {

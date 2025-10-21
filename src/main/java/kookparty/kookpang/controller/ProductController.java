@@ -9,8 +9,10 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import kookparty.kookpang.dto.ProductDTO;
+import kookparty.kookpang.dto.UserDTO;
 import kookparty.kookpang.service.ProductService;
 import kookparty.kookpang.service.ProductServiceImpl;
 import kookparty.kookpang.util.FilePath;
@@ -53,6 +55,11 @@ public class ProductController implements Controller {
 	}
 	
 	public void insertProduct(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		if(user == null || !user.getRole().equals("admin")) {
+			return;
+		}
 		try {
 			Part part = request.getPart("image");
 			String fileName = part.getSubmittedFileName();
@@ -82,6 +89,11 @@ public class ProductController implements Controller {
 	}
 	
 	public void updateProduct(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		if(user == null || !user.getRole().equals("admin")) {
+			return;
+		}
 		try {
 			Part part = request.getPart("image");
 			String fileName = part.getSubmittedFileName();
@@ -113,6 +125,11 @@ public class ProductController implements Controller {
 	}
 	
 	public void deleteProduct(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		if(user == null || !user.getRole().equals("admin")) {
+			return;
+		}
 		String str = request.getParameter("product_id");
 		long productId = Long.parseLong(str);
 		try {

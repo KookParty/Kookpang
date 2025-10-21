@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
+uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -43,37 +43,36 @@
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
 
-<script>
-document.getElementById('doLogin').addEventListener('click', async (e) => {
-  e.preventDefault();
-  const base = (typeof CONTEXT_PATH !== 'undefined') ? CONTEXT_PATH : '';
-  const email = document.getElementById('email').value.trim();
-  const pass  = document.getElementById('pass').value.trim();
+    <script>
+      document.getElementById("doLogin").addEventListener("click", async (e) => {
+        e.preventDefault();
+        const base = typeof CONTEXT_PATH !== "undefined" ? CONTEXT_PATH : "";
+        const email = document.getElementById("email").value.trim();
+        const pass = document.getElementById("pass").value.trim();
 
-  if (!email || !pass) {
-    alert('이메일과 비밀번호를 입력하세요.');
-    return;
-  }
+        if (!email || !pass) {
+          alert("이메일과 비밀번호를 입력하세요.");
+          return;
+        }
 
-  try {
-	  const r = await fetch(base + '/api/ajax?key=user&methodName=login', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
-      body: new URLSearchParams({ email, password: pass }).toString()
-    });
+        try {
+          const r = await fetch(base + "/ajax?key=user&methodName=login", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+            body: new URLSearchParams({ email, password: pass }).toString(),
+          });
 
-    const text = await r.text( );
-    const j = JSON.parse(text);
-    if (!r.ok || !j.ok) throw new Error(j.msg || '로그인 실패');
+          const text = await r.text();
+          const j = JSON.parse(text);
+          if (!r.ok || !j.ok) throw new Error(j.msg || "로그인 실패");
 
-    const to = new URL(location.href).searchParams.get('redirect') || (base + '/index.jsp');
-    location.href = to;
-
-  } catch (err) {
-    alert(err.message);
-  }
-});
-</script>
+          const to = new URL(location.href).searchParams.get("redirect") || base + "/index.jsp";
+          location.href = to;
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+    </script>
   </body>
 </html>

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import kookparty.kookpang.dto.CartDTO;
 import kookparty.kookpang.dto.ResponseCartDTO;
+import kookparty.kookpang.dto.UserDTO;
 import kookparty.kookpang.service.CartService;
 import kookparty.kookpang.service.CartServiceImpl;
 
@@ -21,8 +22,14 @@ public class CartController implements Controller {
 
 	public List<ResponseCartDTO> selectByUserId(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		session.getAttribute("users"); // 세션에서 userId가지고 올 예비용 메서드
-		long userId = 1; // 임시로 등록한 userId 1번을 가지고 옴
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
+		 // 임시로 등록한 userId 1번을 가지고 옴
 		List<ResponseCartDTO> list = null;
 		try {
 			list = cartService.selectByUserId(userId);
@@ -34,8 +41,13 @@ public class CartController implements Controller {
 
 	public int countCart(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		session.getAttribute("users"); // 세션에서 userId가지고 올 예비용 메서드
-		long userId = 1; // 임시로 등록한 userId 1번을 가지고 옴
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		} // 임시로 등록한 userId 1번을 가지고 옴
 		int result = 0;
 
 		try {
@@ -50,8 +62,13 @@ public class CartController implements Controller {
 		long productId = Long.parseLong(request.getParameter("productId"));
 		int count = Integer.parseInt(request.getParameter("count"));
 		HttpSession session = request.getSession();
-		session.getAttribute("users"); // 세션에서 userId가지고 올 예비용 메서드
-		long userId = 1;
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
 		CartDTO cartDTO = new CartDTO(userId, productId, count);
 		try {
 			int result = cartService.insertCart(cartDTO);
@@ -82,8 +99,13 @@ public class CartController implements Controller {
 
 	public void deleteCartByUserId(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		session.getAttribute("users"); // 세션에서 userId가지고 올 예비용 메서드
-		long userId = 1;
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
 		try {
 			int result = cartService.deleteCartByUserId(userId);
 			if (result == 0) {// 실패시
@@ -113,8 +135,13 @@ public class CartController implements Controller {
 	
 	public void duplicatedCartCount(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		session.getAttribute("login");
-		long userId = 1;
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
 		long productId = Long.parseLong(request.getParameter("productId"));
 		int count = Integer.parseInt(request.getParameter("newCount"));
 		try {
@@ -133,8 +160,13 @@ public class CartController implements Controller {
 		CartDTO cartDTO = null;
 		long productId = Long.parseLong(request.getParameter("productId"));
 		HttpSession session = request.getSession();
-		session.getAttribute("login");
-		long userId = 1;
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
 		try {
 			cartDTO = cartService.duplicateCheck(userId, productId);
 		} catch (SQLException e) {

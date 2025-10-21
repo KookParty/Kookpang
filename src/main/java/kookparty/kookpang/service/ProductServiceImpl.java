@@ -3,6 +3,7 @@ package kookparty.kookpang.service;
 import java.sql.SQLException;
 import java.util.List;
 
+import jakarta.servlet.http.Part;
 import kookparty.kookpang.dao.ProductDAO;
 import kookparty.kookpang.dao.ProductDAOImpl;
 import kookparty.kookpang.dto.ProductDTO;
@@ -35,13 +36,14 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public int insertProduct(ProductDTO productDTO) throws SQLException{
+		
 		int result = productDAO.insertProduct(productDTO);
 		return result;
 	}
 
 	@Override
 	public int updateProduct(ProductDTO productDTO) throws SQLException{
-		int result = productDAO.insertProduct(productDTO);
+		int result = productDAO.updateProduct(productDTO);
 		return result;
 	}
 

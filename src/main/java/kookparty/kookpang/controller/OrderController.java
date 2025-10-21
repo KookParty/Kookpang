@@ -7,17 +7,28 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import kookparty.kookpang.dto.OrderDTO;
+import kookparty.kookpang.dto.ResponseCartDTO;
+import kookparty.kookpang.dto.UserDTO;
+import kookparty.kookpang.service.CartService;
+import kookparty.kookpang.service.CartServiceImpl;
 import kookparty.kookpang.service.OrderService;
 import kookparty.kookpang.service.OrderServiceImpl;
 
+
 public class OrderController implements Controller {
 	OrderService orderService = new OrderServiceImpl();
+	CartService cartService = new CartServiceImpl();
 	
 	//임시 메서드. 마이페이지에서 써야할 메서드인듯..
 	public ModelAndView order(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		session.getAttribute("login");
-		long userId = 1;
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
 		try {
 			List<OrderDTO> list = orderService.selectByUserId(userId);
 			request.setAttribute("orderList", list);
@@ -25,6 +36,42 @@ public class OrderController implements Controller {
 			e.printStackTrace();
 		}
 		return new ModelAndView();
+	}
+	public ModelAndView orderPage(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
+		try {
+			List<ResponseCartDTO> cartList = cartService.selectByUserId(userId);
+			int price = 0;
+			int deliveryFee = 3000;
+			for(ResponseCartDTO c : cartList) {
+				price += c.getPrice() * c.getCount();
+			}
+			if(price >= 50000) {
+				deliveryFee = 0;
+			}
+			
+			int totalPrice = price + deliveryFee;
+			request.setAttribute("list", cartList);
+			request.setAttribute("name", user.getName());
+			request.setAttribute("phone", user.getPhone());
+			request.setAttribute("address", user.getAddress());
+			request.setAttribute("price", price);
+			request.setAttribute("deliveryFee", deliveryFee);
+			request.setAttribute("totalPrice", totalPrice);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return new ModelAndView("/orders/order-review.jsp");
 	}
 	
 	public OrderDTO selectByOrderId(HttpServletRequest request, HttpServletResponse response) {
@@ -38,13 +85,20 @@ public class OrderController implements Controller {
 		return orderDTO;
 	}
 	
+	
+	
 	public void insertOrder(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		session.getAttribute("login");
-		long userId = 1;
-		int totlaPrice = Integer.parseInt(request.getParameter("totalPrice"));
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
+		int totalPrice = Integer.parseInt(request.getParameter("totalPrice"));
 		String shippingAddress = request.getParameter("shippingAddress");
-		OrderDTO order = new OrderDTO(userId, totlaPrice, shippingAddress, null);
+		OrderDTO order = new OrderDTO(userId, totalPrice, shippingAddress, null);
 		try {
 			int result = orderService.insertOrder(order);
 			if(result==0) {//실패시

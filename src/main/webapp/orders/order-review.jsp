@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
-uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> <%@taglib
+uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -125,29 +125,28 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               </div>
               <div id="ov-items">
                 <!-- 주문 상품 목록 반복 -->
-                <div class="ov-row">
-                  <div>
-                    <div style="font-weight: 700">상품명</div>
-                    <div class="small" style="color: #6b7280">10,000원 / 1포기</div>
+                <c:forEach var="item" items="${list}">
+                  <div class="ov-row">
+                    <div>
+                      <div style="font-weight: 700">${item.name}</div>
+                      <div class="small" style="color: #6b7280">${item.price}원 / 1</div>
+                    </div>
+                    <div class="ov-qty">
+                      <span>${item.count}</span> <span><b>${item.count * item.price}원</b></span>
+                    </div>
                   </div>
-                  <div class="ov-qty">
-                    <button data-minus="">-</button>
-                    <span>2</span>
-                    <button data-plus="">+</button>
-                    <span><b>20,000원</b></span>
-                    <button class="ov-del" title="삭제" data-del="">🗑</button>
-                  </div>
-                </div>
+                </c:forEach>
                 <!-- 주문 상품 목록 반복 끝 -->
               </div>
             </section>
             <aside class="ov-card ov-aside">
               <div class="ov-sec-title">결제 정보</div>
-              <div class="ov-row"><span>상품 금액</span><b id="ov-price">0원</b></div>
-              <div class="ov-row"><span>배송비</span><b id="ov-ship">3,000원</b></div>
+              <div class="ov-row"><span>상품 금액</span><b id="ov-price">${price}원</b></div>
+              <div class="ov-row"><span>배송비</span><b id="ov-ship">${deliveryFee}원</b></div>
               <div class="ov-row" style="border-top: 1px solid #e5e7eb"></div>
               <div class="ov-row">
-                <span style="font-weight: 800">총 결제 금액</span><b id="ov-total" style="font-size: 18px">0원</b>
+                <span style="font-weight: 800">총 결제 금액</span
+                ><b id="ov-total" style="font-size: 18px">${totalPrice}원</b>
               </div>
               <button id="ov-pay" class="ov-badge" style="margin-top: 12px; width: 100%; justify-content: center">
                 결제하기
@@ -164,8 +163,8 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                   <form id="ship-select-form">
                     <div style="margin-bottom: 8px">
                       <label style="display: block; margin-bottom: 6px"
-                        ><input type="radio" name="ship_choice" value="addr1" checked /> 받는 분: <b>테스트</b> /
-                        연락처: <b>010-1234-5678</b><br />주소: <b>서울시 강남구 테헤란로 123번길 45</b></label
+                        ><input type="radio" name="ship_choice" value="addr1" checked /> 받는 분: <b>${name}</b> /
+                        연락처: <b>${phone}</b><br />주소: <b>${address}</b></label
                       >
                       <label style="display: block; margin-bottom: 6px"
                         ><input type="radio" name="ship_choice" value="custom" /> 직접 입력</label
@@ -235,11 +234,26 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         });
       };
 
+      const payReady = async function () {
+        const r = await fetch(CONTEXT_PATH + "/ajax", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          },
+          body: new URLSearchParams({
+            key: "pay",
+            methodName: "payReady",
+          }),
+        });
+        const json = await r.json();
+        console.log(json);
+        window.location.href = json.next_redirect_pc_url;
+      };
+
       document.getElementById("ov-pay").addEventListener("click", () => {
         //결제 api 호출(ajax)
         //결제 성공시 주문 pk받아서 다음 페이지로
-        const id = 1; //임시
-        location.href = CONTEXT_PATH + "/orders/order-result.jsp?id=" + id;
+        payReady();
       });
     </script>
   </body>
