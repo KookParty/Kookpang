@@ -3,10 +3,11 @@ package kookparty.kookpang.dto;
 public class IngredientDTO {
 	private long ingredientId;
 	private long recipeId;
-	private long productId;	// 보류
+	private long productId;
 	private String name;
 	private String quantity;
 	private int price;
+	private boolean seasoning;
 	
 	public IngredientDTO() {}
 
@@ -27,10 +28,11 @@ public class IngredientDTO {
 		this.productId = productId;
 	}
 
-	public IngredientDTO(long ingredientId, long recipeId, long productId, String name, String quantity, int price) {
+	public IngredientDTO(long ingredientId, long recipeId, long productId, String name, String quantity, int price, boolean seasoning) {
 		this(recipeId, productId, name, quantity);
 		this.ingredientId = ingredientId;
 		this.price = price;
+		this.seasoning = seasoning;
 	}
 
 	public long getIngredientId() {
@@ -79,6 +81,14 @@ public class IngredientDTO {
 
 	public void setPrice(int price) {
 		this.price = price;
+	}
+	
+	public boolean isSeasoning() {
+		return seasoning;
+	}
+
+	public void setSeasoning(boolean seasoning) {
+		this.seasoning = seasoning;
 	}
 
 	@Override

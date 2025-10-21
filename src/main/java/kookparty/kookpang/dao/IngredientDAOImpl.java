@@ -44,7 +44,8 @@ public class IngredientDAOImpl implements IngredientDAO {
 							rs.getLong(3), 
 							rs.getString(4),
 							rs.getString(5),
-							rs.getInt(6)
+							rs.getInt(6),
+							rs.getBoolean(7)
 							));
 				}
 			}

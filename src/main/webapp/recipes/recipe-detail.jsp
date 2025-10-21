@@ -87,7 +87,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
       .row {
         display: flex;
-        align-items: center;
+        align-items: center; /* row 안 전체 수직 정렬 */
         gap: 10px;
         padding: 12px 14px;
         border-top: 1px solid #f2f3f5;
@@ -95,6 +95,13 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
       .row:first-child {
         border-top: none;
+      }
+      
+      label {
+        display: flex;
+        align-items: center; /* 체크박스와 텍스트 수직 정렬 */
+        gap: 5px;
+        
       }
 
       .name {
@@ -259,7 +266,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       <div id="panel-ingredients" class="panel active">
         <div class="card ing">
           <div class="head row"><span>🧾</span> 필요한 재료 </div>
-          <!--재료 반복 시작-->
           <c:choose>
             <c:when test="${empty recipe.ingredients}">
               <h5>재료가 등록되지 않았습니다.</h5>
@@ -269,17 +275,23 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             <div class="row" data-id="${ingredientDTO.ingredientId}" data-title="${ingredientDTO.name} (${ingredientDTO.quantity})" data-price="${ingredientDTO.price}">
               <c:choose>
                 <c:when  test="${ingredientDTO.productId != null and ingredientDTO.productId != 0}">
-	              <input type="checkbox" data-product-id="${ingredientDTO.productId}" />              
-                  <div class="name">
-                    ${ingredientDTO.name} <span class="badge">필수</span>
-                    <!-- <div class="sub">300g</div> -->
-                  </div>
+                  <label>
+                    <input type="checkbox" data-product-id="${ingredientDTO.productId}" />              
+                    <div class="name">
+                      ${ingredientDTO.name}
+                      <c:if test="${not ingredientDTO.seasoning}">
+                        <span class="badge">필수</span>
+                      </c:if>
+                      <div class="sub">${ingredientDTO.quantity}</div>
+                    </div>
+                  </label>
                   <div class="right">${ingredientDTO.price}원</div>
                 </c:when>
                 <c:otherwise>
                   <div class="name">
-                    ${ingredientDTO.name} <span class="badge">필수</span>
-                    <!-- <div class="sub">300g</div> -->
+                    ${ingredientDTO.name} 
+                    <!-- <span class="badge">필수</span> -->
+                    <div class="sub">${ingredientDTO.quantity}</div>
                   </div>
                 </c:otherwise>
               </c:choose>
@@ -384,19 +396,17 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <!-- footer 끝 -->
 
     <script>
-      const KP_CART = "kp_cart";
-      const qs = (s, r = document) => r.querySelector(s);
-      const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
       function price(n) {
         return (Number(n) || 0).toLocaleString() + "원";
       }
+      
       function sum() {
         let s = 0;
-        qsa(".ing .row input[type=checkbox]:checked").forEach((cb) => {
+        document.querySelectorAll(".ing .row input[type=checkbox]:checked").forEach((cb) => {
           const r = cb.closest(".row");
           s += Number(r?.dataset?.price || 0);
         });
-        const el = qs("#sum");
+        const el = document.querySelector("#sum");
         if (el) el.textContent = price(s);
       }
 
@@ -409,22 +419,23 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         document.addEventListener("click", (e) => {
           const t = e.target.closest(".tab");
           if (!t) return;
-          qsa(".tab").forEach((el) => el.classList.remove("active"));
-          qsa(".panel").forEach((el) => el.classList.remove("active"));
+          document.querySelectorAll(".tab").forEach((el) => el.classList.remove("active"));
+          document.querySelectorAll(".panel").forEach((el) => el.classList.remove("active"));
           t.classList.add("active");
           const id = "panel-" + t.dataset.tab;
-          qs("#" + id)?.classList.add("active");
+          const panel = document.querySelector("#" + id)
+          if (panel) panel.classList.add("active");
         });
 
         // Like
-        const likeBtn = qs("#likeBtn");
+        const likeBtn = document.querySelector("#likeBtn");
         likeBtn?.addEventListener("click", () => {
           likeBtn.classList.toggle("active");
-          likeBtn.textContent = likeBtn.classList.contains("active") ? "♥ 좋아요" : "♡ 좋아요";
+          likeBtn.textContent = likeBtn.classList.contains("active") ? "❤️ 좋아요" : "♡ 좋아요";
         });
 
         // Variant write
-        const vb = qs("#variantBtn");
+        const vb = document.querySelector("#variantBtn");
         vb?.addEventListener("click", () => {
           location.href = "${path}/recipes/variant-write.jsp";
         });
@@ -435,30 +446,69 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         });
         sum();
 
-        // Add to cart //변형시켜서 Ajax로 insertCart...
-        window.addSelected = function () {
-          const checked = qsa(".ing [type=checkbox]:checked");
+        // Add to cart // Ajax로 insertCart
+        window.addSelected = async function () {
+          const checked = document.querySelectorAll(".ing [type=checkbox]:checked");
           if (!checked.length) {
             alert("재료를 선택해주세요.");
             return;
           }
-          let cart = [];
-          try {
-            cart = JSON.parse(localStorage.getItem(KP_CART) || "[]");
-          } catch (_) {}
-          checked.forEach((ch) => {
+          
+          // ajax 서버 요청
+          for (const ch of checked) {
             const row = ch.closest(".row");
-            const id = row.dataset.id,
-              title = row.dataset.title,
-              price = Number(row.dataset.price || 0);
-            const i = cart.findIndex((x) => x.id === id);
-            if (i > -1) cart[i].qty = (cart[i].qty || 1) + 1;
-            else cart.push({ id, title, price, qty: 1 });
-          });
-          localStorage.setItem(KP_CART, JSON.stringify(cart));
-          try {
-            window.kpUpdateCartBadge && window.kpUpdateCartBadge();
-          } catch (_) {}
+            const id = ch.dataset.productId;
+            const count = 1;
+
+            if (id === null || id === 0) continue;  // productId 없는 경우 건너뜀
+            
+            try {
+              const duplicateChk = await fetch(CONTEXT_PATH + "/ajax", {
+                method: "POST",
+                body: new URLSearchParams({
+                  key: "cart",
+                  methodName: "duplicateCheck",
+                  productId: id,
+                }),
+              });
+              const exists = await duplicateChk.json();
+              if (exists) {
+                const response = await fetch(conPath + "/ajax", {
+                  method: "POST",
+                  body: new URLSearchParams({
+                    key: "cart",
+                    methodName: "duplicatedCartCount",
+                    productId: id,
+                    newCount: exists.count + count,
+                  }),
+                });
+                if (response.ok) {
+                  console.log("Cart count updated successfully");
+                } else {
+                  console.error("Failed to update cart count:", response.statusText);
+                }
+              } else {
+                const res = await fetch(CONTEXT_PATH + "/ajax", {
+                  method: "POST",
+                  body: new URLSearchParams({
+                    key: "cart",
+                    methodName: "insertCart",
+                    productId: id,
+                    count: count,
+                  }),
+                });
+                if (!res.ok) {
+                  console.error("Failed to add to cart:", res.status, res.statusText);
+                  return;
+                }
+              }
+            } catch (err) {
+              console.error("recipe-detail > insertCart 오류: ", err);
+            }
+          }
+          
+          ensureBadge(); // 장바구니 새로고침
+          // 장바구니 추가 알림 (우측 하단)
           try {
             const n = document.createElement("div");
             n.textContent = `${"${checked.length}"}개 재료가 장바구니에 추가되었습니다.`;
@@ -467,13 +517,13 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             document.body.appendChild(n);
             setTimeout(() => {
               n.remove();
-              location.href = "${path}/orders/cart.jsp";
-            }, 900);
+              //location.href = "${path}/orders/cart.jsp";
+            }, 1000);
           } catch (_) {
-            location.href = "${path}/orders/cart.jsp";
+            //location.href = "${path}/orders/cart.jsp";
           }
         };
-      });
+      }); // DOMContentLoaded end
     </script>
   </body>
 </html>
