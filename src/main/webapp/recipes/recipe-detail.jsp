@@ -81,7 +81,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         background: #fff;
         border: 1px solid #e5e7eb;
         border-radius: 12px;
-        padding: 0;
+        padding: 16px;
         margin-top: 10px;
       }
 
@@ -179,6 +179,10 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         display: block;
       }
 
+      #panel-steps img {
+        max-width: 350px;
+      }
+
       .review-card {
         background: #fff;
         border: 1px solid #e5e7eb;
@@ -226,13 +230,13 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <!-- header끝 -->
     <div class="wrap">
       <div style="margin-bottom: 10px">
-        <a class="ghost-link muted2" href="${path}/recipes/recipes.jsp">← 목록으로</a>
+        <a class="ghost-link muted2" href="${path}/front?key=recipe&methodName=recipes">← 목록으로</a>
       </div>
       <div class="hero">
-        <img src="${path}/assets/img/kimchi.jpg" alt="김치찌개" />
+        <img src="${recipe.thumbnailUrl}" alt="${recipe.title}" />
         <div style="flex: 1">
-          <div class="title">김치찌개</div>
-          <div class="meta"><span>⏱ 30분</span><span>👥 4인분</span><span>❤️ 1,247</span></div>
+          <div class="title">${recipe.title}</div>
+          <div class="meta"><span>${recipe.category}</span><span>${recipe.way}</span><span>❤️ 좋아요수TODO</span></div>
           <div class="row" style="gap: 8px; margin-top: 8px">
             <button class="btn" id="likeBtn" style="padding: 8px 12px">♡ 좋아요</button>
             <button class="btn" id="variantBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">
@@ -254,8 +258,37 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
       <div id="panel-ingredients" class="panel active">
         <div class="card ing">
-          <div class="head"><span>🧾</span> 필요한 재료 <span class="muted">(필요한 만큼 선택)</span></div>
+          <div class="head row"><span>🧾</span> 필요한 재료 </div>
           <!--재료 반복 시작-->
+          <c:choose>
+            <c:when test="${empty recipe.ingredients}">
+              <h5>재료가 등록되지 않았습니다.</h5>
+            </c:when>
+          <c:otherwise>
+            <c:forEach items="${recipe.ingredients}" var="ingredientDTO">
+            <div class="row" data-id="${ingredientDTO.ingredientId}" data-title="${ingredientDTO.name} (${ingredientDTO.quantity})" data-price="${ingredientDTO.price}">
+              <c:choose>
+                <c:when  test="${ingredientDTO.productId != null and ingredientDTO.productId != 0}">
+	              <input type="checkbox" data-product-id="${ingredientDTO.productId}" />              
+                  <div class="name">
+                    ${ingredientDTO.name} <span class="badge">필수</span>
+                    <!-- <div class="sub">300g</div> -->
+                  </div>
+                  <div class="right">${ingredientDTO.price}원</div>
+                </c:when>
+                <c:otherwise>
+                  <div class="name">
+                    ${ingredientDTO.name} <span class="badge">필수</span>
+                    <!-- <div class="sub">300g</div> -->
+                  </div>
+                </c:otherwise>
+              </c:choose>
+            </div>
+            </c:forEach>
+          </c:otherwise>
+          </c:choose>
+
+          <!--
           <div class="row" data-id="pork" data-title="돼지고기 (삼겹살)" data-price="15000">
             <input type="checkbox" />
             <div class="name">
@@ -264,63 +297,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </div>
             <div class="right">15,000원</div>
           </div>
-          <!--재료 반복 끝-->
-          <div class="row" data-id="kimchi" data-title="김치" data-price="8000">
-            <input type="checkbox" />
-            <div class="name">
-              김치 <span class="badge">필수</span>
-              <div class="sub">1개</div>
-            </div>
-            <div class="right">8,000원</div>
-          </div>
-          <div class="row" data-id="tofu" data-title="두부" data-price="2500">
-            <input type="checkbox" />
-            <div class="name">
-              두부 <span class="badge">필수</span>
-              <div class="sub">1개</div>
-            </div>
-            <div class="right">2,500원</div>
-          </div>
-          <div class="row" data-id="greenonion" data-title="대파" data-price="1500">
-            <input type="checkbox" />
-            <div class="name">
-              대파 <span class="badge">필수</span>
-              <div class="sub">2개</div>
-            </div>
-            <div class="right">1,500원</div>
-          </div>
-          <div class="row" data-id="onion" data-title="양파" data-price="3000">
-            <input type="checkbox" />
-            <div class="name">
-              양파
-              <div class="sub">0.5</div>
-            </div>
-            <div class="right">3,000원</div>
-          </div>
-          <div class="row" data-id="garlic" data-title="마늘" data-price="4000">
-            <input type="checkbox" />
-            <div class="name">
-              마늘 <span class="badge">조미료</span>
-              <div class="sub">3</div>
-            </div>
-            <div class="right">4,000원</div>
-          </div>
-          <div class="row" data-id="soy" data-title="간장" data-price="5000">
-            <input type="checkbox" />
-            <div class="name">
-              간장 <span class="badge">조미료</span>
-              <div class="sub">2</div>
-            </div>
-            <div class="right">5,000원</div>
-          </div>
-          <div class="row" data-id="sesame" data-title="참기름" data-price="8000">
-            <input type="checkbox" />
-            <div class="name">
-              참기름 <span class="badge">조미료</span>
-              <div class="sub">1</div>
-            </div>
-            <div class="right">8,000원</div>
-          </div>
+          -->
           <!--재료 반복-->
           <div class="footer">
             <div class="total">총 금액 <span id="sum">0원</span></div>
@@ -334,21 +311,26 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       </div>
 
       <div id="panel-steps" class="panel">
-        <div class="card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px">
+        <div class="card">
           <h3 style="margin: 0 0 10px">조리 방법</h3>
-          <ol style="display: flex; flex-direction: column; gap: 12px; margin-left: 18px">
-            <li>돼지고기를 한 입 크기로 썰어 준비합니다.</li>
-            <li>김치는 적당한 크기로 썰고, 두부는 도톰하게 썰어둡니다.</li>
-            <li>팬에 기름을 두르고 돼지고기를 볶아줍니다.</li>
-            <li>고기가 어느 정도 익으면 김치를 넣고 함께 볶습니다.</li>
-            <li>물을 붓고 끓인 후 두부와 대파를 넣습니다.</li>
-            <li>간을 맞춰 마무리합니다.</li>
-          </ol>
+          <c:choose>
+            <c:when test="${empty requestScope.recipe.steps}">
+              <h5>조리 방법이 등록되지 않았습니다.</h5>
+            </c:when>
+          <c:otherwise>
+            <ol style="display: flex; flex-direction: column; gap: 12px; margin-left: 18px">
+              <c:forEach items="${recipe.steps}" var="stepDTO">
+                <img src="${stepDTO.imageUrl}" alt="${stepDTO.description}" />
+                <li>${stepDTO.description}</li>
+              </c:forEach>
+            </ol>
+          </c:otherwise>
+          </c:choose>
         </div>
       </div>
 
       <div id="panel-variants" class="panel">
-        <div class="card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px">
+        <div class="card">
           <div class="muted" style="margin-bottom: 8px">다른 사용자의 변형 레시피들입니다</div>
           <div class="grid" style="gap: 12px">
             <div class="card" style="padding: 14px">
@@ -373,7 +355,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       </div>
 
       <div id="panel-reviews" class="panel">
-        <div class="card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px">
+        <div class="card">
           <h3 style="margin: 0 0 10px">리뷰 작성하기</h3>
           <div class="stars" id="starBox" aria-label="평점 선택">
             <button data-v="1">★</button>

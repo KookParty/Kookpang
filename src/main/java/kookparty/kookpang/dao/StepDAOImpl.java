@@ -3,12 +3,17 @@ package kookparty.kookpang.dao;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import kookparty.kookpang.common.RecipeType;
 import kookparty.kookpang.dto.IngredientDTO;
+import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.dto.StepDTO;
+import kookparty.kookpang.util.DbUtil;
 
 public class StepDAOImpl implements StepDAO {
 	private Properties proFile = new Properties();
@@ -25,6 +30,28 @@ public class StepDAOImpl implements StepDAO {
 	
 	public static StepDAO getInstance() {
 		return instance;
+	}
+	
+	@Override
+	public List<StepDTO> selectByRecipeId(Connection con, long recipeId) throws SQLException {
+		List<StepDTO> steps = new ArrayList<>();
+		String sql = proFile.getProperty("step.selectByRecipeId");
+		
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, recipeId);
+			
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					steps.add(new StepDTO(
+							rs.getLong(1), 
+							rs.getString(4),
+							rs.getString(5)
+							));
+				}
+			}
+		}
+		
+		return steps;
 	}
 	
 	@Override
