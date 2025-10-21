@@ -507,6 +507,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             }
           }
           
+          ensureBadge(); // 장바구니 새로고침
           // 장바구니 추가 알림 (우측 하단)
           try {
             const n = document.createElement("div");
