@@ -18,6 +18,11 @@ public interface RecipeService {
 	RecipeDTO selectById(long recipeId) throws Exception;
 	
 	/**
+	 * 변형 레시피 전체 검색
+	 */
+	List<RecipeDTO> selectVariantsByParentId(long parentRecipeId) throws Exception;
+	
+	/**
 	 * 레시피 등록
 	 */
 	void insertRecipe(RecipeDTO recipeDTO) throws Exception;

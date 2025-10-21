@@ -30,6 +30,12 @@ public class RecipeServiceImpl implements RecipeService {
 	}
 	
 	@Override
+	public List<RecipeDTO> selectVariantsByParentId(long parentRecipeId) throws Exception {
+		List<RecipeDTO> list = recipeDAO.selectVariantsByParentId(parentRecipeId);
+		return list;
+	}
+	
+	@Override
 	public void insertRecipe(RecipeDTO recipeDTO) throws Exception {
 		int result = recipeDAO.insertRecipe(recipeDTO);
 		
