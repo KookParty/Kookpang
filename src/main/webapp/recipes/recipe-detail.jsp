@@ -386,8 +386,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <!-- footer 끝 -->
 
     <script>
-      const KP_CART = "kp_cart";
-      
       function price(n) {
         return (Number(n) || 0).toLocaleString() + "원";
       }
@@ -514,7 +512,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             //location.href = "${path}/orders/cart.jsp";
           }
         };
-      });
+      }); // DOMContentLoaded end
     </script>
   </body>
 </html>
