@@ -87,7 +87,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
       .row {
         display: flex;
-        align-items: center;
+        align-items: center; /* row 안 전체 수직 정렬 */
         gap: 10px;
         padding: 12px 14px;
         border-top: 1px solid #f2f3f5;
@@ -95,6 +95,13 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
       .row:first-child {
         border-top: none;
+      }
+      
+      label {
+        display: flex;
+        align-items: center; /* 체크박스와 텍스트 수직 정렬 */
+        gap: 5px;
+        
       }
 
       .name {
@@ -259,7 +266,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       <div id="panel-ingredients" class="panel active">
         <div class="card ing">
           <div class="head row"><span>🧾</span> 필요한 재료 </div>
-          <!--재료 반복 시작-->
           <c:choose>
             <c:when test="${empty recipe.ingredients}">
               <h5>재료가 등록되지 않았습니다.</h5>
@@ -271,17 +277,21 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                 <c:when  test="${ingredientDTO.productId != null and ingredientDTO.productId != 0}">
                   <label>
                     <input type="checkbox" data-product-id="${ingredientDTO.productId}" />              
-                      <span class="name">
-                        ${ingredientDTO.name} <span class="badge">필수</span>
-                        <!-- <div class="sub">300g</div> -->
-                      </span>
+                    <div class="name">
+                      ${ingredientDTO.name}
+                      <c:if test="${not ingredientDTO.seasoning}">
+                        <span class="badge">필수</span>
+                      </c:if>
+                      <div class="sub">${ingredientDTO.quantity}</div>
+                    </div>
                   </label>
                   <div class="right">${ingredientDTO.price}원</div>
                 </c:when>
                 <c:otherwise>
                   <div class="name">
-                    ${ingredientDTO.name} <span class="badge">필수</span>
-                    <!-- <div class="sub">300g</div> -->
+                    ${ingredientDTO.name} 
+                    <!-- <span class="badge">필수</span> -->
+                    <div class="sub">${ingredientDTO.quantity}</div>
                   </div>
                 </c:otherwise>
               </c:choose>
