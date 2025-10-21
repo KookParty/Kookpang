@@ -5,11 +5,15 @@ import java.util.List;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kookparty.kookpang.dto.RecipeDTO;
+import kookparty.kookpang.dto.ReviewDTO;
 import kookparty.kookpang.service.RecipeService;
 import kookparty.kookpang.service.RecipeServiceImpl;
+import kookparty.kookpang.service.ReviewService;
+import kookparty.kookpang.service.ReviewServiceImpl;
 
 public class RecipeController implements Controller {
 	private RecipeService recipeService = RecipeServiceImpl.getInstance();
+	private ReviewService reviewService = ReviewServiceImpl.getInstance();
 	
 	public ModelAndView recipes(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		List<RecipeDTO> recipes = recipeService.selectAll();
@@ -28,6 +32,9 @@ public class RecipeController implements Controller {
 		List<RecipeDTO> variants = recipeService.selectVariantsByParentId(recipeId);
 		request.setAttribute("variants", variants);
 		
+		// 리뷰
+		List<ReviewDTO> reviews = reviewService.selectByRecipeId(recipeId);
+		request.setAttribute("reviews", reviews);
 		
 		return new ModelAndView("recipes/recipe-detail.jsp");
 	}

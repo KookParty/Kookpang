@@ -396,8 +396,10 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
       <!-- 리뷰 -->
       <div id="panel-reviews" class="panel">
-        <div class="card">
+        <div class="card" style="padding: 16px">
           <h3 style="margin: 10px">리뷰 작성하기</h3>
+          <div style="padding: 10px">
+          <div>평점</div>
           <div class="stars" id="starBox" aria-label="평점 선택">
             <button data-v="1">★</button>
             <button data-v="2">★</button>
@@ -405,6 +407,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             <button data-v="4">★</button>
             <button data-v="5">★</button>
           </div>
+          <div>리뷰 내용</div>
           <textarea
             id="reviewText"
             rows="4"
@@ -414,10 +417,31 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           ></textarea>
           <input id="photoUrl" class="input" placeholder="이미지 URL을 입력하세요 (선택)" />
           <div class="actions-row" style="margin-top: 10px">
-            <button class="btn" id="submitReview">리뷰 등록하기</button>
+            <button class="btn" id="submitReview" style="width: 100%; padding: 8px">리뷰 등록하기</button>
+          </div>
           </div>
         </div>
-        <div id="reviewList"></div>
+        <div class="card">
+          <c:choose>
+            <c:when test="${empty reviews}">
+              <div class="muted2" style="margin: 10px">
+              아직 리뷰가 없습니다 <br>
+              첫 번째 리뷰를 작성해보세요!
+              </div>
+            </c:when>
+            <c:otherwise>
+              <c:forEach items="${reviews}" var="review">
+                <div class="card variant">
+                  <img src="${review.imageUrl}" alt="thumbnail"/>
+                  <div>
+                    <div class="muted2">${review.nickname}</div>
+                    <div>${review.content}</div>               
+                  </div>
+                </div>
+              </c:forEach>
+            </c:otherwise>
+          </c:choose>
+        </div>
       </div>
     </div>
     <!-- footer 시작 -->
