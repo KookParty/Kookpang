@@ -72,7 +72,8 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getString(3),
 							rs.getString(4),
 							rs.getString(5),
-							RecipeType.BASE,
+							rs.getString(6).toLowerCase().equals("base") ?
+									RecipeType.BASE : RecipeType.VARIANT,
 							rs.getString(7),
 							rs.getString(8),
 							rs.getInt(9),
