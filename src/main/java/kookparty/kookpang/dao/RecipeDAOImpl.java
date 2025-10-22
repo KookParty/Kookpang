@@ -106,6 +106,40 @@ public class RecipeDAOImpl implements RecipeDAO {
 	}
 	
 	@Override
+	public List<RecipeDTO> selectVariantsByParentId(long parentRecipeId) throws SQLException {
+		List<RecipeDTO> list = new ArrayList<>();
+		String sql = proFile.getProperty("recipe.selectVariantsByParentId");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, parentRecipeId);
+			
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					long recipeId = rs.getLong(1);
+					list.add(new RecipeDTO(
+							recipeId, 
+							rs.getLong(2),
+							rs.getString(3),
+							rs.getString(4),
+							rs.getString(5),
+							rs.getString(6).toLowerCase().equals("base") ? 
+									RecipeType.BASE : RecipeType.VARIANT,
+							rs.getString(7),
+							rs.getString(8),
+							rs.getInt(9),
+							rs.getString(10),
+							ingredientDAO.selectByRecipeId(con, recipeId),
+							stepDAO.selectByRecipeId(con, recipeId)
+							));
+				}
+			}
+		}
+		
+		return list;
+	}
+	
+	@Override
 	public int insertRecipe(RecipeDTO recipeDTO) throws SQLException {
 		int result = 0;
 		String sql = proFile.getProperty("recipe.insertRecipe");

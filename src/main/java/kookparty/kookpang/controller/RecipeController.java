@@ -1,16 +1,19 @@
 package kookparty.kookpang.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kookparty.kookpang.dto.RecipeDTO;
+import kookparty.kookpang.dto.ReviewDTO;
 import kookparty.kookpang.service.RecipeService;
 import kookparty.kookpang.service.RecipeServiceImpl;
+import kookparty.kookpang.service.ReviewService;
+import kookparty.kookpang.service.ReviewServiceImpl;
 
 public class RecipeController implements Controller {
 	private RecipeService recipeService = RecipeServiceImpl.getInstance();
+	private ReviewService reviewService = ReviewServiceImpl.getInstance();
 	
 	public ModelAndView recipes(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		List<RecipeDTO> recipes = recipeService.selectAll();
@@ -23,7 +26,15 @@ public class RecipeController implements Controller {
 		Long recipeId = Long.parseLong(request.getParameter("recipeId"));
 		RecipeDTO recipeDTO = recipeService.selectById(recipeId);
 		request.setAttribute("recipe", recipeDTO);
-		System.out.println("recipeDetail:recipe: " + recipeDTO);
+		//System.out.println("recipeDetail:recipe: " + recipeDTO);
+
+		// 변형 레시피
+		List<RecipeDTO> variants = recipeService.selectVariantsByParentId(recipeId);
+		request.setAttribute("variants", variants);
+		
+		// 리뷰
+		List<ReviewDTO> reviews = reviewService.selectByRecipeId(recipeId);
+		request.setAttribute("reviews", reviews);
 		
 		return new ModelAndView("recipes/recipe-detail.jsp");
 	}
@@ -40,6 +51,7 @@ public class RecipeController implements Controller {
 		List<RecipeDTO> list = recipeService.selectAll();
 		return list;
 	}
+	
 	
 	/**
 	 * id로 검색 (상세보기)

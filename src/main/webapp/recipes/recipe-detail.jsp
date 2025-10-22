@@ -89,7 +89,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         display: flex;
         align-items: center; /* row 안 전체 수직 정렬 */
         gap: 10px;
-        padding: 12px 14px;
+        padding: 10px;
         border-top: 1px solid #f2f3f5;
       }
 
@@ -224,6 +224,24 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         gap: 8px;
         align-items: center;
       }
+      
+      .variant {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .variant img {
+        width: 140px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 12px;
+      }
+      
+      h5 {
+        margin: 10px;
+      }
+      
     </style>
     <script type="text/javascript">
       const CONTEXT_PATH = "${pageContext.request.contextPath}";
@@ -240,13 +258,13 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         <a class="ghost-link muted2" href="${path}/front?key=recipe&methodName=recipes">← 목록으로</a>
       </div>
       <div class="hero">
-        <img src="${recipe.thumbnailUrl}" alt="${recipe.title}" />
+        <img src="${recipe.thumbnailUrl}" alt="thumbnail" />
         <div style="flex: 1">
           <div class="title">${recipe.title}</div>
           <div class="meta"><span>${recipe.category}</span><span>${recipe.way}</span><span>❤️ 좋아요수TODO</span></div>
           <div class="row" style="gap: 8px; margin-top: 8px">
             <button class="btn" id="likeBtn" style="padding: 8px 12px">♡ 좋아요</button>
-            <button class="btn" id="variantBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">
+            <button class="btn" id="writeBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">
               + 변형 레시피 추가
             </button>
           </div>
@@ -259,13 +277,16 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       <div class="tabs">
         <div class="tab active" data-tab="ingredients">재료 목록</div>
         <div class="tab" data-tab="steps">조리법</div>
-        <div class="tab" data-tab="variants">변형 레시피</div>
+        <c:if test="${requestScope.recipe.recipeType.toString() == 'BASE'}">
+          <div class="tab" data-tab="variants">변형 레시피</div>
+	    </c:if>
         <div class="tab" data-tab="reviews">리뷰</div>
       </div>
 
+	  <!-- 재료 목록 -->
       <div id="panel-ingredients" class="panel active">
         <div class="card ing">
-          <div class="head row"><span>🧾</span> 필요한 재료 </div>
+          <div class="head row muted2"><span>🧾</span> 필요한 재료 </div>
           <c:choose>
             <c:when test="${empty recipe.ingredients}">
               <h5>재료가 등록되지 않았습니다.</h5>
@@ -299,18 +320,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </c:forEach>
           </c:otherwise>
           </c:choose>
-
-          <!--
-          <div class="row" data-id="pork" data-title="돼지고기 (삼겹살)" data-price="15000">
-            <input type="checkbox" />
-            <div class="name">
-              돼지고기 (삼겹살) <span class="badge">필수</span>
-              <div class="sub">300g</div>
-            </div>
-            <div class="right">15,000원</div>
-          </div>
-          -->
-          <!--재료 반복-->
+          
           <div class="footer">
             <div class="total">총 금액 <span id="sum">0원</span></div>
             <div class="btn" onclick="addSelected()">🛒 선택한 재료 모두 장바구니에 담기</div>
@@ -322,15 +332,16 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         </div>
       </div>
 
+      <!-- 조리법 -->
       <div id="panel-steps" class="panel">
         <div class="card">
-          <h3 style="margin: 0 0 10px">조리 방법</h3>
+          <h3 style="margin: 10px">조리 방법</h3>
           <c:choose>
             <c:when test="${empty requestScope.recipe.steps}">
               <h5>조리 방법이 등록되지 않았습니다.</h5>
             </c:when>
           <c:otherwise>
-            <ol style="display: flex; flex-direction: column; gap: 12px; margin-left: 18px">
+            <ol style="display: flex; flex-direction: column; gap: 12px;">
               <c:forEach items="${recipe.steps}" var="stepDTO">
                 <img src="${stepDTO.imageUrl}" alt="${stepDTO.description}" />
                 <li>${stepDTO.description}</li>
@@ -341,34 +352,54 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         </div>
       </div>
 
+      <!-- 변형 레시피 -->
       <div id="panel-variants" class="panel">
         <div class="card">
-          <div class="muted" style="margin-bottom: 8px">다른 사용자의 변형 레시피들입니다</div>
-          <div class="grid" style="gap: 12px">
-            <div class="card" style="padding: 14px">
-              <div style="font-weight: 700">치즈 김치찌개</div>
-              <div class="muted2">치즈를 추가한 더 묵직한 맛</div>
-              <div class="actions-row">
-                <button class="btn" style="padding: 8px 12px">변형 레시피 보기</button>
-              </div>
-            </div>
-            <div class="card" style="padding: 14px">
+          <div class="muted2" style="margin: 10px; margin-bottom: 20px">다른 사용자의 변형 레시피입니다</div>
+          
+          <c:choose>
+            <c:when test="${empty variants}">
+              <h5>등록된 변형 레시피가 없습니다.</h5>
+            </c:when>
+            <c:otherwise>
+              <c:forEach items="${variants}" var="variant">
+                <div class="card variant">
+                  <img src="${variant.thumbnailUrl}" alt="thumbnail"/>
+                  <div style="flex: 1">
+                    <div style="font-weight: 700">${variant.title}</div>
+                    <div class="muted2">${variant.description}</div>
+                    <div class="actions-row">
+                      <a class="ghost-link muted2" href="${path}/front?key=recipe&methodName=recipeDetail&recipeId=${variant.recipeId}">
+                        <button class="btn" style="padding: 8px 12px; margin-top: 10px">변형 레시피 보기</button>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </c:forEach>
+            </c:otherwise>
+          </c:choose>
+          
+          <!-- 
+          <div class="grid" style="gap: 8px">
+            <div class="card" style="padding: 20px">
               <div style="font-weight: 700">참치 김치찌개</div>
               <div class="muted2">참치를 더해 감칠맛 업</div>
               <div class="actions-row">
-                <button class="btn" style="padding: 8px 12px">변형 레시피 보기</button>
+                <button class="btn" style="padding: 8px 12px; margin-top: 10px">변형 레시피 보기</button>
               </div>
             </div>
           </div>
-          <div class="muted2" style="text-align: center; margin-top: 6px">
-            * 조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다
-          </div>
+           -->
+          
         </div>
       </div>
 
+      <!-- 리뷰 -->
       <div id="panel-reviews" class="panel">
-        <div class="card">
-          <h3 style="margin: 0 0 10px">리뷰 작성하기</h3>
+        <div class="card" style="padding: 16px">
+          <h3 style="margin: 10px">리뷰 작성하기</h3>
+          <div style="padding: 10px">
+          <div>평점</div>
           <div class="stars" id="starBox" aria-label="평점 선택">
             <button data-v="1">★</button>
             <button data-v="2">★</button>
@@ -376,6 +407,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             <button data-v="4">★</button>
             <button data-v="5">★</button>
           </div>
+          <div>리뷰 내용</div>
           <textarea
             id="reviewText"
             rows="4"
@@ -385,10 +417,31 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           ></textarea>
           <input id="photoUrl" class="input" placeholder="이미지 URL을 입력하세요 (선택)" />
           <div class="actions-row" style="margin-top: 10px">
-            <button class="btn" id="submitReview">리뷰 등록하기</button>
+            <button class="btn" id="submitReview" style="width: 100%; padding: 8px">리뷰 등록하기</button>
+          </div>
           </div>
         </div>
-        <div id="reviewList"></div>
+        <div class="card">
+          <c:choose>
+            <c:when test="${empty reviews}">
+              <div class="muted2" style="margin: 10px">
+              아직 리뷰가 없습니다 <br>
+              첫 번째 리뷰를 작성해보세요!
+              </div>
+            </c:when>
+            <c:otherwise>
+              <c:forEach items="${reviews}" var="review">
+                <div class="card variant">
+                  <img src="${review.imageUrl}" alt="thumbnail"/>
+                  <div>
+                    <div class="muted2">${review.nickname}</div>
+                    <div>${review.content}</div>               
+                  </div>
+                </div>
+              </c:forEach>
+            </c:otherwise>
+          </c:choose>
+        </div>
       </div>
     </div>
     <!-- footer 시작 -->
@@ -435,11 +488,19 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         });
 
         // Variant write
-        const vb = document.querySelector("#variantBtn");
-        vb?.addEventListener("click", () => {
+        const writeBtn = document.querySelector("#writeBtn");
+        writeBtn?.addEventListener("click", () => {
           location.href = "${path}/recipes/variant-write.jsp";
         });
-
+        
+        // Variant see
+        /*
+        const variantBtn = document.querySelector("#variantBtn");
+        variantBtn?.addEventListener("click", () => {
+          location.href = "${path}/front?key=recipe&methodName=recipeDetail&recipeId=${"${recipe.recipeId}"}";
+        });
+		*/
+        
         // Checkboxes -> sum
         document.addEventListener("change", (e) => {
           if (e.target.matches(".ing [type=checkbox]")) sum();
