@@ -10,7 +10,7 @@ public interface RecipeDAO {
 	/**
 	 * 레시피 전체 검색
 	 */
-	List<RecipeDTO> selectAll() throws SQLException;
+	List<RecipeDTO> selectByOptions(String word, String category, String order) throws SQLException;
 	
 	/**
 	 * 레시피 단일 검색 (상세보기)

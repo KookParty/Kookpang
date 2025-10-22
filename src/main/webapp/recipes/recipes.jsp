@@ -34,49 +34,29 @@ prefix="c" %>
           placeholder="식재료를 검색해보세요..."
           style="flex: 1; min-width: 240px"
         />
-        <button class="btn">인기순</button
+        <button class="btn">최신순</button
         ><button class="btn">카테고리 ▾</button>
       </div>
       <section class="grid cards" id="list">
-        <!-- 예시 시작 -->
-        <!-- 
-        <article class="card tile">
-          <div class="thumb">
-            <img src="${path}/assets/img/bulgogi.jpg" />
-          </div>
-          <div class="body">
-            <div class="meta">
-              <span class="label">공식 레시피</span>
-              <span class="label green">쉬움</span>
-            </div>
-            <h3 style="margin: 8px 0">불고기</h3>
-            <p class="small">달콤짭짤한 한국 전통 불고기</p>
-            <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
-            <div style="display: flex; gap: 8px; align-items: center">
-              <a class="btn dark full" href="recipe-detail.jsp?id=bulgogi"
-                >레시피 보기</a
-              >
-              <button class="btn small" data-like="bulgogi">♡</button>
-            </div>
-          </div>
-        </article>
-         -->
-        <!-- 예시 끝 -->
+        <!-- 레시피 목록 들어올 공간 -->
       </section>
     </main>
     <!-- footer 시작 -->
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
+    
     <script>
       onload = () => {
-        printData();
+        printData("", "", "");
       };
 
-      const printData = async function (keyword) {
+      const printData = async function (word, category, order) {
         body = new URLSearchParams({
           key: "recipe",
-          methodName: keyword ? "selectByWord" : "selectAll",
-          word: keyword,
+          methodName: "selectByOptions",
+          word,
+          category,
+          order,
         });
 
         try {
@@ -97,7 +77,7 @@ prefix="c" %>
           let str = "";
           result.forEach((recipe, index) => {
             str += `
-            <article class="card tile">
+            <article class="card tile" style="max-width: 320px">
               <div class="thumb">
                 <img src="${"${recipe.ATT_FILE_NO_MAIN}"}" />
               </div>
