@@ -16,12 +16,6 @@ public class RecipeController implements Controller {
 	private ReviewService reviewService = ReviewServiceImpl.getInstance();
 	
 	public ModelAndView recipes(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String word = request.getParameter("word");
-		String category = request.getParameter("category");
-		String order = request.getParameter("order");
-		
-		List<RecipeDTO> recipes = recipeService.selectByOptions(word, category, order);
-		request.setAttribute("recipes", recipes);
 		
 		return new ModelAndView("recipes/recipes.jsp");
 	}
@@ -60,15 +54,4 @@ public class RecipeController implements Controller {
 		return list;
 	}
 	
-	/**
-	 * id로 검색 (상세보기)
-	 */
-	/*
-	// front -> 위에 recipeDetail에서 처리하고 있어서 일단 주석
-	public RecipeDTO selectById(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Long recipeId = Long.parseLong(request.getParameter("recipeId"));
-		RecipeDTO recipeDTO = recipeService.selectById(recipeId);
-		return recipeDTO;
-	}
-	*/
 }

@@ -34,8 +34,13 @@ prefix="c" %>
           placeholder="식재료를 검색해보세요..."
           style="flex: 1; min-width: 240px"
         />
-        <button class="btn">최신순</button
-        ><button class="btn">카테고리 ▾</button>
+        <button id="sort" class="btn">최신순</button>
+        <select id="category" class="btn" style="width: 120px">
+          <option value="base" disabled selected>카테고리</option>
+          <option value="all">전체 레시피</option>
+          <option value="base">기본 레시피</option>
+          <option value="variant">변형 레시피</option>
+        </select>
       </div>
       <section class="grid cards" id="list">
         <!-- 레시피 목록 들어올 공간 -->
@@ -46,11 +51,15 @@ prefix="c" %>
     <!-- footer 끝 -->
     
     <script>
+      let word = "";
+      let category = "base";	// 기본레시피
+      let order = "recent"; // 최신순
+      
       onload = () => {
-        printData("", "", "");
+        printData();
       };
 
-      const printData = async function (word, category, order) {
+      const printData = async function () {
         body = new URLSearchParams({
           key: "recipe",
           methodName: "selectByOptions",
@@ -77,7 +86,7 @@ prefix="c" %>
           let str = "";
           result.forEach((recipe, index) => {
             str += `
-            <article class="card tile" style="max-width: 320px">
+            <article class="card tile">
               <div class="thumb">
                 <img src="${"${recipe.ATT_FILE_NO_MAIN}"}" />
               </div>
@@ -103,6 +112,25 @@ prefix="c" %>
           console.error("에러 발생: " + err);
         }
       };
+      
+      // 검색어 입력
+      document.querySelector("#keyword").onkeyup = async (e) => {
+        word = e.target.value;
+        printData();
+      }
+      
+      // 카테고리 변경
+      document.querySelector("#category").onchange = async (e) => {
+        category = e.target.value;
+        printData();
+      }
+      
+      // 정렬 버튼 클릭 (토글)
+      document.querySelector("#sort").onclick = async (e) => {
+        e.target.textContent = (e.target.textContent === "최신순") ? "인기순" : "최신순";
+        order = (order === "recent") ? "popular" : "recent";
+        printData();
+      }
     </script>
     <!--
       <script>

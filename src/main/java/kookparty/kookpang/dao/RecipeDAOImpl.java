@@ -36,8 +36,6 @@ public class RecipeDAOImpl implements RecipeDAO {
 	
 	@Override
 	public List<RecipeDTO> selectByOptions(String word, String category, String order) throws SQLException {
-		System.out.println("word: " + word + " category: " + category + " order: " + order);
-		
 		List<RecipeDTO> list = new ArrayList<>();
 		StringBuilder baseSql = new StringBuilder(proFile.getProperty("recipe.selectByOptions"));
 		int index = 1;
