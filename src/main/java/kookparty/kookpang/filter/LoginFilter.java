@@ -43,7 +43,7 @@ public class LoginFilter implements Filter {
       needAuth = false;
     }
 
-    if ("recipes".equals(key) && Set.of("selectAll","recipeDetail","recipes").contains(methodName)) {
+    if ("recipe".equals(key) && Set.of("selectAll","recipeDetail","recipes").contains(methodName)) {
       needAuth = false;
     }
     if ("product".equals(key) && methodName != null) {
