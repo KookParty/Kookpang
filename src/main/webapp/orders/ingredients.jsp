@@ -122,6 +122,15 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           .join("");
       };
 
+      const updateCartBadgeAndToast = function () {
+        ensureBadge();
+        const n = document.createElement("div");
+        n.textContent = "장바구니에 담겼습니다.";
+        n.style.cssText =
+          "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
+        document.body.appendChild(n);
+      };
+
       document.getElementById("q").addEventListener("keyup", searchData);
       document.getElementById("cat").addEventListener("change", searchData);
       document.getElementById("sort").addEventListener("change", searchData);
@@ -152,7 +161,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               }),
             });
             if (response.ok) {
-              console.log("Cart count updated successfully");
+              updateCartBadgeAndToast();
             } else {
               console.error("Failed to update cart count:", response.statusText);
             }
@@ -166,22 +175,13 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                 count: count,
               }),
             });
-            if (!res.ok) {
-              console.error("Failed to add to cart:", res.status, res.statusText);
-              return;
+            if (res.ok) {
+              updateCartBadgeAndToast();
             }
           }
         } catch (e) {
           console.error(e);
         }
-
-        ensureBadge();
-        console.log("test");
-        const n = document.createElement("div");
-        n.textContent = "장바구니에 담겼습니다.";
-        n.style.cssText =
-          "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
-        document.body.appendChild(n);
 
         // 배지 갱신 + 토스트
         /*

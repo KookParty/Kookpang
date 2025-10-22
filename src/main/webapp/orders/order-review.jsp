@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
-uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> <%@taglib
+uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -125,29 +125,28 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               </div>
               <div id="ov-items">
                 <!-- 주문 상품 목록 반복 -->
-                <div class="ov-row">
-                  <div>
-                    <div style="font-weight: 700">상품명</div>
-                    <div class="small" style="color: #6b7280">10,000원 / 1포기</div>
+                <c:forEach var="item" items="${list}">
+                  <div class="ov-row">
+                    <div>
+                      <div style="font-weight: 700">${item.name}</div>
+                      <div class="small" style="color: #6b7280">${item.price}원 / 1</div>
+                    </div>
+                    <div class="ov-qty">
+                      <span>${item.count}</span> <span><b>${item.count * item.price}원</b></span>
+                    </div>
                   </div>
-                  <div class="ov-qty">
-                    <button data-minus="">-</button>
-                    <span>2</span>
-                    <button data-plus="">+</button>
-                    <span><b>20,000원</b></span>
-                    <button class="ov-del" title="삭제" data-del="">🗑</button>
-                  </div>
-                </div>
+                </c:forEach>
                 <!-- 주문 상품 목록 반복 끝 -->
               </div>
             </section>
             <aside class="ov-card ov-aside">
               <div class="ov-sec-title">결제 정보</div>
-              <div class="ov-row"><span>상품 금액</span><b id="ov-price">0원</b></div>
-              <div class="ov-row"><span>배송비</span><b id="ov-ship">3,000원</b></div>
+              <div class="ov-row"><span>상품 금액</span><b id="ov-price">${price}원</b></div>
+              <div class="ov-row"><span>배송비</span><b id="ov-ship">${deliveryFee}원</b></div>
               <div class="ov-row" style="border-top: 1px solid #e5e7eb"></div>
               <div class="ov-row">
-                <span style="font-weight: 800">총 결제 금액</span><b id="ov-total" style="font-size: 18px">0원</b>
+                <span style="font-weight: 800">총 결제 금액</span
+                ><b id="ov-total" style="font-size: 18px">${totalPrice}원</b>
               </div>
               <button id="ov-pay" class="ov-badge" style="margin-top: 12px; width: 100%; justify-content: center">
                 결제하기
@@ -163,19 +162,16 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                   <!-- 선택형 주소: 하드코딩된 주소 목록과 '직접 입력' 옵션 -->
                   <form id="ship-select-form">
                     <div style="margin-bottom: 8px">
-                      <label style="display: block; margin-bottom: 6px"
-                        ><input type="radio" name="ship_choice" value="addr1" checked /> 받는 분: <b>테스트</b> /
-                        연락처: <b>010-1234-5678</b><br />주소: <b>서울시 강남구 테헤란로 123번길 45</b></label
+                      받는 분: <b>${name}</b> / 연락처: <b>${phone}</b><br />
+                      <label style="display: block; margin-bottom: 6px">
+                        <input type="radio" name="ship_choice" value="addr1" id="normal" checked /> 주소:
+                        <b id="addr">${address}</b></label
                       >
                       <label style="display: block; margin-bottom: 6px"
-                        ><input type="radio" name="ship_choice" value="custom" /> 직접 입력</label
+                        ><input type="radio" name="ship_choice" value="custom" id="custom" /> 직접 입력</label
                       >
                     </div>
                     <div id="ship-custom-area" style="margin-top: 8px">
-                      <div style="display: flex; gap: 8px; margin-bottom: 8px">
-                        <input id="custom-name" class="input" placeholder="받는 분 이름" style="flex: 1" />
-                        <input id="custom-phone" class="input" placeholder="연락처" style="width: 160px" />
-                      </div>
                       <div style="margin-bottom: 8px">
                         <textarea
                           id="custom-address"
@@ -210,36 +206,54 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
     <script>
-      const insertOrder = async function () {
-        let totalPrice = 0; //구해야함
+      //배송지 선택
+      const shipSelect = function () {
+        let addr = "";
+        if (document.getElementById("normal").checked) {
+          addr = "${address}";
+        } else if (document.getElementById("custom").checked) {
+          addr = document.getElementById("custom-address").value;
+        }
+        return addr;
+      };
 
-        fetch(CONTEXT_PATH + "/ajax", {
+      const payReady = async function () {
+        const addr = shipSelect();
+        const r = await fetch(CONTEXT_PATH + "/ajax", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json;charset=UTF-8",
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
           },
-          body: JSON.stringify({
-            key: "order",
-            methodName: "insertOrder",
-            totalPrice: totalPrice,
-            shippingAddress: "", //구해야함
-            itemlist: [
-              //구해야함
-              {
-                productId: 1,
-                quantity: 2,
-                price: 20000,
-              },
-            ],
+          body: new URLSearchParams({
+            key: "pay",
+            methodName: "payReady",
+            address: addr,
           }),
+        });
+        const json = await r.json();
+        const popupWidth = 500;
+        const popupHeight = 500;
+        const left = window.screen.width / 2 - popupWidth / 2;
+        const top = window.screen.height / 2 - popupHeight / 2;
+
+        window.open(
+          json.next_redirect_pc_url,
+          "kakaoPayPopup",
+          `width=${"${popupWidth}"},height=${"${popupHeight}"},left=${"${left}"},top=${"${top}"},resizable=no,scrollbars=yes`
+        );
+
+        window.addEventListener("message", (event) => {
+          if (event.data) {
+            console.log("결제 완료, 주문번호: " + event.data);
+            window.location.href = CONTEXT_PATH + "/front?key=order&methodName=orderResult&orderPk=" + event.data;
+          }
         });
       };
 
       document.getElementById("ov-pay").addEventListener("click", () => {
         //결제 api 호출(ajax)
         //결제 성공시 주문 pk받아서 다음 페이지로
-        const id = 1; //임시
-        location.href = CONTEXT_PATH + "/orders/order-result.jsp?id=" + id;
+        payReady();
       });
     </script>
   </body>

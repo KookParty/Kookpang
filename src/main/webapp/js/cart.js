@@ -1,5 +1,5 @@
 const order = function () {
-  location.href = conPath + "/orders/order-review.jsp";
+  location.href = conPath + "/front?key=order&methodName=orderPage";
 };
 const showCart = function (list) {
   const emptyState = document.getElementById("emptyState");

@@ -108,7 +108,7 @@ public class CartDAOImpl implements CartDAO {
 		Connection con = null;
 		PreparedStatement ps = null;
 		int result = 0;
-		String sql = proFile.getProperty("cart.deleteCartByCardId");
+		String sql = proFile.getProperty("cart.deleteCartByUserId");
 		try {
 			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
