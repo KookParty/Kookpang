@@ -44,35 +44,45 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <!-- footer 끝 -->
 
     <script>
-      document.getElementById("doLogin").addEventListener("click", async (e) => {
-        e.preventDefault();
-        const base = typeof CONTEXT_PATH !== "undefined" ? CONTEXT_PATH : "";
-        const email = document.getElementById("email").value.trim();
-        const pass = document.getElementById("pass").value.trim();
+    document.getElementById('doLogin').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const base = (typeof CONTEXT_PATH !== 'undefined') ? CONTEXT_PATH : '';
+      const email = document.getElementById('email').value.trim();
+      const pass  = document.getElementById('pass').value.trim();
 
-        if (!email || !pass) {
-          alert("이메일과 비밀번호를 입력하세요.");
-          return;
-        }
+      if (!email || !pass) {
+        alert('이메일과 비밀번호를 입력하세요.');
+        return;
+      }
 
-        try {
-          const r = await fetch(base + "/ajax?key=user&methodName=login", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-            body: new URLSearchParams({ email, password: pass }).toString(),
-          });
+      try {
+        const r = await fetch(base + '/ajax?key=user&methodName=login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'
+          },
+          body: new URLSearchParams({ email, password: pass }).toString()
+        });
 
-          const text = await r.text();
-          const j = JSON.parse(text);
-          if (!r.ok || !j.ok) throw new Error(j.msg || "로그인 실패");
+        const text = await r.text();
+        const j = JSON.parse(text);
+        if (!r.ok || !j.ok) throw new Error(j.msg || '로그인 실패');
+        alert('로그인되었습니다.')
+        const to = new URL(location.href).searchParams.get('redirect') || (base + '/index.jsp');
+        location.href = to;
 
-          const to = new URL(location.href).searchParams.get("redirect") || base + "/index.jsp";
-          location.href = to;
-        } catch (err) {
-          alert(err.message);
-        }
-      });
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const msg = localStorage.getItem('flashNext');
+      if (msg) {
+        alert(msg);
+        localStorage.removeItem('flashNext');
+      }
+    });
     </script>
   </body>
 </html>

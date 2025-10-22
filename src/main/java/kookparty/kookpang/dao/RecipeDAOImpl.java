@@ -22,9 +22,6 @@ public class RecipeDAOImpl implements RecipeDAO {
 	
 	private RecipeDAOImpl() {
 		try {
-			//dbQuery를 준비한 ~.properties파일을 로딩해서 Properties 자료구조에 저장한다.
-			//현재 프로젝트가 런타임(실행)될 때, 즉 서버가 실행될때 classes폴더의 위치를
-			//동적으로 가져와서 경로를 설정해야한다.
 			InputStream is = getClass().getClassLoader().getResourceAsStream("dbQuery.properties");
 			proFile.load(is);
 			
@@ -38,12 +35,33 @@ public class RecipeDAOImpl implements RecipeDAO {
 	}
 	
 	@Override
-	public List<RecipeDTO> selectAll() throws SQLException {
+	public List<RecipeDTO> selectByOptions(String word, String category, String order) throws SQLException {
 		List<RecipeDTO> list = new ArrayList<>();
-		String sql = proFile.getProperty("recipe.selectAll");
+		StringBuilder baseSql = new StringBuilder(proFile.getProperty("recipe.selectByOptions"));
+		int index = 1;
+		
+		// 검색어
+		if(word != null && word.isEmpty() == false) {
+			baseSql.append(" where upper(replace(title, ' ', '')) like upper(replace(?, ' ', ''))");
+		}
+		
+		// 카테고리(기본/변형 선택했을 경우)
+		if ("base".equals(category) || "variant".equals(category)) {
+			baseSql.append(word == null || word.isEmpty() ? " where " : " and ");
+			baseSql.append("recipe_type = ? ");
+		}
+		
+		// 정렬 기준 (최신순/인기순)
+		if(order == null || "recent".equals(order)) baseSql.append(" order by created_at desc");
+		// else if ("like".equals(order)) baseSql.append(" order by  desc ");
 		
 		try (Connection con = DbUtil.getConnection();
-				PreparedStatement ps = con.prepareStatement(sql)) {
+				PreparedStatement ps = con.prepareStatement(baseSql.toString())) {
+			if (word != null && word.isEmpty() == false) 
+				ps.setString(index++, "%" + word + "%");
+			if ("base".equals(category) || "variant".equals(category)) 
+				ps.setString(index++, category);
+				
 			
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
@@ -54,7 +72,7 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getString(3),
 							rs.getString(4),
 							rs.getString(5),
-							rs.getString(6).toLowerCase().equals("base") ? 
+							rs.getString(6).toLowerCase().equals("base") ?
 									RecipeType.BASE : RecipeType.VARIANT,
 							rs.getString(7),
 							rs.getString(8),
@@ -63,13 +81,13 @@ public class RecipeDAOImpl implements RecipeDAO {
 							ingredientDAO.selectByRecipeId(con, recipeId),
 							stepDAO.selectByRecipeId(con, recipeId)
 							));
-					
 				}
 			}
 		}
 		
 		return list;
 	}
+	
 	
 	@Override
 	public RecipeDTO selectById(long recipeId) throws SQLException {
@@ -103,6 +121,40 @@ public class RecipeDAOImpl implements RecipeDAO {
 		}
 		
 		return recipeDTO;
+	}
+	
+	@Override
+	public List<RecipeDTO> selectVariantsByParentId(long parentRecipeId) throws SQLException {
+		List<RecipeDTO> list = new ArrayList<>();
+		String sql = proFile.getProperty("recipe.selectVariantsByParentId");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, parentRecipeId);
+			
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					long recipeId = rs.getLong(1);
+					list.add(new RecipeDTO(
+							recipeId, 
+							rs.getLong(2),
+							rs.getString(3),
+							rs.getString(4),
+							rs.getString(5),
+							rs.getString(6).toLowerCase().equals("base") ? 
+									RecipeType.BASE : RecipeType.VARIANT,
+							rs.getString(7),
+							rs.getString(8),
+							rs.getInt(9),
+							rs.getString(10),
+							ingredientDAO.selectByRecipeId(con, recipeId),
+							stepDAO.selectByRecipeId(con, recipeId)
+							));
+				}
+			}
+		}
+		
+		return list;
 	}
 	
 	@Override

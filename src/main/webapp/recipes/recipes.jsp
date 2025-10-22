@@ -34,49 +34,38 @@ prefix="c" %>
           placeholder="식재료를 검색해보세요..."
           style="flex: 1; min-width: 240px"
         />
-        <button class="btn">인기순</button
-        ><button class="btn">카테고리 ▾</button>
+        <button id="sort" class="btn">최신순</button>
+        <select id="category" class="btn" style="width: 120px">
+          <option value="base" disabled selected>카테고리</option>
+          <option value="all">전체 레시피</option>
+          <option value="base">기본 레시피</option>
+          <option value="variant">변형 레시피</option>
+        </select>
       </div>
       <section class="grid cards" id="list">
-        <!-- 예시 시작 -->
-        <!-- 
-        <article class="card tile">
-          <div class="thumb">
-            <img src="${path}/assets/img/bulgogi.jpg" />
-          </div>
-          <div class="body">
-            <div class="meta">
-              <span class="label">공식 레시피</span>
-              <span class="label green">쉬움</span>
-            </div>
-            <h3 style="margin: 8px 0">불고기</h3>
-            <p class="small">달콤짭짤한 한국 전통 불고기</p>
-            <div class="meta">⏱️ 45분 · 👥 3인분 · ❤ 892</div>
-            <div style="display: flex; gap: 8px; align-items: center">
-              <a class="btn dark full" href="recipe-detail.jsp?id=bulgogi"
-                >레시피 보기</a
-              >
-              <button class="btn small" data-like="bulgogi">♡</button>
-            </div>
-          </div>
-        </article>
-         -->
-        <!-- 예시 끝 -->
+        <!-- 레시피 목록 들어올 공간 -->
       </section>
     </main>
     <!-- footer 시작 -->
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
+    
     <script>
+      let word = "";
+      let category = "base";	// 기본레시피
+      let order = "recent"; // 최신순
+      
       onload = () => {
         printData();
       };
 
-      const printData = async function (keyword) {
+      const printData = async function () {
         body = new URLSearchParams({
           key: "recipe",
-          methodName: keyword ? "selectByWord" : "selectAll",
-          word: keyword,
+          methodName: "selectByOptions",
+          word,
+          category,
+          order,
         });
 
         try {
@@ -123,6 +112,25 @@ prefix="c" %>
           console.error("에러 발생: " + err);
         }
       };
+      
+      // 검색어 입력
+      document.querySelector("#keyword").onkeyup = async (e) => {
+        word = e.target.value;
+        printData();
+      }
+      
+      // 카테고리 변경
+      document.querySelector("#category").onchange = async (e) => {
+        category = e.target.value;
+        printData();
+      }
+      
+      // 정렬 버튼 클릭 (토글)
+      document.querySelector("#sort").onclick = async (e) => {
+        e.target.textContent = (e.target.textContent === "최신순") ? "인기순" : "최신순";
+        order = (order === "recent") ? "popular" : "recent";
+        printData();
+      }
     </script>
     <!--
       <script>

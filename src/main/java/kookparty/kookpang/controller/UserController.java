@@ -89,4 +89,55 @@ public class UserController implements Controller {
         }
         return Map.of("ok", true, "user", user);
     }
+    public ModelAndView loginForm(HttpServletRequest req, HttpServletResponse resp) {
+        
+        return new ModelAndView("/users/login.jsp");
+    }
+
+    public ModelAndView registerForm(HttpServletRequest req, HttpServletResponse resp) {
+       
+        return new ModelAndView("/users/register.jsp");
+    }
+
+    public ModelAndView loginSubmit(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            req.setCharacterEncoding("UTF-8");
+            String email = t(req.getParameter("email"));
+            String password = t(req.getParameter("password"));
+            UserDTO u = svc.login(email, password);
+            req.getSession(true).setAttribute("loginUser", u);
+            return new ModelAndView(req.getContextPath() + "/index.jsp", true);
+        } catch (Exception e) {
+            req.setAttribute("errorMsg", e.getMessage());
+            return new ModelAndView("/users/login.jsp");
+        }
+    }
+
+    public ModelAndView registerSubmit(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            req.setCharacterEncoding("UTF-8");
+            String email    = t(req.getParameter("email"));
+            String password = t(req.getParameter("password"));
+            String name     = t(req.getParameter("name"));
+            String nickname = t(req.getParameter("nickname"));
+            String phone    = t(req.getParameter("phone"));
+            String address  = t(req.getParameter("address"));
+            UserDTO u = svc.register(email, password, name, nickname, phone, address);
+            return new ModelAndView(req.getContextPath() + "/users/login.jsp", true);
+        } catch (Exception e) {            
+            req.setAttribute("errorMsg", e.getMessage());
+            req.setAttribute("formEmail", emailParam(req));
+            req.setAttribute("formName",  nameParam(req));
+            req.setAttribute("formNick",  nickParam(req));
+            req.setAttribute("formPhone", phoneParam(req));
+            req.setAttribute("formAddr",  addrParam(req));
+            return new ModelAndView("/users/register.jsp");
+        }
+    }
+
+    private String emailParam(HttpServletRequest req){ return req.getParameter("email"); }
+    private String nameParam (HttpServletRequest req){ return req.getParameter("name"); }
+    private String nickParam (HttpServletRequest req){ return req.getParameter("nickname"); }
+    private String phoneParam(HttpServletRequest req){ return req.getParameter("phone"); }
+    private String addrParam (HttpServletRequest req){ return req.getParameter("address"); }
 }
