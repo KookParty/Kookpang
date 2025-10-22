@@ -9,21 +9,22 @@ import kookparty.kookpang.dto.BoardDTO.Image;
 import kookparty.kookpang.dto.BoardDTO.Comment;
 import kookparty.kookpang.dto.UserDTO;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /** key=board */
 public class BoardController implements Controller {
     private final BoardDAO dao = new BoardDAO();
 
     // ===================== 유틸 =====================
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     private static String t(String s){ return (s==null) ? "" : s.trim(); }
     private static int parseInt(String s, int dv){ try { return Integer.parseInt(s); } catch(Exception e){ return dv; } }
     private static Long parseLongObj(String s){ try { return Long.parseLong(s); } catch(Exception e){ return null; } }
 
-    /** 세션에서 로그인 사용자 ID 꺼내기 (UserDTO 또는 Map 지원) */
+    /** 세션에서 로그인 사용자 ID 꺼내기 */
     private static Long uid(HttpServletRequest req){
         HttpSession session = req.getSession(false);
         if(session == null) return null;
@@ -36,7 +37,6 @@ public class BoardController implements Controller {
                 if(v instanceof Number n) return n.longValue();
                 if(v != null) return Long.valueOf(v.toString());
             }
-            // POJO with getUserId()
             return ((Number)u.getClass().getMethod("getUserId").invoke(u)).longValue();
         }catch(Exception e){
             return null;
@@ -57,11 +57,81 @@ public class BoardController implements Controller {
         return list;
     }
 
+    private static String iso(LocalDateTime dt){
+        return (dt == null) ? null : dt.format(FMT);
+    }
+
+    /** 리스트용 간단 맵 (LocalDateTime → String) */
+    private static Map<String,Object> mapPostLite(BoardDTO d){
+        Map<String,Object> m = new LinkedHashMap<>();
+        m.put("postId", d.getPostId());
+        m.put("userId", d.getUserId());
+        m.put("category", d.getCategory());
+        m.put("title", d.getTitle());
+        m.put("content", d.getContent());
+        m.put("viewCount", d.getViewCount());
+        m.put("commentCount", d.getCommentCount());
+        m.put("createdAt", iso(d.getCreatedAt()));
+        m.put("nickname", d.getNickname());
+        return m;
+    }
+
+    /** 상세뷰용 맵 (이미지/댓글 포함, LocalDateTime → String) */
+    private static Map<String,Object> mapPostFull(BoardDTO d){
+        Map<String,Object> m = mapPostLite(d);
+        // images
+        List<Map<String,Object>> imgs = new ArrayList<>();
+        if (d.getImages() != null){
+            for (Image im : d.getImages()){
+                Map<String,Object> mi = new LinkedHashMap<>();
+                mi.put("imageId", im.getImageId());
+                mi.put("postId", im.getPostId());
+                mi.put("imageUrl", im.getImageUrl());
+                mi.put("imageOrder", im.getImageOrder());
+                imgs.add(mi);
+            }
+        }
+        m.put("images", imgs);
+
+        // comments
+        List<Map<String,Object>> cmts = new ArrayList<>();
+        if (d.getComments() != null){
+            for (Comment c : d.getComments()){
+                Map<String,Object> mc = new LinkedHashMap<>();
+                mc.put("commentId", c.getCommentId());
+                mc.put("postId", c.getPostId());
+                mc.put("userId", c.getUserId());
+                mc.put("content", c.getContent());
+                mc.put("createdAt", iso(c.getCreatedAt()));
+                mc.put("nickname", c.getNickname());
+                cmts.add(mc);
+            }
+        }
+        m.put("comments", cmts);
+        return m;
+    }
+
+    private static List<Map<String,Object>> mapComments(List<Comment> cs){
+        List<Map<String,Object>> out = new ArrayList<>();
+        if(cs != null){
+            for(Comment c : cs){
+                Map<String,Object> mc = new LinkedHashMap<>();
+                mc.put("commentId", c.getCommentId());
+                mc.put("postId", c.getPostId());
+                mc.put("userId", c.getUserId());
+                mc.put("content", c.getContent());
+                mc.put("createdAt", iso(c.getCreatedAt()));
+                mc.put("nickname", c.getNickname());
+                out.add(mc);
+            }
+        }
+        return out;
+    }
+
     // ===================== /front (JSP forward/redirect) =====================
 
     /** GET /front?key=board&methodName=list */
     public ModelAndView list(HttpServletRequest req, HttpServletResponse resp){
-        // 목록 데이터는 AJAX로 가져가므로 여기서는 필터값만 세팅하고 JSP forward
         req.setAttribute("category", t(req.getParameter("category")));
         req.setAttribute("q", t(req.getParameter("q")));
         return new ModelAndView("/boards/board.jsp");
@@ -73,7 +143,7 @@ public class BoardController implements Controller {
         if(id != null){
             dao.incView(id);
             BoardDTO d = dao.findById(id);
-            req.setAttribute("post", d); // JSP에서는 post가 있으면 보기 모드로 렌더
+            req.setAttribute("post", d); // JSP에서 보기/수정 전환에 사용
         }
         return new ModelAndView("/boards/board-write.jsp");
     }
@@ -81,13 +151,12 @@ public class BoardController implements Controller {
     /** GET /front?key=board&methodName=writeForm */
     public ModelAndView writeForm(HttpServletRequest req, HttpServletResponse resp){
         if (uid(req) == null) {
-            // ModelAndView 클래스 수정 없이 redirect 사용 (두 번째 인자 true)
             return new ModelAndView(req.getContextPath()+"/front?key=user&methodName=loginForm", true);
         }
         return new ModelAndView("/boards/board-write.jsp");
     }
 
-    // ===================== /ajax (JSON 반환) =====================
+    // ===================== /ajax (JSON 반환: LocalDateTime → String 변환 적용) =====================
 
     /** GET /ajax?key=board&methodName=listData&category=&q=&page=&size= */
     public Object listData(HttpServletRequest req, HttpServletResponse resp){
@@ -97,11 +166,14 @@ public class BoardController implements Controller {
         int size = parseInt(req.getParameter("size"), 10);
 
         List<BoardDTO> rows = dao.list(category, q, page, size);
+        List<Map<String,Object>> mapped = new ArrayList<>();
+        for (BoardDTO d : rows) mapped.add(mapPostLite(d));
+
         int total = dao.count(category, q);
 
-        Map<String,Object> res = new HashMap<>();
+        Map<String,Object> res = new LinkedHashMap<>();
         res.put("ok", true);
-        res.put("rows", rows);
+        res.put("rows", mapped);
         res.put("total", total);
         res.put("page", page);
         res.put("size", size);
@@ -111,29 +183,24 @@ public class BoardController implements Controller {
     /** GET /ajax?key=board&methodName=postData&postId= */
     public Object postData(HttpServletRequest req, HttpServletResponse resp){
         Long id = parseLongObj(req.getParameter("postId"));
-        Map<String,Object> res = new HashMap<>();
         if(id == null){
-            res.put("ok", false);
-            res.put("error", "invalid");
-            return res;
+            return Map.of("ok", false, "error", "invalid");
         }
-        res.put("ok", true);
-        res.put("post", dao.findById(id));
-        return res;
+        BoardDTO d = dao.findById(id);
+        return Map.of("ok", true, "post", d==null ? null : mapPostFull(d));
     }
 
     /** POST /ajax?key=board&methodName=save  (등록/수정 공용) */
     public Object save(HttpServletRequest req, HttpServletResponse resp){
         Long userId = uid(req);
-        if(userId == null) return Map.of("ok", false, "error", "login-required");
+        if (userId == null) return Map.of("ok", false, "error", "login-required");
 
         String postIdStr = req.getParameter("postId");
         String category  = t(req.getParameter("category"));
         String title     = t(req.getParameter("title"));
         String contentH  = t(req.getParameter("content"));      // HTML
-        String contentT  = t(req.getParameter("contentText"));  // 순수 텍스트(프론트에서 추가 전송)
+        String contentT  = t(req.getParameter("contentText"));  // 순수 텍스트 (JSP에서 추가 전송)
 
-        // 내용 검증: 빈 HTML(<br>, &nbsp;)도 빈값으로 취급
         String contentForCheck =
                 (contentT == null || contentT.isBlank())
                         ? contentH.replaceAll("\\<[^>]*>", "")
@@ -141,7 +208,7 @@ public class BoardController implements Controller {
                                   .trim()
                         : contentT;
 
-        if (title.isBlank() || contentForCheck.isBlank()){
+        if (title.isBlank() || contentForCheck.isBlank()) {
             return Map.of("ok", false, "error", "invalid");
         }
 
@@ -153,15 +220,14 @@ public class BoardController implements Controller {
 
         List<Image> images = parseImages(req.getParameterValues("imageUrl"));
 
-        long newId;
-        if(postIdStr == null || postIdStr.isBlank()){
-            newId = dao.insertPost(d, images);
+        if (postIdStr == null || postIdStr.isBlank()){
+            long newId = dao.insertPost(d, images);
             return Map.of("ok", newId > 0, "postId", newId);
         } else {
             Long pid = parseLongObj(postIdStr);
             if(pid == null) return Map.of("ok", false, "error", "invalid");
             d.setPostId(pid);
-            boolean ok = dao.updatePost(d, images); // BoardDAO가 boolean 반환하도록 가정
+            boolean ok = dao.updatePost(d, images);
             return Map.of("ok", ok, "postId", d.getPostId());
         }
     }
@@ -185,12 +251,7 @@ public class BoardController implements Controller {
         if(postId == null || content.isBlank()) return Map.of("ok", false, "error", "invalid");
 
         long cid = dao.addComment(postId, userId, content);
-        List<Comment> list = dao.listComments(postId);
-        Map<String,Object> res = new HashMap<>();
-        res.put("ok", true);
-        res.put("commentId", cid);
-        res.put("comments", list);
-        return res;
+        return Map.of("ok", true, "commentId", cid, "comments", mapComments(dao.listComments(postId)));
     }
 
     /** POST /ajax?key=board&methodName=delComment */
@@ -202,10 +263,6 @@ public class BoardController implements Controller {
         if(cid == null || postId == null) return Map.of("ok", false, "error", "invalid");
 
         boolean ok = dao.delComment(cid, userId, postId);
-        List<Comment> list = dao.listComments(postId);
-        Map<String,Object> res = new HashMap<>();
-        res.put("ok", ok);
-        res.put("comments", list);
-        return res;
+        return Map.of("ok", ok, "comments", mapComments(dao.listComments(postId)));
     }
 }
