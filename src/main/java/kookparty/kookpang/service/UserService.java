@@ -48,4 +48,6 @@ public class UserService {
         return dao.findByEmailAndPassword(email, password)
                   .orElseThrow(() -> new IllegalStateException("이메일 또는 비밀번호가 올바르지 않습니다."));
     }
+
 }
+
