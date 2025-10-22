@@ -19,6 +19,7 @@ public class LoginFilter implements Filter {
 	
 
     private static boolean isAjax(HttpServletRequest req) {
+    	
         String xhr = req.getHeader("X-Requested-With");
         String accept = req.getHeader("Accept");
         return "XMLHttpRequest".equalsIgnoreCase(xhr)
@@ -41,7 +42,7 @@ public class LoginFilter implements Filter {
         if ("user".equals(key) && methodName != null && PUBLIC_USER_METHODS.contains(methodName)) {
             needAuth = false;
         }
-        if ("recipes".equals(key) && Set.of("selectAll","detail").equals(methodName)) {
+        if ("recipes".equals(key) && Set.of("selectAll", "detail").contains(methodName)) {
             needAuth = false;
         }
         if ("orders".equals(key) && methodName != null && PUBLIC_ORDER_METHODS.contains(methodName)) {

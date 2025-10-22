@@ -109,9 +109,13 @@
     }
   }
 
-  // -----------------------------
-  // ✅ 이메일 중복확인
-  // -----------------------------
+  async function checkPhoneDup(phone) {
+    const j = await getJSON(base + '/ajax?key=user&methodName=checkPhone&phone=' + encodeURIComponent(phone));
+    if (!j.ok) throw new Error(j.msg || '전화번호 확인 실패');
+    return j.taken;
+  }
+
+  // 이메일 중복확인
   $('#checkEmail')?.addEventListener('click', async () => {
     const v = $('#email').value.trim();
     if (!v) return alert('이메일을 입력해주세요.');
@@ -125,14 +129,12 @@
       } else {
         alert('사용 가능한 이메일입니다.');
         emailChecked = true;
-        lastCheckedEmail = v; // ✅ 입력값 기억
+        lastCheckedEmail = v;
       }
     } catch(e){ alert(e.message); }
   });
 
-  // -----------------------------
-  // ✅ 닉네임 중복확인
-  // -----------------------------
+  // 닉네임 중복확인
   $('#checkNick')?.addEventListener('click', async () => {
     const v = $('#nick').value.trim();
     if (!v) return alert('닉네임을 입력해주세요.');
@@ -149,45 +151,57 @@
       }
     } catch(e){ alert(e.message); }
   });
-  document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+
+ 
+  document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
     const email = $('#email').value.trim();
-    const name = $('#name').value.trim();
-    const nick = $('#nick').value.trim();
+    const name  = $('#name').value.trim();
+    const nick  = $('#nick').value.trim();
     const phone = $('#phone').value.trim();
     const pass1 = $('#pass').value.trim();
     const pass2 = $('#pass2').value.trim();
 
+    // 기본 검증
     if (!email || !name || !nick || !phone || !pass1 || !pass2) {
-      e.preventDefault();
       alert('필수 항목을 모두 입력해주세요.');
       return;
     }
     if (!EMAIL_RE.test(email)) {
-      e.preventDefault();
       alert('이메일 형식이 올바르지 않습니다.');
       return;
     }
     if (pass1 !== pass2) {
-      e.preventDefault();
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-
     if (!emailChecked || lastCheckedEmail !== email) {
-      e.preventDefault();
       alert('이메일 중복확인을 해주세요.');
       return;
     }
     if (!nickChecked || lastCheckedNick !== nick) {
-      e.preventDefault();
       alert('닉네임 중복확인을 해주세요.');
       return;
     }
 
+    try {
+      const taken = await checkPhoneDup(phone);
+      if (taken) {
+        alert('이미 등록된 전화번호입니다.');
+        return;
+      }
+    } catch (err) {
+      alert(err.message);
+      return;
+    }
+
     localStorage.setItem('flashNext', '회원가입이 완료되었습니다. 로그인해 주세요.');
+    e.target.submit();
   });
 })();
 </script>
+
 
 </body>
 </html>

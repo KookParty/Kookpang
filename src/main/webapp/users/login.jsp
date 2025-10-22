@@ -56,10 +56,11 @@
       }
 
       try {
-        const r = await fetch(base + '/api/ajax?key=user&methodName=login', {
+        const r = await fetch(base + '/ajax?key=user&methodName=login', {
           method: 'POST',
           credentials: 'include',
-          headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+          headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'
+          },
           body: new URLSearchParams({ email, password: pass }).toString()
         });
 
