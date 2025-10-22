@@ -18,8 +18,8 @@ public class RecipeServiceImpl implements RecipeService {
 	}
 	
 	@Override
-	public List<RecipeDTO> selectAll() throws Exception {
-		List<RecipeDTO> list = recipeDAO.selectAll();
+	public List<RecipeDTO> selectByOptions(String word, String category, String order) throws Exception {
+		List<RecipeDTO> list = recipeDAO.selectByOptions(word, category, order);
 		return list;
 	}
 	

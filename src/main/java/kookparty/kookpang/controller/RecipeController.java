@@ -16,8 +16,6 @@ public class RecipeController implements Controller {
 	private ReviewService reviewService = ReviewServiceImpl.getInstance();
 	
 	public ModelAndView recipes(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		List<RecipeDTO> recipes = recipeService.selectAll();
-		request.setAttribute("recipes", recipes);
 		
 		return new ModelAndView("recipes/recipes.jsp");
 	}
@@ -45,23 +43,15 @@ public class RecipeController implements Controller {
 	}
 	
 	/**
-	 * 전체 검색
+	 * 카테고리(기본/변형), 키워드 포함 레시피 전체 검색
 	 */
-	public Object selectAll(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		List<RecipeDTO> list = recipeService.selectAll();
+	public Object selectByOptions(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String word = request.getParameter("word");
+		String category = request.getParameter("category");
+		String order = request.getParameter("sort");
+		
+		List<RecipeDTO> list = recipeService.selectByOptions(word, category, order);
 		return list;
 	}
 	
-	
-	/**
-	 * id로 검색 (상세보기)
-	 */
-	/*
-	// front -> 위에 recipeDetail에서 처리하고 있어서 일단 주석
-	public RecipeDTO selectById(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Long recipeId = Long.parseLong(request.getParameter("recipeId"));
-		RecipeDTO recipeDTO = recipeService.selectById(recipeId);
-		return recipeDTO;
-	}
-	*/
 }
