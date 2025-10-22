@@ -34,15 +34,15 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 			<c:forEach var="item" items="${list}">
             <div class="list-row">
               <span>${item.name} / ${item.count}</span>
-              <b>${item.price}원</b>
+              <b>${item.price * item.count}원</b>
             </div>
             </c:forEach>
             <!-- 반복 -->
           </article>
           <article class="card" style="padding: 16px">
             <h3 style="margin: 0 0 8px">배송 정보</h3>
-            <p class="small">받는 분: ${name } · 연락처 ${phone }</p>
-            <p class="small">배송 주소: ${order.shippingAddress }</p>
+            <p class="small">받는 분: ${name } · 연락처 ${phone}</p>
+            <p class="small">배송 주소: ${order.shippingAddress}</p>
             <div class="card" style="padding: 12px; margin-top: 10px; background: #f3f4f6; border-style: dashed">
               <!-- 
               <b>배송 상태</b>
