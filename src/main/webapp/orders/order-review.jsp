@@ -162,19 +162,16 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
                   <!-- 선택형 주소: 하드코딩된 주소 목록과 '직접 입력' 옵션 -->
                   <form id="ship-select-form">
                     <div style="margin-bottom: 8px">
-                      <label style="display: block; margin-bottom: 6px"
-                        ><input type="radio" name="ship_choice" value="addr1" checked /> 받는 분: <b>${name}</b> /
-                        연락처: <b>${phone}</b><br />주소: <b>${address}</b></label
+                      받는 분: <b>${name}</b> / 연락처: <b>${phone}</b><br />
+                      <label style="display: block; margin-bottom: 6px">
+                        <input type="radio" name="ship_choice" value="addr1" id="normal" checked /> 주소:
+                        <b id="addr">${address}</b></label
                       >
                       <label style="display: block; margin-bottom: 6px"
-                        ><input type="radio" name="ship_choice" value="custom" /> 직접 입력</label
+                        ><input type="radio" name="ship_choice" value="custom" id="custom" /> 직접 입력</label
                       >
                     </div>
                     <div id="ship-custom-area" style="margin-top: 8px">
-                      <div style="display: flex; gap: 8px; margin-bottom: 8px">
-                        <input id="custom-name" class="input" placeholder="받는 분 이름" style="flex: 1" />
-                        <input id="custom-phone" class="input" placeholder="연락처" style="width: 160px" />
-                      </div>
                       <div style="margin-bottom: 8px">
                         <textarea
                           id="custom-address"
@@ -209,32 +206,19 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
     <script>
-      const insertOrder = async function () {
-        let totalPrice = 0; //구해야함
-
-        fetch(CONTEXT_PATH + "/ajax", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json;charset=UTF-8",
-          },
-          body: JSON.stringify({
-            key: "order",
-            methodName: "insertOrder",
-            totalPrice: totalPrice,
-            shippingAddress: "", //구해야함
-            itemlist: [
-              //구해야함
-              {
-                productId: 1,
-                quantity: 2,
-                price: 20000,
-              },
-            ],
-          }),
-        });
+      //배송지 선택
+      const shipSelect = function () {
+        let addr = "";
+        if (document.getElementById("normal").checked) {
+          addr = "${address}";
+        } else if (document.getElementById("custom").checked) {
+          addr = document.getElementById("custom-address").value;
+        }
+        return addr;
       };
 
       const payReady = async function () {
+        const addr = shipSelect();
         const r = await fetch(CONTEXT_PATH + "/ajax", {
           method: "POST",
           headers: {
@@ -243,11 +227,27 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
           body: new URLSearchParams({
             key: "pay",
             methodName: "payReady",
+            address: addr,
           }),
         });
         const json = await r.json();
-        console.log(json);
-        window.location.href = json.next_redirect_pc_url;
+        const popupWidth = 500;
+        const popupHeight = 500;
+        const left = window.screen.width / 2 - popupWidth / 2;
+        const top = window.screen.height / 2 - popupHeight / 2;
+
+        window.open(
+          json.next_redirect_pc_url,
+          "kakaoPayPopup",
+          `width=${"${popupWidth}"},height=${"${popupHeight}"},left=${"${left}"},top=${"${top}"},resizable=no,scrollbars=yes`
+        );
+
+        window.addEventListener("message", (event) => {
+          if (event.data) {
+            console.log("결제 완료, 주문번호: " + event.data);
+            window.location.href = CONTEXT_PATH + "/front?key=order&methodName=orderResult&orderPk=" + event.data;
+          }
+        });
       };
 
       document.getElementById("ov-pay").addEventListener("click", () => {

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import kookparty.kookpang.dto.OrderDTO;
+import kookparty.kookpang.dto.OrderItemDTO;
 import kookparty.kookpang.dto.ResponseCartDTO;
 import kookparty.kookpang.dto.UserDTO;
 import kookparty.kookpang.service.CartService;
@@ -69,10 +70,36 @@ public class OrderController implements Controller {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		
 		return new ModelAndView("/orders/order-review.jsp");
 	}
+	
+	public ModelAndView orderResult(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = 0;
+		if(user == null) {
+			userId = 1;
+		}else {
+			userId = user.getUserId();
+		}
+		long orderId = Long.parseLong(request.getParameter("orderPk"));
+		OrderDTO order = null;
+		List<OrderItemDTO> list = null;
+		try {
+			order = orderService.selectByOrderId(orderId);
+			list = order.getItemList();
+			int count = list.size();
+			request.setAttribute("order", order);
+			request.setAttribute("list", list);
+			request.setAttribute("count", count);
+			request.setAttribute("name", user.getNickname());
+			request.setAttribute("phone", user.getPhone());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return new ModelAndView("/orders/order-result.jsp");	
+	}
+	
 	
 	public OrderDTO selectByOrderId(HttpServletRequest request, HttpServletResponse response) {
 		long orderId = Long.parseLong(request.getParameter("orderId"));
@@ -86,7 +113,7 @@ public class OrderController implements Controller {
 	}
 	
 	
-	
+	/* 더이상 쓰지 않는 api, payController로 기능 옮겨짐
 	public void insertOrder(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
@@ -110,6 +137,7 @@ public class OrderController implements Controller {
 			e.printStackTrace();
 		}
 	}
+	*/
 	
 	public void deleteOrder(HttpServletRequest request, HttpServletResponse response) {
 		long orderId = Long.parseLong(request.getParameter("orderId"));

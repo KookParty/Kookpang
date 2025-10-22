@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import kookparty.kookpang.dto.OrderDTO;
+import kookparty.kookpang.dto.PaymentDTO;
 
 public interface OrderService {
 	/**
@@ -36,7 +37,7 @@ public interface OrderService {
 	 * @param userId
 	 * @return
 	 */
-	int insertOrder(OrderDTO order) throws SQLException;
+	long insertOrder(OrderDTO order, PaymentDTO paymentDTO) throws SQLException;
 	
 	/**
 	 * orderId로 주문을 삭제. 삭제하면 on delete cascade로 order-items의 레코드도 삭제

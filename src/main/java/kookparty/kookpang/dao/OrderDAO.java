@@ -6,6 +6,7 @@ import java.util.List;
 
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.OrderItemDTO;
+import kookparty.kookpang.dto.PaymentDTO;
 
 public interface OrderDAO {
 	/**
@@ -40,7 +41,7 @@ public interface OrderDAO {
 	 * @return
 	 * @throws SQLException 
 	 */
-	long insertOrder(OrderDTO order) throws SQLException;
+	long insertOrder(OrderDTO order, PaymentDTO paymentDTO) throws SQLException;
 	
 	/**
 	 * 트랜잭션용 메서드
@@ -49,7 +50,7 @@ public interface OrderDAO {
 	 * @return
 	 * @throws SQLException
 	 */
-	long insertOrder(OrderDTO order, Connection con) throws SQLException;
+	long insertOrder(OrderDTO order, PaymentDTO paymentDTO, Connection con) throws SQLException;
 	
 	/**
 	 * orderId로 주문을 삭제. 삭제하면 on delete cascade로 order-items의 레코드도 삭제

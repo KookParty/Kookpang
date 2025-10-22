@@ -6,6 +6,7 @@ public class OrderItemDTO {
 	private long productId;
 	private int count;
 	private int price; // 당시 가격 저장용
+	private String name;
 
 	public OrderItemDTO() {
 	}
@@ -84,10 +85,19 @@ public class OrderItemDTO {
 		this.price = price;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public String toString() {
 		return "OrderItemDTO [itemId=" + itemId + ", orderId=" + orderId + ", productId=" + productId + ", count="
-				+ count + ", price=" + price + "]";
+				+ count + ", price=" + price + ", name=" + name + "]";
 	}
 
+	
 }

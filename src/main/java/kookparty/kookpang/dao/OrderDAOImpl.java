@@ -1,17 +1,20 @@
 package kookparty.kookpang.dao;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.OrderItemDTO;
+import kookparty.kookpang.dto.PaymentDTO;
 import kookparty.kookpang.util.DbUtil;
 
 public class OrderDAOImpl implements OrderDAO {
@@ -41,8 +44,19 @@ public class OrderDAOImpl implements OrderDAO {
 			rs = ps.executeQuery();
 			OrderDTO order = null;
 			while (rs.next()) {
-				order = new OrderDTO(rs.getLong("order_id"), rs.getLong("user_id"), rs.getString("created_at"),
-						rs.getInt("total_price"), rs.getString("shipping_address"), rs.getInt("status") == 1, null);
+				order = new OrderDTO(rs.getLong("order_id"),
+						rs.getLong("user_id"), 
+						rs.getString("created_at"),
+						rs.getInt("total_price"), 
+						rs.getInt("delivery_fee"),
+						rs.getString("shipping_address"), 
+						rs.getString("order_name"),
+						rs.getString("cid"),
+						rs.getString("tid"),
+						rs.getString("partner_order_id"),
+						rs.getString("partner_user_id"),
+						rs.getString("pg_token"),
+						rs.getInt("status") == 1, null);
 				list.add(order);
 			}
 		} finally {
@@ -71,8 +85,19 @@ public class OrderDAOImpl implements OrderDAO {
 			ps.setLong(1, orderId);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				order = new OrderDTO(rs.getLong("order_id"), rs.getLong("user_id"), rs.getString("created_at"),
-						rs.getInt("total_price"), rs.getString("shipping_address"), rs.getInt("status") == 1, null);
+				order = new OrderDTO(rs.getLong("order_id"),
+						rs.getLong("user_id"), 
+						rs.getString("created_at"),
+						rs.getInt("total_price"), 
+						rs.getInt("delivery_fee"),
+						rs.getString("shipping_address"), 
+						rs.getString("order_name"),
+						rs.getString("cid"),
+						rs.getString("tid"),
+						rs.getString("partner_order_id"),
+						rs.getString("partner_user_id"),
+						rs.getString("pg_token"),
+						rs.getInt("status") == 1, null);
 				List<OrderItemDTO> itemlist = selectItemsByOrderId(con, orderId);
 				order.setItemList(itemlist);
 			}
@@ -84,12 +109,12 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public long insertOrder(OrderDTO order) throws SQLException {
+	public long insertOrder(OrderDTO order, PaymentDTO paymentDTO) throws SQLException {
 		Connection con = null;
 		long pk = 0;
 		try {
 			con = DbUtil.getConnection();
-			pk = insertOrder(order, con);
+			pk = insertOrder(order, paymentDTO, con);
 		} finally {
 			DbUtil.dbClose(con, null);
 		}
@@ -99,24 +124,31 @@ public class OrderDAOImpl implements OrderDAO {
 	
 
 	@Override
-	public long insertOrder(OrderDTO order, Connection con) throws SQLException {
+	public long insertOrder(OrderDTO order, PaymentDTO paymentDTO, Connection con) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		long pk = 0;
 		String sql = proFile.getProperty("order.insertOrder");
 		
 		try {
-			ps = con.prepareStatement(sql);
+			ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			ps.setLong(1, order.getUserId());
 			ps.setInt(2, order.getTotalPrice());
-			ps.setString(3, order.getShippingAddress());
+			ps.setInt(3, order.getDeliveryFee());
+			ps.setString(4, order.getShippingAddress());
+			ps.setString(5, paymentDTO.getOrderName());
+			ps.setString(6, paymentDTO.getCid());
+			ps.setString(7, paymentDTO.getTid());
+			ps.setString(8, paymentDTO.getPartnerOrderId());
+			ps.setString(9, paymentDTO.getPartnerUserId());
+			ps.setString(10, paymentDTO.getPgToken());
 			ps.executeUpdate();
 			rs = ps.getGeneratedKeys();
 			if(rs.next()) {
 				pk = rs.getLong(1);
 			}
 		} finally {
-			DbUtil.dbClose(null, ps, rs);
+			DbUtil.dbClose(null, ps);
 		}
 		return pk;
 	}

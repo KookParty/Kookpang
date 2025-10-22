@@ -8,7 +8,14 @@ public class OrderDTO {
 	private long userId;
 	private String createdAt;
 	private int totalPrice;
+	private int deliveryFee;
 	private String shippingAddress;
+	private String OrderName;
+	private String cid;
+	private String tid;
+	private String partnerOrderId;
+	private String partnerUserId;
+	private String pgToken;
 	private boolean status;
 	private List<OrderItemDTO> itemList;
 
@@ -18,23 +25,37 @@ public class OrderDTO {
 
 	/**
 	 * select용 생성자
-	 * 
 	 * @param orderId
 	 * @param userId
 	 * @param createdAt
 	 * @param totalPrice
+	 * @param deliveryFee
 	 * @param shippingAddress
+	 * @param orderName
+	 * @param cid
+	 * @param tid
+	 * @param partnerOrderId
+	 * @param partnerUserId
+	 * @param pgToken
 	 * @param status
 	 * @param itemList
 	 */
-	public OrderDTO(long orderId, long userId, String createdAt, int totalPrice, String shippingAddress,
-			boolean status, List<OrderItemDTO> itemList) {
+	public OrderDTO(long orderId, long userId, String createdAt, int totalPrice, int deliveryFee,
+			String shippingAddress, String orderName, String cid, String tid, String partnerOrderId,
+			String partnerUserId, String pgToken, boolean status, List<OrderItemDTO> itemList) {
 		super();
 		this.orderId = orderId;
 		this.userId = userId;
 		this.createdAt = createdAt;
 		this.totalPrice = totalPrice;
+		this.deliveryFee = deliveryFee;
 		this.shippingAddress = shippingAddress;
+		OrderName = orderName;
+		this.cid = cid;
+		this.tid = tid;
+		this.partnerOrderId = partnerOrderId;
+		this.partnerUserId = partnerUserId;
+		this.pgToken = pgToken;
 		this.status = status;
 		this.itemList = itemList;
 	}
@@ -44,14 +65,16 @@ public class OrderDTO {
 	 * 
 	 * @param userId
 	 * @param totalPrice
+	 * @param deliveryFee
 	 * @param shippingAddress
 	 * @param status
 	 * @param itemList
 	 */
-	public OrderDTO(long userId, int totalPrice, String shippingAddress, List<OrderItemDTO> itemList) {
+	public OrderDTO(long userId, int totalPrice, int deliveryFee, String shippingAddress, List<OrderItemDTO> itemList) {
 		super();
 		this.userId = userId;
 		this.totalPrice = totalPrice;
+		this.deliveryFee = deliveryFee;
 		this.shippingAddress = shippingAddress;
 		this.itemList = itemList;
 	}
@@ -88,12 +111,68 @@ public class OrderDTO {
 		this.totalPrice = totalPrice;
 	}
 
+	public int getDeliveryFee() {
+		return deliveryFee;
+	}
+
+	public void setDeliveryFee(int deliveryFee) {
+		this.deliveryFee = deliveryFee;
+	}
+
 	public String getShippingAddress() {
 		return shippingAddress;
 	}
 
 	public void setShippingAddress(String shippingAddress) {
 		this.shippingAddress = shippingAddress;
+	}
+
+	public String getOrderName() {
+		return OrderName;
+	}
+
+	public void setOrderName(String orderName) {
+		OrderName = orderName;
+	}
+
+	public String getCid() {
+		return cid;
+	}
+
+	public void setCid(String cid) {
+		this.cid = cid;
+	}
+
+	public String getTid() {
+		return tid;
+	}
+
+	public void setTid(String tid) {
+		this.tid = tid;
+	}
+
+	public String getPartnerOrderId() {
+		return partnerOrderId;
+	}
+
+	public void setPartnerOrderId(String partnerOrderId) {
+		this.partnerOrderId = partnerOrderId;
+	}
+
+	public String getPartnerUserId() {
+		return partnerUserId;
+	}
+
+	public void setPartnerUserId(String partnerUserId) {
+		this.partnerUserId = partnerUserId;
+	}
+
+	public String getPgToken() {
+		return pgToken;
+	}
+
+	public void setPgToken(String pgToken) {
+		this.pgToken = pgToken;
 	}
 
 	public boolean isStatus() {
@@ -115,8 +194,15 @@ public class OrderDTO {
 	@Override
 	public String toString() {
 		return "OrderDTO [orderId=" + orderId + ", userId=" + userId + ", createdAt=" + createdAt + ", totalPrice="
-				+ totalPrice + ", shippingAddress=" + shippingAddress + ", status=" + status + ", itemList=" + itemList
-				+ "]";
+				+ totalPrice + ", deliveryFee=" + deliveryFee + ", shippingAddress=" + shippingAddress + ", OrderName="
+				+ OrderName + ", cid=" + cid + ", tid=" + tid + ", partnerOrderId=" + partnerOrderId
+				+ ", partnerUserId=" + partnerUserId + ", pgToken=" + pgToken + ", status=" + status + ", itemList="
+				+ itemList + "]";
 	}
+
+
+	
+
+	
 
 }

@@ -122,7 +122,7 @@ public class ProductDAOImpl implements ProductDAO {
 
 		return productDTO;
 	}
-	
+
 	@Override
 	public ProductDTO selectByProductId(long productId, Connection con) throws SQLException {
 		PreparedStatement ps = null;
@@ -133,10 +133,10 @@ public class ProductDAOImpl implements ProductDAO {
 			ps = con.prepareStatement(sql);
 			ps.setLong(1, productId);
 			rs = ps.executeQuery();
-			if(rs.next()) {
-				productDTO = new ProductDTO(rs.getInt("product_id"), rs.getString("name"),
-						rs.getInt("price"), rs.getString("description"), rs.getString("category"),
-						rs.getString("brand"), rs.getString("image_url"), rs.getString("created_at"));
+			if (rs.next()) {
+				productDTO = new ProductDTO(rs.getInt("product_id"), rs.getString("name"), rs.getInt("price"),
+						rs.getString("description"), rs.getString("category"), rs.getString("brand"),
+						rs.getString("image_url"), rs.getString("created_at"));
 			}
 		} finally {
 			DbUtil.dbClose(null, ps, rs);
