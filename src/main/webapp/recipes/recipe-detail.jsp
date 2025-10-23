@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
-uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -264,9 +265,11 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           <div class="meta"><span>${recipe.category}</span><span>${recipe.way}</span><span>❤️ 좋아요수TODO</span></div>
           <div class="row" style="gap: 8px; margin-top: 8px">
             <button class="btn" id="likeBtn" style="padding: 8px 12px">♡ 좋아요</button>
-            <button class="btn" id="writeBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">
-              + 변형 레시피 추가
-            </button>
+            <c:if test="${recipe.recipeType.toString().toLowerCase() == 'base'}">
+              <button class="btn" id="writeBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">
+                + 변형 레시피 추가
+              </button>
+            </c:if>
           </div>
           <div class="muted2" style="text-align: center; margin-top: 6px">
             * 조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다
@@ -277,7 +280,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       <div class="tabs">
         <div class="tab active" data-tab="ingredients">재료 목록</div>
         <div class="tab" data-tab="steps">조리법</div>
-        <c:if test="${requestScope.recipe.recipeType.toString() == 'BASE'}">
+        <c:if test="${recipe.recipeType.toString().toLowerCase() == 'base'}">
           <div class="tab" data-tab="variants">변형 레시피</div>
 	    </c:if>
         <div class="tab" data-tab="reviews">리뷰</div>
@@ -379,18 +382,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </c:otherwise>
           </c:choose>
           
-          <!-- 
-          <div class="grid" style="gap: 8px">
-            <div class="card" style="padding: 20px">
-              <div style="font-weight: 700">참치 김치찌개</div>
-              <div class="muted2">참치를 더해 감칠맛 업</div>
-              <div class="actions-row">
-                <button class="btn" style="padding: 8px 12px; margin-top: 10px">변형 레시피 보기</button>
-              </div>
-            </div>
-          </div>
-           -->
-          
         </div>
       </div>
 
@@ -490,16 +481,8 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         // Variant write
         const writeBtn = document.querySelector("#writeBtn");
         writeBtn?.addEventListener("click", () => {
-          location.href = "${path}/recipes/variant-write.jsp";
+          location.href = "${path}/front?key=recipe&methodName=variantWrite&parentId=${recipe.recipeId}";
         });
-        
-        // Variant see
-        /*
-        const variantBtn = document.querySelector("#variantBtn");
-        variantBtn?.addEventListener("click", () => {
-          location.href = "${path}/front?key=recipe&methodName=recipeDetail&recipeId=${"${recipe.recipeId}"}";
-        });
-		*/
         
         // Checkboxes -> sum
         document.addEventListener("change", (e) => {
@@ -578,11 +561,8 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             document.body.appendChild(n);
             setTimeout(() => {
               n.remove();
-              //location.href = "${path}/orders/cart.jsp";
             }, 1000);
-          } catch (_) {
-            //location.href = "${path}/orders/cart.jsp";
-          }
+          } catch (_) { }
         };
       }); // DOMContentLoaded end
     </script>

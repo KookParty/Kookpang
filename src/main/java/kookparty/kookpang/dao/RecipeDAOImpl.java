@@ -171,8 +171,11 @@ public class RecipeDAOImpl implements RecipeDAO {
 			ps.setString(2, recipeDTO.getTitle());
 			ps.setString(3, recipeDTO.getDescription());
 			ps.setString(4, recipeDTO.getThumbnailUrl());
-			ps.setString(5, recipeDTO.getWay());
-			ps.setString(6, recipeDTO.getCategory());
+			ps.setString(5, recipeDTO.getRecipeType().toString().toLowerCase());
+			ps.setString(6, recipeDTO.getWay());
+			ps.setString(7, recipeDTO.getCategory());
+			if (recipeDTO.getParentRecipeId() != 0)
+				ps.setLong(8, recipeDTO.getParentRecipeId());
 
 			result = ps.executeUpdate();
 			
@@ -191,19 +194,23 @@ public class RecipeDAOImpl implements RecipeDAO {
 				}
 				
 				int[] results = ingredientDAO.insertIngredients(con, recipeDTO.getRecipeId(), recipeDTO.getIngredients());
-				for (int re : results) {
-					if (re != 1) {
-						con.rollback();
-						throw new SQLException("레시피-재료 등록 실패");
-					}
+				if (results != null) {
+					for (int re : results) {
+						if (re != 1) {
+							con.rollback();
+							throw new SQLException("레시피-재료 등록 실패");
+						}
+					}					
 				}
 				
 				results = stepDAO.insertSteps(con, recipeDTO.getRecipeId(), recipeDTO.getSteps());
-				for (int re : results) {
-					if (re != 1) {
-						con.rollback();
-						throw new SQLException("레시피-조리법 등록 실패");
-					}
+				if (results != null) {
+					for (int re : results) {
+						if (re != 1) {
+							con.rollback();
+							throw new SQLException("레시피-조리법 등록 실패");
+						}
+					}					
 				}
 				
 				con.commit();
