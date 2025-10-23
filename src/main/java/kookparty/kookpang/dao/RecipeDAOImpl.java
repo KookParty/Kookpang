@@ -1,10 +1,12 @@
 package kookparty.kookpang.dao;
 
+import java.awt.Window.Type;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -176,6 +178,8 @@ public class RecipeDAOImpl implements RecipeDAO {
 			ps.setString(7, recipeDTO.getCategory());
 			if (recipeDTO.getParentRecipeId() != 0)
 				ps.setLong(8, recipeDTO.getParentRecipeId());
+			else
+				ps.setNull(8, Types.BIGINT);
 
 			result = ps.executeUpdate();
 			

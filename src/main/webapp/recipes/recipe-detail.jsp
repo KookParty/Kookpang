@@ -397,12 +397,12 @@
             <h3 style="margin: 10px">리뷰 작성하기</h3>
             <div style="padding: 10px">
             <div>평점</div>
-            <div class="stars" id="rating" aria-label="평점 선택" data-rating="">
-              <button data-v="1">★</button>
-              <button data-v="2">★</button>
-              <button data-v="3">★</button>
-              <button data-v="4">★</button>
-              <button data-v="5">★</button>
+            <div class="stars" id="rating" aria-label="평점 선택" data-rating="5">
+              <button type="button" data-star="1">★</button>
+              <button type="button" data-star="2">★</button>
+              <button type="button" data-star="3">★</button>
+              <button type="button" data-star="4">★</button>
+              <button type="button" data-star="5">★</button>
             </div>
             <div>리뷰 내용</div>
             <textarea
@@ -414,12 +414,12 @@
             ></textarea>
             <input type="file" id="imageUrl" class="input" placeholder="이미지를 업로드하세요 (선택)" />
             <div class="actions-row" style="margin-top: 10px">
-              <button class="btn" style="width: 100%; padding: 8px">리뷰 등록하기</button>
+              <button id="insertReviewBtn" class="btn" style="width: 100%; padding: 8px">리뷰 등록하기</button>
             </div>
             </div>
           </form>
         </div>
-        <div id="reviewList" class="card">
+        <div id="reviewList" class="card" data-rid="${recipe.recipeId}">
           
         </div>
       </div>
@@ -467,19 +467,104 @@
           likeBtn.textContent = likeBtn.classList.contains("active") ? "❤️ 좋아요" : "♡ 좋아요";
         });
 
-        // Variant write
+        // insert recipe
         const writeBtn = document.querySelector("#writeBtn");
-        writeBtn?.addEventListener("click", () => {
+        writeBtn?.addEventListener("click", (e) => {
+          e.preventDefault();
           location.href = "${path}/front?key=recipe&methodName=variantWrite&parentId=${recipe.recipeId}";
         });
         
         // delete recipe
         const deleteBtn = document.querySelector("#deleteBtn");
-        deleteBtn?.addEventListener("click", () => {
+        deleteBtn?.addEventListener("click", (e) => {
+          e.preventDefault();
           if (confirm("정말 레시피를 삭제하시겠습니까?")) {
             location.href = "${path}/front?key=recipe&methodName=deleteRecipe&recipeId=${recipe.recipeId}";      	  
           }
         });
+        
+        // insert review
+        const insertReviewBtn = document.querySelector("#insertReviewBtn");
+        insertReviewBtn?.addEventListener("click", async (e) => {
+          e.preventDefault();
+          
+          let rid = document.querySelector("#reviewList").dataset.rid;
+          let content = document.querySelector("#content");
+          let imageUrl = document.querySelector("#imageUrl");
+          
+          /*
+          body = new URLSearchParams({
+            key: "review",
+            methodName: "insertReview",
+            recipeId,
+            rating: rating.dataset.rating,
+            content: content.value,
+            imageUrl: imageUrl.value,
+          });
+          */
+          
+          // URLSearchParams는 텍스트 데이터 전송 전용이라 이미지 파일 보내면 null 나올 것...그래도 FormData로 변경
+          const form = new FormData();
+          form.append("key", "review");
+          form.append("methodName", "insertReview");
+          form.append("recipeId", rid);
+          form.append("rating", rating.dataset.rating);
+          form.append("content", content.value);
+          form.append("imageUrl", imageUrl.files[0]);
+
+          try {
+            const response = await fetch(CONTEXT_PATH + "/ajax", {
+              method: "POST",
+              //body,
+              body:form
+            });
+
+            if (response.ok == false) {
+              throw new Error("서버 응답 에러: " + response.status);
+            }
+
+            const result = await response.json();
+            console.log("result: ", result);
+            
+            // 값 초기화
+            content.value = "";
+            imageUrl.value = "";
+            rating.dataset.rating = 5;	// 평점 세팅
+       		starBtns.forEach(b => {
+       			b.textContent = "★";
+       		})
+            
+       		// 리뷰 목록 다시 불러오기
+            printReviews();
+            
+          } catch (err) {
+            console.error("에러 발생: " + err);
+          }
+        });
+        
+        // delete review
+        const deleteReviewBtn = document.querySelectorAll(".deleteReviewBtn");
+        deleteReviewBtn?.forEach((btn, i) => {
+        	btn.addEventListener("click", async (e) => {
+                
+            });
+        })
+        
+        // 평점
+        const rating = document.querySelector("#rating");
+        const starBtns = rating.querySelectorAll("button");
+        
+        starBtns.forEach(btn => {
+        	btn.addEventListener("click", () => {
+        		const value = btn.dataset.star;
+        		rating.dataset.rating = value;	// 평점 세팅
+        		
+        		starBtns.forEach(b => {
+        			b.textContent = b.dataset.star <= value ? "★" : "☆";	// 별 색깔 바꾸기
+        		})
+        	})
+        })
+        
         
         // Checkboxes -> sum
         document.addEventListener("change", (e) => {
@@ -562,34 +647,42 @@
           } catch (_) { }
         };
 
-        /* 리뷰 */
-        onload = () => {
-          printReviews();
-        };
+        printReviews();
+      }); // DOMContentLoaded end
 
-        const printReviews = async function () {
-          body = new URLSearchParams({
-            key: "review",
-            methodName: "selectByRecipeId",
-            recipeId: ${recipe.recipeId},
+      /* 리뷰 전체 검색 */
+
+      const recipeId = document.querySelector("#reviewList").dataset.rid;
+      const printReviews = async function () {
+        body = new URLSearchParams({
+          key: "review",
+          methodName: "selectByRecipeId",
+          recipeId,
+        });
+
+        try {
+          const response = await fetch(CONTEXT_PATH + "/ajax", {
+            method: "POST",
+            body,
           });
 
-          try {
-            const response = await fetch(CONTEXT_PATH + "/ajax", {
-              method: "POST",
-              body,
-            });
+          if (response.ok == false) {
+            throw new Error("서버 응답 에러: " + response.status);
+          }
 
-            if (response.ok == false) {
-              throw new Error("서버 응답 에러: " + response.status);
-            }
-
-            const result = await response.json();
-            console.log("reviews: ", result);
-            
-            // 데이터 출력
-            let list = document.querySelector("#reviewList");
-            let str = "";
+          const result = await response.json();
+          console.log("reviews: ", result);
+          
+          // 데이터 출력
+          let list = document.querySelector("#reviewList");
+          let str = "";
+          
+          if (result.length === 0) {
+            str = `<div class="muted2" style="margin: 10px">
+            아직 리뷰가 없습니다 <br>
+            첫 번째 리뷰를 작성해보세요!
+            </div>`
+          } else {
             result.forEach((review, index) => {
               str += `<div class="card variant">
                 <img src="${path}/${"${review.imageUrl}"}" alt="thumbnail"/>
@@ -599,15 +692,14 @@
                 </div>
               </div>`;
             });
-            
-            list.innerHTML = str;
-            
-          } catch (err) {
-            console.error("에러 발생: " + err);
           }
-        };
-
-      }); // DOMContentLoaded end
+          
+          list.innerHTML = str;
+          
+        } catch (err) {
+          console.error("에러 발생: " + err);
+        }
+      };
     </script>
   </body>
 </html>
