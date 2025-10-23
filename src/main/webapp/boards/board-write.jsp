@@ -191,11 +191,17 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
       (p.images||[]).forEach(function(im){ addImageInput(im.imageUrl||""); });
     });
 
+    // 🔁 게시글 삭제: URLSearchParams 로 변경
     qs("#kp-delete")&&qs("#kp-delete").addEventListener("click",async function(){
       if(!confirm("삭제하시겠습니까?")) return;
-      var fd=new FormData(); fd.append("postId",p.postId);
-      var r=await fetch(BASE+"/ajax?key=board&methodName=delete",{method:"POST",body:fd});
-      var jj=await r.json();
+      const params = new URLSearchParams();
+      params.set("postId", String(p.postId));
+      const r = await fetch(BASE + "/ajax?key=board&methodName=delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: params
+      });
+      const jj = await r.json();
       if(jj.ok) location.href=BASE+"/front?key=board&methodName=list";
       else alert(jj.error==="login-required"?"로그인이 필요합니다.":"삭제 권한이 없습니다.");
     });
@@ -215,21 +221,45 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
     }
     $list.innerHTML=html;
 
+    //댓글 삭제: URLSearchParams 로 변경
     $list.querySelectorAll(".cmt-del").forEach(function(btn){
       btn.addEventListener("click",async function(){
         if(!confirm("댓글을 삭제할까요?")) return;
-        var fd=new FormData();
-        fd.append("commentId",btn.getAttribute("data-cid"));
-        fd.append("postId",postId);
-        var r=await fetch(BASE+"/ajax?key=board&methodName=delComment",{method:"POST",body:fd});
-        var jj=await r.json();
+        const params = new URLSearchParams();
+        params.set("commentId", btn.getAttribute("data-cid"));
+        params.set("postId", String(postId));
+        const r = await fetch(BASE + "/ajax?key=board&methodName=delComment", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+          body: params
+        });
+        const jj = await r.json();
         if(jj.ok) renderComments(jj.comments);
         else alert(jj.error==="login-required"?"로그인이 필요합니다.":"삭제 권한이 없습니다.");
       });
     });
   }
 
-  // ✅ 글쓰기/수정: URLSearchParams로 모든 필드 전송 (서버는 getParameter로 안전하게 수신)
+  //댓글 등록: URLSearchParams 로 추가
+  qs("#kp-cmt-form") && qs("#kp-cmt-form").addEventListener("submit", async function(e){
+    e.preventDefault();
+    const content = (e.target.elements.content?.value || "").trim();
+    if(!content){ alert("댓글을 입력하세요."); return; }
+    const params = new URLSearchParams();
+    params.set("postId", String(postId));
+    params.set("content", content);
+
+    const r = await fetch(BASE + "/ajax?key=board&methodName=addComment", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: params
+    });
+    const j = await r.json();
+    if(j.ok){ e.target.reset(); renderComments(j.comments); }
+    else alert(j.error==="login-required"?"로그인이 필요합니다.":"로그인이 필요합니다.");
+  });
+
+  //글쓰기/수정: URLSearchParams로 모든 필드 전송 (서버는 getParameter로 안전하게 수신)
   qs("#kp-write-form form")&&qs("#kp-write-form form").addEventListener("submit",async function(e){
     e.preventDefault();
     var title=(qs("#titleInput").value||"").trim();
@@ -256,7 +286,7 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
     });
     var j=await r.json();
     if(j.ok){ location.href=BASE+"/front?key=board&methodName=view&postId="+j.postId; }
-    else alert(j.error==="login-required"?"로그인이 필요합니다.":"저장 실패");
+    else alert(j.error==="login-required"?"로그인이 필요합니다.":"작성자 본인만 수정할 수 있습니다.");
   });
 
 })();

@@ -64,7 +64,7 @@
               '<p class="small" style="margin:6px 0 8px">👤 '+escapeHtml(r.nickname||"익명")+'</p>'+
               '<p>'+escapeHtml((r.content||"").slice(0,140))+'</p>'+
               '<div class="meta" style="justify-content:flex-end">'+
-                '<span>❤ '+r.viewCount+'</span>'+
+                '<span>조회수 '+r.viewCount+'</span>'+
                 '<span>💬 '+r.commentCount+'</span>'+
               '</div>'+
             '</a>'+

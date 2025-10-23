@@ -55,7 +55,8 @@ public class BoardDAO {
                     d.setContent(rs.getString("content"));
                     d.setViewCount(rs.getLong("view_count"));
                     d.setCommentCount(rs.getLong("comment_count"));
-                    d.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
                     d.setNickname(rs.getString("nickname"));
                     d.setCategory(rs.getString("category"));
                     list.add(d);
@@ -91,12 +92,39 @@ public class BoardDAO {
     // ===== 조회수 증가 / 단건 조회 =====
 
     public void incView(long postId) {
-        String sql = Q("board.post.incView");
-        try (Connection con = DbUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, postId);
-            ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        final String sql = Q("board.post.incView"); // UPDATE posts SET view_count = view_count + 1 WHERE post_id = ?
+        final int MAX_RETRY = 3;
+
+        for (int attempt = 1; attempt <= MAX_RETRY; attempt++) {
+            Connection con = null;
+            try {
+                con = DbUtil.getConnection();
+                // 단발 업데이트지만, 혹시 모를 상위 격리수준이면 낮춰서 대기시간 줄이기
+                try { con.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED); } catch (Exception ignore) {}
+                con.setAutoCommit(true); // 개별 업데이트면 오토커밋이 가장 짧게 끝남
+
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setLong(1, postId);
+                    ps.executeUpdate();
+                }
+                return; // 성공
+
+            } catch (SQLTransactionRollbackException e) {
+                // 데드락/락대기 타임아웃 등: 짧게 백오프 후 재시도
+                try { if (con != null) con.rollback(); } catch (Exception ignore) {}
+                try { Thread.sleep(30L * attempt); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+                if (attempt == MAX_RETRY) {
+                    e.printStackTrace();
+                    return;
+                }
+            } catch (SQLException e) {
+                try { if (con != null) con.rollback(); } catch (Exception ignore) {}
+                e.printStackTrace();
+                return;
+            } finally {
+                try { if (con != null) con.close(); } catch (Exception ignore) {}
+            }
+        }
     }
 
     public BoardDTO findById(long postId) {
@@ -116,7 +144,8 @@ public class BoardDAO {
                     d.setContent(rs.getString("content"));
                     d.setViewCount(rs.getLong("view_count"));
                     d.setCommentCount(rs.getLong("comment_count"));
-                    d.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
                     d.setNickname(rs.getString("nickname"));
                 }
             }
@@ -260,52 +289,122 @@ public class BoardDAO {
         return list;
     }
 
+    /** 데드락 방지: 부모행 선점(SELECT ... FOR UPDATE) + 짧은 재시도 */
     public long addComment(long postId, long userId, String content) {
         String sql = Q("board.comment.insert");
         String inc = Q("board.comment.incOnAdd");
-        long id = 0;
 
-        try (Connection con = DbUtil.getConnection()) {
-            con.setAutoCommit(false);
-            try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setLong(1, postId);
-                ps.setLong(2, userId);
-                ps.setString(3, content);
-                ps.executeUpdate();
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) id = rs.getLong(1);
+        final int MAX_RETRY = 3;
+        for (int attempt = 1; attempt <= MAX_RETRY; attempt++) {
+            Connection con = null;
+            try {
+                con = DbUtil.getConnection();
+                try { con.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED); } catch (Exception ignore) {}
+                con.setAutoCommit(false);
+
+                // 1) 부모(post) 행 선점 → 락 순서 통일
+                try (PreparedStatement lock = con.prepareStatement(
+                        "SELECT post_id FROM posts WHERE post_id = ? FOR UPDATE")) {
+                    lock.setLong(1, postId);
+                    lock.executeQuery(); // row lock
                 }
-            }
-            try (PreparedStatement ps2 = con.prepareStatement(inc)) {
-                ps2.setLong(1, postId);
-                ps2.executeUpdate();
-            }
-            con.commit();
-        } catch (Exception e) { e.printStackTrace(); }
-        return id;
-    }
 
-    public boolean delComment(long commentId, long userId, long postId) {
-        String sql = Q("board.comment.delete");
-        String dec = Q("board.comment.decOnDel");
-        int r = 0;
+                long id = 0;
 
-        try (Connection con = DbUtil.getConnection()) {
-            con.setAutoCommit(false);
-            try (PreparedStatement ps = con.prepareStatement(sql)) {
-                ps.setLong(1, commentId);
-                ps.setLong(2, userId);
-                r = ps.executeUpdate();
-            }
-            if (r > 0) {
-                try (PreparedStatement ps2 = con.prepareStatement(dec)) {
+                // 2) 댓글 삽입
+                try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setLong(1, postId);
+                    ps.setLong(2, userId);
+                    ps.setString(3, content);
+                    ps.executeUpdate();
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                        if (rs.next()) id = rs.getLong(1);
+                    }
+                }
+
+                // 3) 카운트 증가
+                try (PreparedStatement ps2 = con.prepareStatement(inc)) {
                     ps2.setLong(1, postId);
                     ps2.executeUpdate();
                 }
+
+                con.commit();
+                return id;
+
+            } catch (SQLTransactionRollbackException e) { // Deadlock/lock wait
+                try { if (con != null) con.rollback(); } catch (Exception ignore) {}
+                // 짧게 대기 후 재시도 (지수 백오프)
+                try { Thread.sleep(50L * attempt); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+                if (attempt == MAX_RETRY) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            } catch (SQLException e) {
+                try { if (con != null) con.rollback(); } catch (Exception ignore) {}
+                e.printStackTrace();
+                return 0;
+            } finally {
+                try { if (con != null) con.close(); } catch (Exception ignore) {}
             }
-            con.commit();
-        } catch (Exception e) { e.printStackTrace(); }
-        return r > 0;
+        }
+        return 0;
+    }
+
+    /** 데드락 방지: 부모행 선점(SELECT ... FOR UPDATE) + 짧은 재시도 */
+    public boolean delComment(long commentId, long userId, long postId) {
+        String sql = Q("board.comment.delete");
+        String dec = Q("board.comment.decOnDel");
+
+        final int MAX_RETRY = 3;
+        for (int attempt = 1; attempt <= MAX_RETRY; attempt++) {
+            Connection con = null;
+            try {
+                con = DbUtil.getConnection();
+                try { con.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED); } catch (Exception ignore) {}
+                con.setAutoCommit(false);
+
+                // 1) 부모(post) 행 선점 → 락 순서 통일
+                try (PreparedStatement lock = con.prepareStatement(
+                        "SELECT post_id FROM posts WHERE post_id = ? FOR UPDATE")) {
+                    lock.setLong(1, postId);
+                    lock.executeQuery();
+                }
+
+                int r;
+                // 2) 댓글 삭제 (본인만)
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setLong(1, commentId);
+                    ps.setLong(2, userId);
+                    r = ps.executeUpdate();
+                }
+
+                // 3) 카운트 감소
+                if (r > 0) {
+                    try (PreparedStatement ps2 = con.prepareStatement(dec)) {
+                        ps2.setLong(1, postId);
+                        ps2.executeUpdate();
+                    }
+                }
+
+                con.commit();
+                return r > 0;
+
+            } catch (SQLTransactionRollbackException e) {
+                try { if (con != null) con.rollback(); } catch (Exception ignore) {}
+                try { Thread.sleep(50L * attempt); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+                if (attempt == MAX_RETRY) {
+                    e.printStackTrace();
+                    return false;
+                }
+            } catch (SQLException e) {
+                try { if (con != null) con.rollback(); } catch (Exception ignore) {}
+                e.printStackTrace();
+                return false;
+            } finally {
+                try { if (con != null) con.close(); } catch (Exception ignore) {}
+            }
+        }
+        return false;
     }
 
     // ===== utils =====
