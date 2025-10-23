@@ -63,7 +63,7 @@
       <section class="cmt-wrap">
         <h3 style="margin:16px 0 10px">댓글</h3>
         <ul id="kp-cmt-list"></ul>
-        <form id="kp-cmt-form" class="form-row" style="display:flex;gap:8px">
+        <form id="kp-cmt-form" class="form-row" style="display:flex;gap:8px ">
           <input class="input" name="content" placeholder="댓글을 입력하세요(로그인 필요)" maxlength="200" />
           <button class="btn dark" type="submit">등록</button>
         </form>
@@ -71,7 +71,7 @@
     </article>
 
     <!-- 작성/수정 -->
-    <article id="kp-write-form" class="card" style="padding:16px; display:none">
+    <article id="kp-write-form" class="card" style="padding:16px; display:none"><form enctype="multipart/form-data"></form>
       <form>
         <input type="hidden" name="postId" id="postId" />
         <div class="form-row">
@@ -132,9 +132,24 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
     var input=document.getElementById(id);
     input&&input.addEventListener("change",function(e){
       var f=e.target.files&&e.target.files[0]; if(!f)return;
-      var r=new FileReader();
-      r.onload=function(ev){ var img=qs("#preview"); img.src=ev.target.result; img.style.display="block"; };
-      r.readAsDataURL(f);
+      // show preview
+      var p = qs("#preview");
+      var reader = new FileReader();
+      reader.onload = function(ev){ p.src = ev.target.result; p.style.display = 'block'; };
+      reader.readAsDataURL(f);
+
+      // upload as multipart/form-data to /uploadImage
+      (async function(){
+        try{
+          var fd = new FormData();
+          fd.append('file', f);
+          // send to the ajax front controller so we don't need explicit web.xml servlet mapping
+          var res = await fetch(BASE + '/ajax?key=board&methodName=uploadImage', { method: 'POST', body: fd });
+          var j = await res.json();
+          if(j.ok && j.url){ addImageInput(j.url); }
+          else { console.error('upload failed', j); alert('이미지 업로드에 실패했습니다.'); }
+        }catch(err){ console.error(err); alert('이미지 업로드 중 오류가 발생했습니다.'); }
+      })();
     });
   });
 
@@ -286,7 +301,7 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
     });
     var j=await r.json();
     if(j.ok){ location.href=BASE+"/front?key=board&methodName=view&postId="+j.postId; }
-    else alert(j.error==="login-required"?"로그인이 필요합니다.":"작성자 본인만 수정할 수 있습니다.");
+    else alert(j.error==="login-required"?"로그인이 필요합니다.":"작성자 본인만 수정할 수 있습니다");
   });
 
 })();

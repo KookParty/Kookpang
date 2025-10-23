@@ -31,8 +31,29 @@ public class BoardDAO {
     // ===== 목록/카운트 =====
 
     public List<BoardDTO> list(String category, String q, int page, int size) {
+        return list(category, q, page, size, "latest");
+    }
+
+    /** sort: latest | views | likes */
+    public List<BoardDTO> list(String category, String q, int page, int size, String sort) {
         List<BoardDTO> list = new ArrayList<>();
-        String sql = Q("board.post.listPage");
+        String sqlKey = "board.post.listPage";
+        if ("views".equalsIgnoreCase(sort)) sqlKey = "board.post.listPage.orderViews";
+        else if ("likes".equalsIgnoreCase(sort)) sqlKey = "board.post.listPage.orderLikes";
+        String sql = Q(sqlKey);
+        if (sql == null) {
+            if ("views".equalsIgnoreCase(sort)) {
+                // dbQuery.properties missing orderViews entry — build SQL inline to allow view-count sorting
+                sql = "SELECT p.post_id, p.title, p.content, p.view_count, p.comment_count, p.created_at, u.nickname, p.category " +
+                      "FROM posts p JOIN users u ON u.user_id = p.user_id " +
+                      "WHERE ( ? = '' OR p.category = ? ) AND ( ? = '' OR p.title LIKE CONCAT('%', ?, '%') OR p.content LIKE CONCAT('%', ?, '%') ) " +
+                      "ORDER BY p.view_count DESC, p.created_at DESC LIMIT ? OFFSET ?";
+                System.err.println("[BoardDAO] built inline SQL for views sorting because key '" + sqlKey + "' not found");
+            } else {
+                System.err.println("[BoardDAO] query key '" + sqlKey + "' not found in dbQuery.properties — falling back to board.post.listPage");
+                sql = Q("board.post.listPage");
+            }
+        }
         int off = (page - 1) * size;
 
         try (Connection con = DbUtil.getConnection();
@@ -53,7 +74,7 @@ public class BoardDAO {
                     d.setPostId(rs.getLong("post_id"));
                     d.setTitle(rs.getString("title"));
                     d.setContent(rs.getString("content"));
-                    d.setViewCount(rs.getLong("view_count"));
+                        d.setViewCount(rs.getLong("view_count"));
                     d.setCommentCount(rs.getLong("comment_count"));
                     Timestamp ts = rs.getTimestamp("created_at");
                     if (ts != null) d.setCreatedAt(ts.toLocalDateTime());

@@ -3,12 +3,18 @@ package kookparty.kookpang.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import kookparty.kookpang.dao.BoardDAO;
 import kookparty.kookpang.dto.BoardDTO;
 import kookparty.kookpang.dto.BoardDTO.Image;
 import kookparty.kookpang.dto.BoardDTO.Comment;
 import kookparty.kookpang.dto.UserDTO;
 
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -69,8 +75,8 @@ public class BoardController implements Controller {
         m.put("category", d.getCategory());
         m.put("title", d.getTitle());
         m.put("content", d.getContent());
-        m.put("viewCount", d.getViewCount());
-        m.put("commentCount", d.getCommentCount());
+    m.put("viewCount", d.getViewCount());
+    m.put("commentCount", d.getCommentCount());
         m.put("createdAt", iso(d.getCreatedAt()));
         m.put("nickname", d.getNickname());
         return m;
@@ -164,8 +170,10 @@ public class BoardController implements Controller {
         String q = t(req.getParameter("q"));
         int page = parseInt(req.getParameter("page"), 1);
         int size = parseInt(req.getParameter("size"), 10);
+        String sort = t(req.getParameter("sort"));
+        if (sort.isBlank()) sort = "latest";
 
-        List<BoardDTO> rows = dao.list(category, q, page, size);
+        List<BoardDTO> rows = dao.list(category, q, page, size, sort);
         List<Map<String,Object>> mapped = new ArrayList<>();
         for (BoardDTO d : rows) mapped.add(mapPostLite(d));
 
@@ -177,6 +185,7 @@ public class BoardController implements Controller {
         res.put("total", total);
         res.put("page", page);
         res.put("size", size);
+        res.put("sort", sort);
         return res;
     }
 
@@ -275,5 +284,54 @@ public class BoardController implements Controller {
 
         boolean ok = dao.delComment(cid, userId, postId);
         return Map.of("ok", ok, "comments", mapComments(dao.listComments(postId)));
+    }
+
+    /** POST /ajax?key=board&methodName=uploadImage  (multipart file upload via front controller) */
+    /** POST /ajax?key=board&methodName=uploadImage  (multipart file upload via front controller) */
+    public Object uploadImage(HttpServletRequest req, HttpServletResponse resp){
+        try {
+            // === 아주 간단한 프린트 디버깅 ===
+            System.out.println("==== [uploadImage] ====");
+            System.out.println("Content-Type: " + req.getContentType());
+
+            Part filePart = req.getPart("file");
+            System.out.println("filePart = " + filePart);
+            if (filePart != null) {
+                System.out.println("name=" + filePart.getName());
+                System.out.println("filename=" + filePart.getSubmittedFileName());
+                System.out.println("size=" + filePart.getSize());
+                System.out.println("contentType=" + filePart.getContentType());
+            } else {
+                System.out.println("filePart가 null 입니다. (name=\"file\" 파트를 못 찾음)");
+            }
+            System.out.println("=======================");
+            // ===============================
+
+            if (filePart == null) return Map.of("ok", false, "msg", "no-file");
+
+            String submitted = filePart.getSubmittedFileName();
+            String ext = "";
+            if (submitted != null && submitted.contains(".")) {
+                ext = submitted.substring(submitted.lastIndexOf('.'));
+            }
+
+            String uploads = req.getServletContext().getRealPath("/uploads");
+            Path up = Paths.get(uploads);
+            if (!Files.exists(up)) Files.createDirectories(up);
+
+            String newName = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 6) + ext;
+            Path target = up.resolve(newName);
+
+            try (InputStream in = filePart.getInputStream()) {
+                Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            String url = req.getContextPath() + "/uploads/" + newName;
+            return Map.of("ok", true, "url", url);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Map.of("ok", false, "msg", e.getClass().getName() + ":" + e.getMessage());
+        }
     }
 }
