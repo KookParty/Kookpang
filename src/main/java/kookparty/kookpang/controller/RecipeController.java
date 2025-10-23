@@ -58,7 +58,7 @@ public class RecipeController implements Controller {
 		
 		// 식재료 목록 가져오기
 		List<ProductDTO> products = null;
-		products = productService.selectAll();
+		products = productService.selectAll(1);
 		request.setAttribute("products", products);
 		System.out.println(products);
 		
