@@ -26,7 +26,6 @@ import kookparty.kookpang.util.FilePath;
 
 public class RecipeController implements Controller {
 	private RecipeService recipeService = RecipeServiceImpl.getInstance();
-	private ReviewService reviewService = ReviewServiceImpl.getInstance();
 	ProductService productService = new ProductServiceImpl();
 	
 	public ModelAndView recipes(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -43,10 +42,6 @@ public class RecipeController implements Controller {
 		// 변형 레시피
 		List<RecipeDTO> variants = recipeService.selectVariantsByParentId(recipeId);
 		request.setAttribute("variants", variants);
-		
-		// 리뷰
-		List<ReviewDTO> reviews = reviewService.selectByRecipeId(recipeId);
-		request.setAttribute("reviews", reviews);
 		
 		return new ModelAndView("recipes/recipe-detail.jsp");
 	}

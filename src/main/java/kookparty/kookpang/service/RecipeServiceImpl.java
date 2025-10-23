@@ -46,7 +46,7 @@ public class RecipeServiceImpl implements RecipeService {
 	@Override
 	public void deleteRecipeByRecipeId(long recipeId) throws Exception {
 		int result = recipeDAO.deleteRecipeByRecipeId(recipeId);
-		System.out.println("result: " + result);
+		
 		if (result == 0)
 			throw new DBAccessException("레시피가 삭제되지 않았습니다.");
 	}

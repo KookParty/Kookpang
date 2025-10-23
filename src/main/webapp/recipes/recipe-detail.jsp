@@ -393,50 +393,34 @@
       <!-- 리뷰 -->
       <div id="panel-reviews" class="panel">
         <div class="card" style="padding: 16px">
-          <h3 style="margin: 10px">리뷰 작성하기</h3>
-          <div style="padding: 10px">
-          <div>평점</div>
-          <div class="stars" id="starBox" aria-label="평점 선택">
-            <button data-v="1">★</button>
-            <button data-v="2">★</button>
-            <button data-v="3">★</button>
-            <button data-v="4">★</button>
-            <button data-v="5">★</button>
-          </div>
-          <div>리뷰 내용</div>
-          <textarea
-            id="reviewText"
-            rows="4"
-            placeholder="이 레시피에 대한 경험을 공유해주세요..."
-            class="input"
-            style="margin: 10px 0"
-          ></textarea>
-          <input id="photoUrl" class="input" placeholder="이미지 URL을 입력하세요 (선택)" />
-          <div class="actions-row" style="margin-top: 10px">
-            <button class="btn" id="submitReview" style="width: 100%; padding: 8px">리뷰 등록하기</button>
-          </div>
-          </div>
+          <form enctype="multipart/form-data">
+            <h3 style="margin: 10px">리뷰 작성하기</h3>
+            <div style="padding: 10px">
+            <div>평점</div>
+            <div class="stars" id="rating" aria-label="평점 선택" data-rating="">
+              <button data-v="1">★</button>
+              <button data-v="2">★</button>
+              <button data-v="3">★</button>
+              <button data-v="4">★</button>
+              <button data-v="5">★</button>
+            </div>
+            <div>리뷰 내용</div>
+            <textarea
+              id="content"
+              rows="4"
+              placeholder="이 레시피에 대한 경험을 공유해주세요..."
+              class="input"
+              style="margin: 10px 0"
+            ></textarea>
+            <input type="file" id="imageUrl" class="input" placeholder="이미지를 업로드하세요 (선택)" />
+            <div class="actions-row" style="margin-top: 10px">
+              <button class="btn" style="width: 100%; padding: 8px">리뷰 등록하기</button>
+            </div>
+            </div>
+          </form>
         </div>
-        <div class="card">
-          <c:choose>
-            <c:when test="${empty reviews}">
-              <div class="muted2" style="margin: 10px">
-              아직 리뷰가 없습니다 <br>
-              첫 번째 리뷰를 작성해보세요!
-              </div>
-            </c:when>
-            <c:otherwise>
-              <c:forEach items="${reviews}" var="review">
-                <div class="card variant">
-                  <img src="${review.imageUrl}" alt="thumbnail"/>
-                  <div>
-                    <div class="muted2">${review.nickname}</div>
-                    <div>${review.content}</div>               
-                  </div>
-                </div>
-              </c:forEach>
-            </c:otherwise>
-          </c:choose>
+        <div id="reviewList" class="card">
+          
         </div>
       </div>
     </div>
@@ -577,6 +561,52 @@
             }, 1000);
           } catch (_) { }
         };
+
+        /* 리뷰 */
+        onload = () => {
+          printReviews();
+        };
+
+        const printReviews = async function () {
+          body = new URLSearchParams({
+            key: "review",
+            methodName: "selectByRecipeId",
+            recipeId: ${recipe.recipeId},
+          });
+
+          try {
+            const response = await fetch(CONTEXT_PATH + "/ajax", {
+              method: "POST",
+              body,
+            });
+
+            if (response.ok == false) {
+              throw new Error("서버 응답 에러: " + response.status);
+            }
+
+            const result = await response.json();
+            console.log("reviews: ", result);
+            
+            // 데이터 출력
+            let list = document.querySelector("#reviewList");
+            let str = "";
+            result.forEach((review, index) => {
+              str += `<div class="card variant">
+                <img src="${path}/${"${review.imageUrl}"}" alt="thumbnail"/>
+                <div>
+                  <div class="muted2">${"${review.nickname}"}</div>
+                  <div>${"${review.content}"}</div>               
+                </div>
+              </div>`;
+            });
+            
+            list.innerHTML = str;
+            
+          } catch (err) {
+            console.error("에러 발생: " + err);
+          }
+        };
+
       }); // DOMContentLoaded end
     </script>
   </body>
