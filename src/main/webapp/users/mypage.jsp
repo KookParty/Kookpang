@@ -83,9 +83,9 @@
         <div class="mpp-grid">
           <!-- 왼쪽: 프로필 카드 -->
           <aside class="card profile">
-            <div class="avatar">S</div>
-            <div class="name" style="font-weight:800;">ssssssss</div>
-            <div class="email muted">ssss@sss</div>
+            <div class="avatar">${user.nickname.substring(0,1).toUpperCase()}</div>
+            <div class="name" style="font-weight:800;" id="mypageNickname">${user.nickname}</div>
+            <div class="email muted">${user.email}</div>
             <div class="meta" style="margin:10px 0;">
               <span class="muted">작성한 게시글 <b>4</b></span>
               <span class="muted">주문내역 <b>12</b></span>
@@ -180,6 +180,58 @@
       </main>
 
       <script src="../js/mypage.js"></script>
+      
+      <!-- 마이페이지 서버 연동 기능 -->
+      <script>
+        // 로그아웃 기능
+        document.querySelector('.btn.logout').addEventListener('click', function() {
+          if (confirm('로그아웃 하시겠습니까?')) {
+            fetch(CONTEXT_PATH + '/ajax?key=user&methodName=logout', {
+              method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+              alert('로그아웃 되었습니다.');
+              window.location.href = CONTEXT_PATH + '/users/login.jsp';
+            })
+            .catch(error => {
+              console.error('Logout error:', error);
+              // 세션 만료 등으로 서버 오류가 있어도 로그인 페이지로 이동
+              window.location.href = CONTEXT_PATH + '/users/login.jsp';
+            });
+          }
+        });
+
+        // 회원탈퇴 기능
+        document.querySelector('.btn.danger.delete-account').addEventListener('click', function() {
+          if (confirm('정말로 회원탈퇴를 하시겠습니까?\n탈퇴 후 복구할 수 없습니다.')) {
+            const password = prompt('비밀번호를 입력해주세요:');
+            if (password) {
+              fetch(CONTEXT_PATH + '/ajax?key=user&methodName=deleteAccount', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                  password: password
+                })
+              })
+              .then(response => response.json())
+              .then(data => {
+                alert(data.msg);
+                if (data.ok) {
+                  window.location.href = CONTEXT_PATH + '/index.jsp';
+                }
+              })
+              .catch(error => {
+                console.error('Delete account error:', error);
+                alert('회원탈퇴 중 오류가 발생했습니다.');
+              });
+            }
+          }
+        });
+      </script>
+      
       <script>
         (function () {
           function getUserKey() {
