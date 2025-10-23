@@ -10,6 +10,7 @@ import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.OrderItemDTO;
 import kookparty.kookpang.dto.ResponseCartDTO;
 import kookparty.kookpang.dto.UserDTO;
+import kookparty.kookpang.exception.AuthenticationException;
 import kookparty.kookpang.service.CartService;
 import kookparty.kookpang.service.CartServiceImpl;
 import kookparty.kookpang.service.OrderService;
@@ -38,16 +39,20 @@ public class OrderController implements Controller {
 		}
 		return new ModelAndView();
 	}
+	
+	public List<OrderDTO> getOrderListLimit(HttpServletRequest request, HttpServletResponse response){
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = user.getUserId();
+		return null;
+	}
+	
+	
 	public ModelAndView orderPage(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
-		long userId = 0;
-		if(user == null) {
-			userId = 1;
-		}else {
-			userId = user.getUserId();
-		}
 		try {
+			long userId = user.getUserId();
 			List<ResponseCartDTO> cartList = cartService.selectByUserId(userId);
 			int price = 0;
 			int deliveryFee = 3000;
@@ -76,18 +81,18 @@ public class OrderController implements Controller {
 	public ModelAndView orderResult(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
-		long userId = 0;
-		if(user == null) {
-			userId = 1;
-		}else {
-			userId = user.getUserId();
-		}
-		long orderId = Long.parseLong(request.getParameter("orderPk"));
+		
+		
+		long orderId = Long.parseLong(request.getParameter("order_id"));
 		OrderDTO order = null;
 		List<OrderItemDTO> list = null;
 		try {
+			long userId = user.getUserId();
 			order = orderService.selectByOrderId(orderId);
 			list = order.getItemList();
+			if(userId != order.getUserId()) {
+				throw new AuthenticationException("허가되지 않은 접근입니다.");
+			}
 			int count = list.size();
 			request.setAttribute("order", order);
 			request.setAttribute("list", list);
@@ -96,22 +101,31 @@ public class OrderController implements Controller {
 			request.setAttribute("phone", user.getPhone());
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		} catch (AuthenticationException e) {
+			e.printStackTrace();
+			request.setAttribute("errMsg", e.getMessage());
+			return new ModelAndView("/common/error.jsp");
 		}
 		return new ModelAndView("/orders/order-result.jsp");	
 	}
 	
-	
+	/*더이상 쓰지 않는 api. ajax로 비동기 처리해서 js로 렌더링 하려 했으나 orderResult라는 메서드로 jsp반환하게 변경
 	public OrderDTO selectByOrderId(HttpServletRequest request, HttpServletResponse response) {
 		long orderId = Long.parseLong(request.getParameter("orderId"));
 		OrderDTO orderDTO = null;
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
 		try {
+			long userId = user.getUserId();
 			orderDTO = orderService.selectByOrderId(orderId);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return orderDTO;
 	}
-	
+	*/
 	
 	/* 더이상 쓰지 않는 api, payController로 기능 옮겨짐
 	public void insertOrder(HttpServletRequest request, HttpServletResponse response) {
@@ -139,9 +153,12 @@ public class OrderController implements Controller {
 	}
 	*/
 	
-	public void deleteOrder(HttpServletRequest request, HttpServletResponse response) {
-		long orderId = Long.parseLong(request.getParameter("orderId"));
+	public ModelAndView deleteOrder(HttpServletRequest request, HttpServletResponse response) {
+		long orderId = Long.parseLong(request.getParameter("order_id"));
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
 		try {
+			long userId = user.getUserId();//검증메서드 추가 예정
 			int result = orderService.deleteOrder(orderId);
 			if(result == 0) {
 				
@@ -152,5 +169,6 @@ public class OrderController implements Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return new ModelAndView(request.getContextPath() + "/front?key=order&methodName=orderResult&order_id=" + orderId, true);
 	}
 }

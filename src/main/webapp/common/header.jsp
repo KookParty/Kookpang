@@ -25,6 +25,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 </header>
 
 <script>
+  let isLogin = ${sessionScope.loginUser != null};
   const getCartHeader = async function () {
     const res = await fetch("${path}/ajax", {
       method: "POST",
@@ -33,9 +34,12 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         methodName: "countCart",
       }),
     });
-    if (!res.ok) {
-      console.error("Failed to fetch cart header:", res.status, res.statusText);
+    if (res.status === 401) {
+      // 비로그인 상태
       return 0;
+    }
+    if (!res.ok) {
+      throw new Error(res.status);
     }
     const text = await res.json();
     console.log("cart header response:", text);
@@ -68,10 +72,12 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     b.style.display = c > 0 ? "inline-flex" : "none";
   };
   (function () {
-    ensureBadge();
-    window.kpUpdateCartBadge = ensureBadge;
-    document.addEventListener("DOMContentLoaded", ensureBadge);
-    window.addEventListener("storage", ensureBadge);
+	if(isLogin){
+		ensureBadge();
+	    window.kpUpdateCartBadge = ensureBadge;
+	    document.addEventListener("DOMContentLoaded", ensureBadge);
+	    window.addEventListener("storage", ensureBadge);
+	}
   })();
 </script>
 

@@ -16,6 +16,14 @@ public interface OrderService {
 	List<OrderDTO> selectByUserId(long userId) throws SQLException;
 	
 	/**
+	 * 한 유저의 결제내역을 최근 3개만(마이페이지용)
+	 * @param userId
+	 * @return
+	 * @throws SQLException
+	 */
+	List<OrderDTO> selectByUserIdLimit(long userId) throws SQLException;
+	
+	/**
 	 * 한 유저의 결제내역을 특정개수만 불러오기
 	 * @param userId
 	 * @param limit

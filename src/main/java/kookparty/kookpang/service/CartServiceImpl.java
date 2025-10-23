@@ -11,6 +11,7 @@ import kookparty.kookpang.dao.ProductDAOImpl;
 import kookparty.kookpang.dto.CartDTO;
 import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.dto.ResponseCartDTO;
+import kookparty.kookpang.exception.AuthenticationException;
 
 public class CartServiceImpl implements CartService {
 	CartDAO cartDAO = new CartDAOImpl();
@@ -37,8 +38,11 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public int deleteCartByCartId(long cartId) throws SQLException {
-		int result = cartDAO.deleteCartByCartId(cartId);
+	public int deleteCartByCartId(long cartId, long userId) throws SQLException, AuthenticationException {
+		int result = cartDAO.deleteCartByCartId(cartId, userId);
+		if(result == 0) {
+			throw new AuthenticationException("허가되지 않은 접근입니다.");
+		}
 		return result;
 	}
 
@@ -57,7 +61,6 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public int updateCartCount(long userId, long productId, int count) throws SQLException {
 		CartDTO cart = cartDAO.selectByUserIdAndProductId(userId, productId);
-		long cartId = cart.getCartId();
 		cart.setCount(count);
 		int result = cartDAO.updateCartCount(cart);
 		return result;

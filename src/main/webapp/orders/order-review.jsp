@@ -245,7 +245,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
         window.addEventListener("message", (event) => {
           if (event.data) {
             console.log("결제 완료, 주문번호: " + event.data);
-            window.location.href = CONTEXT_PATH + "/front?key=order&methodName=orderResult&orderPk=" + event.data;
+            window.location.href = CONTEXT_PATH + "/front?key=order&methodName=orderResult&order_id=" + event.data;
           }
         });
       };

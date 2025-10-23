@@ -38,7 +38,7 @@ public interface CartDAO {
 	 * @return
 	 * @throws SQLException 
 	 */
-	int deleteCartByCartId(long cartId) throws SQLException;
+	int deleteCartByCartId(long cartId, long userId) throws SQLException;
 	
 	/**
 	 * 유저의 장바구니 목록 전체 삭제
@@ -64,5 +64,12 @@ public interface CartDAO {
 	 */
 	int countCart(long userId) throws SQLException;
 	
+	/**
+	 * userId와 productId로 carts테이블의 레코드 하나를 select하는 메서드
+	 * @param userId
+	 * @param productId
+	 * @return
+	 * @throws SQLException
+	 */
 	CartDTO selectByUserIdAndProductId(long userId, long productId) throws SQLException;
 }
