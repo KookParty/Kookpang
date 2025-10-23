@@ -1,5 +1,6 @@
 package kookparty.kookpang.service;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -11,15 +12,14 @@ import kookparty.kookpang.dto.ProductDTO;
 public class ProductServiceImpl implements ProductService {
 	ProductDAO productDAO = new ProductDAOImpl();
 	@Override
-	public List<ProductDTO> selectAll() throws SQLException{
+	public List<ProductDTO> selectAll(int pageNo) throws SQLException{
+		
 		List<ProductDTO> productList = productDAO.selectAll();
 		return productList;
 	}
-
-	@Override
-	public List<ProductDTO> selectAllLimit(int limit, int offset) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	private int getTotalCount(Connection con) {
+		return 0;
 	}
 	
 	@Override

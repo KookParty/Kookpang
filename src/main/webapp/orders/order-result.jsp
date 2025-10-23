@@ -24,7 +24,9 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         <div>
           <span class="small">주문번호: ORDER1</span>
         </div>
-        <a class="btn" href="#">주문 취소</a>
+        <c:if test="${order.status}">
+        <a class="btn" href="${path}/front?key=order&methodName=deleteOrder&order_id=${order.orderId}">주문 취소</a>
+        </c:if>
       </div>
       <div class="grid cols-2">
         <section class="grid" style="gap: 16px">
@@ -75,7 +77,14 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           <article class="card" style="padding: 16px">
             <h3 style="margin: 0 0 8px">결제 정보</h3>
             <p class="small">결제 수단 kakaoPay</p>
-            <span class="badge">결제 완료</span>
+            <c:choose>
+            	<c:when test="${order.status}">
+            	<span class="badge">결제 완료</span>
+            	</c:when>
+            	<c:otherwise>
+            	<span class="badge-cancel">주문 취소</span>
+            	</c:otherwise>
+            </c:choose>
           </article>
           <article class="card" style="padding: 16px">
             <h3 style="margin: 0 0 8px">주문자 정보</h3>

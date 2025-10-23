@@ -87,7 +87,7 @@ public class CartDAOImpl implements CartDAO {
 	}
 
 	@Override
-	public int deleteCartByCartId(long cartId) throws SQLException{
+	public int deleteCartByCartId(long cartId, long userId) throws SQLException{
 		Connection con = null;
 		PreparedStatement ps = null;
 		int result = 0;
@@ -96,6 +96,7 @@ public class CartDAOImpl implements CartDAO {
 			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
 			ps.setLong(1, cartId);
+			ps.setLong(2, userId);
 			result = ps.executeUpdate();
 		} finally {
 			DbUtil.dbClose(con, ps);
@@ -132,6 +133,7 @@ public class CartDAOImpl implements CartDAO {
 			ps = con.prepareStatement(sql);
 			ps.setInt(1, cartDTO.getCount());
 			ps.setLong(2, cartDTO.getCartId());
+			ps.setLong(3, cartDTO.getUserId());
 			result = ps.executeUpdate();
 		} finally {
 			DbUtil.dbClose(con, ps);

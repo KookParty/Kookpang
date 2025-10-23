@@ -19,21 +19,21 @@ public class CartController implements Controller {
 
 		return new ModelAndView();
 	}
-
+	
+	/**
+	 * 세션에 저장된 userId를 통해 cartDTO
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	public List<ResponseCartDTO> selectByUserId(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
-		long userId = 0;
-		if(user == null) {
-			userId = 1;
-		}else {
-			userId = user.getUserId();
-		}
-		 // 임시로 등록한 userId 1번을 가지고 옴
 		List<ResponseCartDTO> list = null;
 		try {
+			long userId = user.getUserId();
 			list = cartService.selectByUserId(userId);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return list;
@@ -42,15 +42,10 @@ public class CartController implements Controller {
 	public int countCart(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
-		long userId = 0;
-		if(user == null) {
-			userId = 1;
-		}else {
-			userId = user.getUserId();
-		} // 임시로 등록한 userId 1번을 가지고 옴
 		int result = 0;
 
 		try {
+			long userId = user.getUserId();
 			result = cartService.countCart(userId);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -63,50 +58,39 @@ public class CartController implements Controller {
 		int count = Integer.parseInt(request.getParameter("count"));
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
-		long userId = 0;
-		if(user == null) {
-			userId = 1;
-		}else {
-			userId = user.getUserId();
-		}
-		CartDTO cartDTO = new CartDTO(userId, productId, count);
 		try {
+			long userId = user.getUserId();
+			CartDTO cartDTO = new CartDTO(userId, productId, count);
 			int result = cartService.insertCart(cartDTO);
 			if (result == 0) {// 실패시
 
 			} else {// 성공시
 
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void deleteCartByCartId(HttpServletRequest request, HttpServletResponse response) {
 		long cartId = Long.parseLong(request.getParameter("cartId"));
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
 		try {
-			int result = cartService.deleteCartByCartId(cartId);
-			if (result == 0) {// 실패시
-
-			} else {// 성공시
-
-			}
-		} catch (SQLException e) {
+			long userId = user.getUserId();
+			int result = cartService.deleteCartByCartId(cartId, userId);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		}
 	}
 
 	public void deleteCartByUserId(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
-		long userId = 0;
-		if(user == null) {
-			userId = 1;
-		}else {
-			userId = user.getUserId();
-		}
 		try {
+			long userId = user.getUserId();
 			int result = cartService.deleteCartByUserId(userId);
 			if (result == 0) {// 실패시
 
@@ -119,10 +103,15 @@ public class CartController implements Controller {
 	}
 
 	public void updateCartCount(HttpServletRequest request, HttpServletResponse response) {
-		long productId = Long.parseLong(request.getParameter("cartId"));
+		long cartId = Long.parseLong(request.getParameter("cartId"));
 		int count = Integer.parseInt(request.getParameter("newCount"));
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
 		try {
-			int result = cartService.updateCartCount(new CartDTO(productId, count));
+			long userId = user.getUserId();
+			CartDTO cartDTO = new CartDTO(cartId, count);
+			cartDTO.setUserId(userId);
+			int result = cartService.updateCartCount(cartDTO);
 			if (result == 0) {// 실패시
 
 			} else {// 성공시

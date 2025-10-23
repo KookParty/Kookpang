@@ -8,22 +8,15 @@ import kookparty.kookpang.dto.ProductDTO;
 
 public interface ProductService {
 	/**
-	 * 모든 식재료 검색
+	 * 모든 식재료 검색 & paging
 	 * @return
 	 * @throws SQLException 
 	 */
-	List<ProductDTO> selectAll() throws SQLException;
+	List<ProductDTO> selectAll(int pageNo) throws SQLException;
+
 	
 	/**
-	 * 모든 식재료 검색, 페이징
-	 * @param limit
-	 * @param offset
-	 * @return
-	 */
-	List<ProductDTO> selectAllLimit(int limit, int offset);
-	
-	/**
-	 * 키워드, 카테고리 검색 및 순서
+	 * 키워드, 카테고리, 순서로 검색 & paging
 	 * @param word
 	 * @param category
 	 * @param order
