@@ -143,6 +143,8 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
         try{
           var fd = new FormData();
           fd.append('file', f);
+          console.log(f);
+          console.log(fd.get('file'));
           // send to the ajax front controller so we don't need explicit web.xml servlet mapping
           var res = await fetch(BASE + '/ajax?key=board&methodName=uploadImage', { method: 'POST', body: fd });
           var j = await res.json();
