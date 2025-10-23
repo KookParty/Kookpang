@@ -8,6 +8,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>게시글 - 자유게시판</title>
   <link rel="stylesheet" href="${path}/css/styles.css">
+  <!-- 문자열 누락 버그 수정 -->
+  <script type="text/javascript">const CONTEXT_PATH = "${path}";</script>
   <script>const BASE="${pageContext.request.contextPath}";const PAGE_ACTIVE="board";</script>
   <script src="${path}/js/config.js"></script>
   <script src="${path}/js/app.js"></script>
@@ -25,7 +27,7 @@
     .preview{max-width:100%;border-radius:12px;margin-top:10px;display:none}
     .meta{color:#6b7280;font-size:14px;display:flex;gap:10px}
     .view-title{font-size:22px;font-weight:700;margin:0 0 8px}
-    .view-body{white-space:pre-wrap;line-height:1.6}
+    .view-body{white-space:normal;line-height:1.6}
     .img-list img{max-width:100%;border-radius:12px;display:block;margin:10px 0}
     .cmt-wrap{margin-top:18px}
     .cmt-wrap ul{list-style:none;padding:0;margin:0}
@@ -49,6 +51,7 @@
         <span>댓글 <b data-cmts>0</b></span>
       </div>
       <div class="img-list" data-images></div>
+      <!-- HTML 내용은 그대로 보여줘야 하므로 escape 제거 -->
       <div class="view-body" data-content style="margin-top:10px"></div>
 
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
@@ -169,9 +172,12 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
     qs("[data-date]").textContent=fmt(p.createdAt);
     qs("[data-views]").textContent=p.viewCount;
     qs("[data-cmts]").textContent=p.commentCount;
-    qs("[data-content]").innerHTML=esc(p.content).replace(/\n/g,"<br>");
+
+    // 보기 페이지에서는 HTML 그대로 그려주기 (XSS 방어는 서버/에디터에서 별도 처리 권장)
+    qs("[data-content]").innerHTML = p.content || "";
+
     var imgBox=qs("[data-images]");
-    imgBox.innerHTML=(p.images||[]).map(function(im){return '<img src="'+im.imageUrl+'" alt="">' }).join("");
+    imgBox.innerHTML=(p.images||[]).map(function(im){return '<img src="'+esc(im.imageUrl)+'" alt="">' }).join("");
 
     renderComments(p.comments||[]);
 
@@ -223,34 +229,31 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
     });
   }
 
-  qs("#kp-cmt-form")&&qs("#kp-cmt-form").addEventListener("submit",async function(e){
-    e.preventDefault();
-    var fd=new FormData(e.target);
-    fd.append("postId",postId);
-    var r=await fetch(BASE+"/ajax?key=board&methodName=addComment",{method:"POST",body:fd});
-    var j=await r.json();
-    if(j.ok){ e.target.reset(); renderComments(j.comments); }
-    else alert(j.error==="login-required"?"로그인이 필요합니다.":"댓글 저장 실패");
-  });
-
-  // ✅ 수정된 글쓰기 이벤트
+  // ✅ 글쓰기/수정: URLSearchParams로 모든 필드 전송 (서버는 getParameter로 안전하게 수신)
   qs("#kp-write-form form")&&qs("#kp-write-form form").addEventListener("submit",async function(e){
     e.preventDefault();
     var title=(qs("#titleInput").value||"").trim();
     var content=(qs("#editor").innerHTML||"").trim();
     if(!title||!content){ alert("제목과 내용을 입력하세요."); return; }
 
-    var fd=new FormData(e.target);
-    fd.set('title', title);
-    fd.set('content', content);
-    // ✅ 순수 텍스트 버전도 함께 전송
-    fd.set('contentText', (qs('#editor').innerText || '').replace(/\u00A0/g,' ').trim());
+    var params = new URLSearchParams();
+    params.set("title", title);
+    params.set("content", content);
+    params.set("contentText", (qs('#editor').innerText || '').replace(/\u00A0/g,' ').trim());
+    params.set("category", qs('select[name="category"]')?.value || "free");
+
+    var pid = (qs("#postId")?.value || "").trim();
+    if (pid) params.set("postId", pid);
 
     document.querySelectorAll(".kp-image-url").forEach(function(inp){
-      var v=(inp.value||"").trim(); if(v) fd.append("imageUrl",v);
+      var v=(inp.value||"").trim(); if(v) params.append("imageUrl", v);
     });
 
-    var r=await fetch(BASE+"/ajax?key=board&methodName=save",{method:"POST",body:fd});
+    var r=await fetch(BASE+"/ajax?key=board&methodName=save",{
+      method:"POST",
+      headers:{ "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8" },
+      body: params
+    });
     var j=await r.json();
     if(j.ok){ location.href=BASE+"/front?key=board&methodName=view&postId="+j.postId; }
     else alert(j.error==="login-required"?"로그인이 필요합니다.":"저장 실패");

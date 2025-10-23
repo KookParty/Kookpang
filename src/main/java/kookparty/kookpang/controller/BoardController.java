@@ -197,27 +197,38 @@ public class BoardController implements Controller {
 
         String postIdStr = req.getParameter("postId");
         String category  = t(req.getParameter("category"));
-        String title     = t(req.getParameter("title"));
-        String contentH  = t(req.getParameter("content"));      // HTML
-        String contentT  = t(req.getParameter("contentText"));  // 순수 텍스트 (JSP에서 추가 전송)
+        String title     = req.getParameter("title");
+        String contentH  = req.getParameter("content");          // HTML
+        String contentT  = t(req.getParameter("contentText"));   // 순수 텍스트 (선택)
 
-        String contentForCheck =
-                (contentT == null || contentT.isBlank())
-                        ? contentH.replaceAll("\\<[^>]*>", "")
-                                  .replace('\u00A0',' ')
-                                  .trim()
-                        : contentT;
+        // NPE 방지 및 로깅
+        String safeTitle = (title == null) ? "" : title;
+        String safeContentH = (contentH == null) ? "" : contentH;
+        System.out.println("Board.save >> title=" + safeTitle + " | content.len=" + safeContentH.length());
 
-        if (title.isBlank() || contentForCheck.isBlank()) {
+        // 텍스트로 검증
+        String contentForCheck;
+        if (contentT != null && !contentT.isBlank()) {
+            contentForCheck = contentT;
+        } else {
+            // contentH가 null일 수 있으니 안전 처리
+            String raw = (contentH == null) ? "" : contentH;
+            contentForCheck = raw.replaceAll("\\<[^>]*>", "")
+                                 .replace('\u00A0',' ')
+                                 .trim();
+        }
+
+        if (safeTitle.isBlank() || contentForCheck.isBlank()) {
             return Map.of("ok", false, "error", "invalid");
         }
 
         BoardDTO d = new BoardDTO();
         d.setUserId(userId);
         d.setCategory(category.isBlank() ? "free" : category);
-        d.setTitle(title);
-        d.setContent(contentH); // 저장은 HTML 그대로
+        d.setTitle(safeTitle);
+        d.setContent(safeContentH); // 저장은 HTML 그대로
 
+        // imageUrl 여러 개 수신
         List<Image> images = parseImages(req.getParameterValues("imageUrl"));
 
         if (postIdStr == null || postIdStr.isBlank()){
