@@ -136,6 +136,17 @@ public class RecipeController implements Controller {
 	}
 	
 	/**
+	 * 레시피 삭제
+	 */
+	public ModelAndView deleteRecipe(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		long recipeId = Long.parseLong(request.getParameter("recipeId"));
+		System.out.println("삭제 recipeId: " + recipeId);
+		recipeService.deleteRecipeByRecipeId(recipeId);
+		
+		return new ModelAndView("recipes/recipes.jsp", true);
+	}
+	
+	/**
 	 * 카테고리(기본/변형), 키워드 포함 레시피 전체 검색
 	 */
 	public Object selectByOptions(HttpServletRequest request, HttpServletResponse response) throws Exception {

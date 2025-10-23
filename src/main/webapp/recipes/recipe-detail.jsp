@@ -270,6 +270,11 @@
                 + 변형 레시피 추가
               </button>
             </c:if>
+            <c:if test="${recipe.userId == loginUser.userId}">
+              <button class="btn" id="deleteBtn" style="padding: 8px 12px; background: #eef1f4; color: #a11">
+                레시피 삭제
+              </button>
+            </c:if>
           </div>
           <div class="muted2" style="text-align: center; margin-top: 6px">
             * 조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다
@@ -482,6 +487,14 @@
         const writeBtn = document.querySelector("#writeBtn");
         writeBtn?.addEventListener("click", () => {
           location.href = "${path}/front?key=recipe&methodName=variantWrite&parentId=${recipe.recipeId}";
+        });
+        
+        // delete recipe
+        const deleteBtn = document.querySelector("#deleteBtn");
+        deleteBtn?.addEventListener("click", () => {
+          if (confirm("정말 레시피를 삭제하시겠습니까?")) {
+            location.href = "${path}/front?key=recipe&methodName=deleteRecipe&recipeId=${recipe.recipeId}";      	  
+          }
         });
         
         // Checkboxes -> sum

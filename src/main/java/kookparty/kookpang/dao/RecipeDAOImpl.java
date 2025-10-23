@@ -219,4 +219,19 @@ public class RecipeDAOImpl implements RecipeDAO {
 		
 		return result;
 	}
+	
+	@Override
+	public int deleteRecipeByRecipeId(long recipeId) throws SQLException {
+		int result = 0;
+		String sql = proFile.getProperty("recipe.deleteRecipeByRecipeId");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, recipeId);
+			
+			result = ps.executeUpdate();
+		}
+		
+		return result;
+	}
 }
