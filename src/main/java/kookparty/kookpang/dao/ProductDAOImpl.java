@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.util.DbUtil;
+import kookparty.kookpang.util.PageCnt;
 
 public class ProductDAOImpl implements ProductDAO {
 	private Properties proFile = new Properties();
@@ -26,16 +27,24 @@ public class ProductDAOImpl implements ProductDAO {
 	}
 
 	@Override
-	public List<ProductDTO> selectAll() throws SQLException {
+	public List<ProductDTO> selectAll(int pageNo) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		List<ProductDTO> productList = new ArrayList<ProductDTO>();
-		String sql = proFile.getProperty("product.selectAll");
+		String preSql = proFile.getProperty("product.selectAll");
+		String limitOffset = proFile.getProperty("page.limitOffset");
+		String sql = preSql + " " + limitOffset;
 
 		try {
 			con = DbUtil.getConnection();
+			con.setAutoCommit(false);
+			int countAll = countAll(con);
+			PageCnt page = new PageCnt(countAll, 20, pageNo);
+
 			ps = con.prepareStatement(sql);
+			ps.setInt(1, page.getLimit());
+			ps.setInt(2, page.getOffset());
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ProductDTO productDTO = new ProductDTO(rs.getInt("product_id"), rs.getString("name"),
@@ -51,28 +60,55 @@ public class ProductDAOImpl implements ProductDAO {
 		return productList;
 	}
 
+	private int countAll(Connection con) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int result = 0;
+		String sql = proFile.getProperty("product.countAll");
+		try {
+			ps = con.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				result = rs.getInt(1);
+			}
+		} finally {
+			DbUtil.dbClose(null, ps, rs);
+		}
+
+		return result;
+	}
+
 	@Override
-	public List<ProductDTO> selectByOptions(String word, String category, String order) throws SQLException {
+	public List<ProductDTO> selectByOptions(String word, String category, String order, int PageNo)
+			throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		List<ProductDTO> productList = new ArrayList<ProductDTO>();
 		String preparedSql = null;
 		String sql = null;
+		String limitOffset = proFile.getProperty("page.limitOffset");
 		try {
 			con = DbUtil.getConnection();
+			con.setAutoCommit(false);
+			int countAll = countByOptions(word, category, con);
+			PageCnt page = new PageCnt(countAll, 20, PageNo);
 			String orderBy = "desc".equals(order) ? "desc" : "asc";
 			if (category == null || category.isEmpty()) {
 				preparedSql = proFile.getProperty("product.selectByOptions2");
-				sql = preparedSql + " " + orderBy;
+				sql = preparedSql + " " + orderBy + " " + limitOffset;
 				ps = con.prepareStatement(sql);
 				ps.setString(1, "%" + word + "%");
+				ps.setInt(2, page.getLimit());
+				ps.setInt(3, page.getOffset());
 			} else {
 				preparedSql = proFile.getProperty("product.selectByOptions1");
-				sql = preparedSql + " " + orderBy;
+				sql = preparedSql + " " + orderBy + " " + limitOffset;
 				ps = con.prepareStatement(sql);
 				ps.setString(1, category);
 				ps.setString(2, "%" + word + "%");
+				ps.setInt(3, page.getLimit());
+				ps.setInt(4, page.getOffset());
 			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -85,6 +121,33 @@ public class ProductDAOImpl implements ProductDAO {
 			DbUtil.dbClose(con, ps, rs);
 		}
 		return productList;
+	}
+
+	private int countByOptions(String word, String category, Connection con) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int result = 0;
+		String sql = null;
+		try {
+			if (category == null || category.isEmpty()) {
+				sql = proFile.getProperty("product.countByOptions2");
+				ps = con.prepareStatement(sql);
+				ps.setString(1, "%" + word + "%");
+			} else {
+				sql = proFile.getProperty("product.countByOptions1");
+				ps = con.prepareStatement(sql);
+				ps.setString(1, category);
+				ps.setString(2, "%" + word + "%");
+			}
+			rs = ps.executeQuery();
+			if(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} finally {
+			DbUtil.dbClose(null, ps, rs);
+		}
+
+		return result;
 	}
 
 	@Override

@@ -28,6 +28,12 @@ public class OrderServiceImpl implements OrderService {
 		List<OrderDTO> list = orderDAO.selectByUserId(userId);
 		return list;
 	}
+	
+	@Override
+	public List<OrderDTO> selectByUserIdLimit(long userId) throws SQLException {
+		List<OrderDTO> list = orderDAO.selectByUserId(userId);
+		return list;
+	}
 
 	@Override
 	public List<OrderDTO> selectByUserIdLimit(long userId, int limit, int offset) throws SQLException {

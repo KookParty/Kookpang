@@ -51,30 +51,40 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
     <script>
+      let pageNo = 1;
+      let ITEMS = [];
+
       window.onload = function () {
         initData();
       };
+      let isLoading = false;
 
-      let ITEMS = [];
+      window.addEventListener("scroll", async () => {
+        if (isLoading) return;
+
+        const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+        if (nearBottom) {
+          isLoading = true;
+          await loadNextPage();
+          isLoading = false;
+        }
+      });
 
       const initData = async function () {
-        try {
-          const res = await fetch(CONTEXT_PATH + "/ajax", {
-            method: "POST",
-            body: new URLSearchParams({
-              key: "product",
-              methodName: "selectAll",
-            }),
-          });
-          if (res.ok) ingredients = await res.json();
-        } catch (e) {
-          console.error(e);
-        }
-        ITEMS = ingredients;
+        pageNo = 1;
+        ITEMS = await getData();
         render(ITEMS);
       };
 
-      const searchData = async function () {
+      const loadNextPage = async function () {
+        pageNo++;
+        ITEMS = await getData();
+        if (ITEMS.length === 0) return;
+
+        renderAdd(ITEMS);
+      };
+
+      const getData = async function () {
         const word = document.getElementById("q").value;
         const category = document.getElementById("cat").value;
         const sort = document.getElementById("sort").value;
@@ -87,20 +97,29 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               word: word,
               category: category,
               sort: sort,
+              pageNo: pageNo,
             }),
           });
-          if (res.ok) ITEMS = await res.json();
+          if (res.ok) return await res.json();
         } catch (e) {
           console.error(e);
         }
-
-        render(ITEMS);
+        return [];
       };
 
       const render = function (list) {
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
-        grid.innerHTML = list
+        grid.insertAdjacentHTML("beforeend", buildHTML(list));
+      };
+
+      const renderAdd = function (list) {
+        const grid = document.getElementById("grid");
+        grid.insertAdjacentHTML("beforeend", buildHTML(list));
+      };
+
+      const buildHTML = function (list) {
+        return list
           .map(
             (it) => `
         <article class="card tile">
@@ -131,10 +150,15 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         document.body.appendChild(n);
       };
 
-      document.getElementById("q").addEventListener("keyup", searchData);
-      document.getElementById("cat").addEventListener("change", searchData);
-      document.getElementById("sort").addEventListener("change", searchData);
-      document.getElementById("reset").addEventListener("click", initData);
+      document.getElementById("q").addEventListener("keyup", initData);
+      document.getElementById("cat").addEventListener("change", initData);
+      document.getElementById("sort").addEventListener("change", initData);
+      document.getElementById("reset").addEventListener("click", () => {
+        document.getElementById("q").value = "";
+        document.getElementById("cat").value = "";
+        document.getElementById("sort").value = "asc";
+        initData();
+      });
       document.addEventListener("click", async (e) => {
         const id = e.target?.dataset?.add;
         const count = 1;

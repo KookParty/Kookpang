@@ -23,7 +23,7 @@ public interface ProductService {
 	 * @return
 	 * @throws SQLException 
 	 */
-	List<ProductDTO> selectByOptions(String word, String category, String order) throws SQLException;
+	List<ProductDTO> selectByOptions(String word, String category, String order, int PageNo) throws SQLException;
 	
 	/**
 	 * 등록된 식재료의 카테고리를 검색

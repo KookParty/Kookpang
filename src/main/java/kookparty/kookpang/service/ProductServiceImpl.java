@@ -14,17 +14,13 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public List<ProductDTO> selectAll(int pageNo) throws SQLException{
 		
-		List<ProductDTO> productList = productDAO.selectAll();
+		List<ProductDTO> productList = productDAO.selectAll(pageNo);
 		return productList;
 	}
 	
-	private int getTotalCount(Connection con) {
-		return 0;
-	}
-	
 	@Override
-	public List<ProductDTO> selectByOptions(String word, String category, String order) throws SQLException {
-		List<ProductDTO> productList = productDAO.selectByOptions(word, category, order);
+	public List<ProductDTO> selectByOptions(String word, String category, String order, int PageNo) throws SQLException {
+		List<ProductDTO> productList = productDAO.selectByOptions(word, category, order, PageNo);
 		return productList;
 	}
 	

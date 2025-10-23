@@ -39,6 +39,15 @@ public class OrderController implements Controller {
 		}
 		return new ModelAndView();
 	}
+	
+	public List<OrderDTO> getOrderListLimit(HttpServletRequest request, HttpServletResponse response){
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		long userId = user.getUserId();
+		return null;
+	}
+	
+	
 	public ModelAndView orderPage(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
