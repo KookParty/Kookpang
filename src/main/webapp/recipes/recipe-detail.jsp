@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -274,7 +273,15 @@
         <a class="ghost-link muted2" href="${path}/front?key=recipe&methodName=recipes">← 목록으로</a>
       </div>
       <div class="hero">
-        <img src="${recipe.thumbnailUrl}" alt="thumbnail" />
+        <c:choose>
+          <c:when test="${recipe.thumbnailUrl != null and recipe.thumbnailUrl.substring(0,2) == '..'}">
+            <img src="${path}/${recipe.thumbnailUrl}" alt="thumbnail" />
+          </c:when>
+          <c:otherwise>
+            <img src="${recipe.thumbnailUrl}" alt="thumbnail" />
+          </c:otherwise>
+        </c:choose>
+        
         <div style="flex: 1">
           <div class="title">${recipe.title}</div>
           <div class="meta"><span>${recipe.category}</span><span>${recipe.way}</span><span>❤️ 좋아요수TODO</span></div>
@@ -532,7 +539,10 @@
               str += `<div class="card variant">`;
               // 이미지가 있을 때만 img 태그
               if (review.imageUrl) {
-                str += `<img src="${path}/${review.imageUrl}" alt="thumbnail"/>`;
+                if (review.imageUrl.substring(0,2) == '..')
+                  str += `<img src="${path}/${review.imageUrl}" alt="thumbnail"/>`;
+                else
+                  str += `<img src="${review.imageUrl}" alt="thumbnail"/>`;
               }
               str += `
                 <div class="rv">
