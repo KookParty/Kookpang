@@ -43,7 +43,7 @@
 					aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
 					<nav class="sb-sidenav-menu-nested nav">
 						<a class="nav-link" href="${path}/front?key=admin&methodName=productList">식재료 조회</a> 
-						<a class="nav-link" href="layout-sidenav-light.html">식재료 등록</a>
+						<a class="nav-link" href="${path}/front?key=admin&methodName=productInsertPage">식재료 등록</a>
 					</nav>
 				</div>
 				<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"

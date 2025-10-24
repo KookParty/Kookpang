@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - Kookpang Admin</title>
+        <title>Kookpang Admin</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
         <link href="${path}/admin/css/styles.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -55,7 +55,7 @@
                                         </thead>
                                         <tfoot>
                                             <tr>
-                                                <th>체크박스<th>
+                                                <th>체크박스</tr>
                                                 <th>이름</th>
                                                 <th>가격</th>
                                                 <th>카테고리</th>
@@ -94,12 +94,8 @@
         <script>
             const form = document.getElementById('deleteForm');
             const deleteBtn = document.getElementById('deleteBtn');
-
+            const selectedItems = form.elements['selectedItems'];
             deleteBtn.addEventListener('click', function() {
-                const selectedItems = Array.from(form.elements['selectedItems'])
-                    .filter(checkbox => checkbox.checked)
-                    .map(checkbox => checkbox.value);
-
                 if (selectedItems.length === 0) {
                     alert('삭제할 항목을 선택하세요.');
                     return;

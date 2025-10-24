@@ -75,7 +75,7 @@ public class ProductController implements Controller {
 			Part part = request.getPart("image");
 			String fileName = part.getSubmittedFileName();
 			fileName = Paths.get(fileName).getFileName().toString();
-			String savePath = FilePath.getSavePath(request);
+			String savePath = FilePath.getSavePath(request, "product_image");
 			String imageUrl = null;
 			if(fileName!=null) {
 				imageUrl = savePath + "/" + fileName;
@@ -109,7 +109,7 @@ public class ProductController implements Controller {
 			Part part = request.getPart("image");
 			String fileName = part.getSubmittedFileName();
 			fileName = Paths.get(fileName).getFileName().toString();
-			String savePath = FilePath.getSavePath(request);
+			String savePath = FilePath.getSavePath(request, "product_image");
 			String imageUrl = null;
 			if(fileName!=null) {
 				imageUrl = savePath + "/" + fileName;
