@@ -82,7 +82,7 @@ public class LoginFilter implements Filter {
     if ("cart".equals(key)) {
       needAuth = true;
     }
-
+    
     // ----- 인증 확인 -----
     if (needAuth) {
       HttpSession session = req.getSession(false);
