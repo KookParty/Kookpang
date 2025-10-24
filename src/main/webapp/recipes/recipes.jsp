@@ -8,6 +8,28 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>레시피</title>
     <link rel="stylesheet" href="${path}/css/styles.css" />
+    <style>
+      .card.tile {
+	    display: flex;
+        flex-direction: column;
+        height: 100%; /* 카드 전체 높이 일정하게 */
+      }
+		
+      .card.tile .body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* 내용과 bottom을 위아래로 배치 */
+        flex-grow: 1;
+        padding: 12px;
+      }
+		
+      .card.tile .bottom {
+        margin-top: auto; /* body 안에서 맨 아래로 */
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+    </style>
     <script type="text/javascript">
       const CONTEXT_PATH = "${pageContext.request.contextPath}";
     </script>
@@ -101,10 +123,12 @@
                 </div>
                 <h3 style="margin: 8px 0">${"${recipe.RCP_NM}"}</h3>
                 <p class="small">${"${recipe.RCP_NA_TIP}"}</p>
+                <div class="bottom">
                 <div class="meta">${"${recipe.RCP_PAT2}"} · ${"${recipe.RCP_WAY2}"} · ❤ 좋아요수TODO</div>
                 <div style="display: flex; gap: 8px; align-items: center">
                   <a class="btn dark full" href='${path}/front?key=recipe&methodName=recipeDetail&recipeId=${"${recipe.recipeId}"}'>레시피 보기</a>
                   <button class="btn small" data-like="${"${recipe.recipeId}"}">♡</button>
+                </div>
                 </div>
               </div>
             </article>`;

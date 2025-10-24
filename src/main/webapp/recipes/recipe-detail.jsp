@@ -373,7 +373,16 @@
           <c:otherwise>
             <ol style="display: flex; flex-direction: column; gap: 12px;">
               <c:forEach items="${recipe.steps}" var="stepDTO">
-                <img src="${stepDTO.imageUrl}" alt="${stepDTO.description}" />
+              
+                <c:choose>
+		          <c:when test="${stepDTO.imageUrl != null and stepDTO.imageUrl.substring(0,2) == '..'}">
+		            <img src="${path}/${stepDTO.imageUrl}" alt="thumbnail" />
+		          </c:when>
+		          <c:otherwise>
+		            <img src="${stepDTO.imageUrl}" alt="thumbnail" />
+		          </c:otherwise>
+		        </c:choose>
+		        
                 <li>${stepDTO.description}</li>
               </c:forEach>
             </ol>
@@ -540,9 +549,9 @@
               // 이미지가 있을 때만 img 태그
               if (review.imageUrl) {
                 if (review.imageUrl.substring(0,2) == '..')
-                  str += `<img src="${path}/${review.imageUrl}" alt="thumbnail"/>`;
+                  str += `<img src="${path}/${"${review.imageUrl}"}" alt="thumbnail"/>`;
                 else
-                  str += `<img src="${review.imageUrl}" alt="thumbnail"/>`;
+                  str += `<img src="${"${review.imageUrl}"}" alt="thumbnail"/>`;
               }
               str += `
                 <div class="rv">
