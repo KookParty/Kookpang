@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
-uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -236,10 +237,25 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         height: 90px;
         object-fit: cover;
         border-radius: 12px;
+        flex-shrink: 0; /* 텍스트 때문에 이미지 줄어듦 방지 */
       }
       
       h5 {
         margin: 10px;
+      }
+      
+      .rv {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      
+      .rv-del {
+        border: none;
+        background: #fff;
+        cursor: pointer;
+        font-size: 18px;
       }
       
     </style>
@@ -264,9 +280,16 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           <div class="meta"><span>${recipe.category}</span><span>${recipe.way}</span><span>❤️ 좋아요수TODO</span></div>
           <div class="row" style="gap: 8px; margin-top: 8px">
             <button class="btn" id="likeBtn" style="padding: 8px 12px">♡ 좋아요</button>
-            <button class="btn" id="writeBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">
-              + 변형 레시피 추가
-            </button>
+            <c:if test="${recipe.recipeType.toString().toLowerCase() == 'base'}">
+              <button class="btn" id="writeBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">
+                + 변형 레시피 추가
+              </button>
+            </c:if>
+            <c:if test="${recipe.userId == loginUser.userId}">
+              <button class="btn" id="deleteBtn" style="padding: 8px 12px; background: #eef1f4; color: #a11">
+                레시피 삭제
+              </button>
+            </c:if>
           </div>
           <div class="muted2" style="text-align: center; margin-top: 6px">
             * 조미료, 신선식품에 따라 가격은 변동/품절될 수 있습니다
@@ -277,7 +300,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       <div class="tabs">
         <div class="tab active" data-tab="ingredients">재료 목록</div>
         <div class="tab" data-tab="steps">조리법</div>
-        <c:if test="${requestScope.recipe.recipeType.toString() == 'BASE'}">
+        <c:if test="${recipe.recipeType.toString().toLowerCase() == 'base'}">
           <div class="tab" data-tab="variants">변형 레시피</div>
 	    </c:if>
         <div class="tab" data-tab="reviews">리뷰</div>
@@ -379,68 +402,40 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </c:otherwise>
           </c:choose>
           
-          <!-- 
-          <div class="grid" style="gap: 8px">
-            <div class="card" style="padding: 20px">
-              <div style="font-weight: 700">참치 김치찌개</div>
-              <div class="muted2">참치를 더해 감칠맛 업</div>
-              <div class="actions-row">
-                <button class="btn" style="padding: 8px 12px; margin-top: 10px">변형 레시피 보기</button>
-              </div>
-            </div>
-          </div>
-           -->
-          
         </div>
       </div>
 
       <!-- 리뷰 -->
       <div id="panel-reviews" class="panel">
         <div class="card" style="padding: 16px">
-          <h3 style="margin: 10px">리뷰 작성하기</h3>
-          <div style="padding: 10px">
-          <div>평점</div>
-          <div class="stars" id="starBox" aria-label="평점 선택">
-            <button data-v="1">★</button>
-            <button data-v="2">★</button>
-            <button data-v="3">★</button>
-            <button data-v="4">★</button>
-            <button data-v="5">★</button>
-          </div>
-          <div>리뷰 내용</div>
-          <textarea
-            id="reviewText"
-            rows="4"
-            placeholder="이 레시피에 대한 경험을 공유해주세요..."
-            class="input"
-            style="margin: 10px 0"
-          ></textarea>
-          <input id="photoUrl" class="input" placeholder="이미지 URL을 입력하세요 (선택)" />
-          <div class="actions-row" style="margin-top: 10px">
-            <button class="btn" id="submitReview" style="width: 100%; padding: 8px">리뷰 등록하기</button>
-          </div>
-          </div>
+          <form>
+            <h3 style="margin: 10px">리뷰 작성하기</h3>
+            <div style="padding: 10px">
+            <div>평점</div>
+            <div class="stars" id="rating" aria-label="평점 선택" data-rating="5">
+              <button type="button" data-star="1">★</button>
+              <button type="button" data-star="2">★</button>
+              <button type="button" data-star="3">★</button>
+              <button type="button" data-star="4">★</button>
+              <button type="button" data-star="5">★</button>
+            </div>
+            <div>리뷰 내용</div>
+            <textarea
+              id="content"
+              rows="4"
+              placeholder="이 레시피에 대한 경험을 공유해주세요..."
+              class="input"
+              style="margin: 10px 0"
+            ></textarea>
+            <input type="file" id="imageUrl" class="input" placeholder="이미지를 업로드하세요 (선택)" />
+            <div class="actions-row" style="margin-top: 10px">
+              <button id="insertReviewBtn" class="btn" style="width: 100%; padding: 8px">리뷰 등록하기</button>
+            </div>
+            </div>
+          </form>
         </div>
-        <div class="card">
-          <c:choose>
-            <c:when test="${empty reviews}">
-              <div class="muted2" style="margin: 10px">
-              아직 리뷰가 없습니다 <br>
-              첫 번째 리뷰를 작성해보세요!
-              </div>
-            </c:when>
-            <c:otherwise>
-              <c:forEach items="${reviews}" var="review">
-                <div class="card variant">
-                  <img src="${review.imageUrl}" alt="thumbnail"/>
-                  <div>
-                    <div class="muted2">${review.nickname}</div>
-                    <div>${review.content}</div>               
-                  </div>
-                </div>
-              </c:forEach>
-            </c:otherwise>
-          </c:choose>
+        <div id="reviewList" class="card" data-rid="${recipe.recipeId}">
+          
         </div>
       </div>
     </div>
@@ -464,10 +459,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        try {
-          initHeader && initHeader("recipes");
-        } catch (e) {}
-
         // Tabs
         document.addEventListener("click", (e) => {
           const t = e.target.closest(".tab");
@@ -487,104 +478,256 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           likeBtn.textContent = likeBtn.classList.contains("active") ? "❤️ 좋아요" : "♡ 좋아요";
         });
 
-        // Variant write
-        const writeBtn = document.querySelector("#writeBtn");
-        writeBtn?.addEventListener("click", () => {
-          location.href = "${path}/recipes/variant-write.jsp";
-        });
-        
-        // Variant see
-        /*
-        const variantBtn = document.querySelector("#variantBtn");
-        variantBtn?.addEventListener("click", () => {
-          location.href = "${path}/front?key=recipe&methodName=recipeDetail&recipeId=${"${recipe.recipeId}"}";
-        });
-		*/
-        
         // Checkboxes -> sum
         document.addEventListener("change", (e) => {
           if (e.target.matches(".ing [type=checkbox]")) sum();
         });
         sum();
 
-        // Add to cart // Ajax로 insertCart
-        window.addSelected = async function () {
-          const checked = document.querySelectorAll(".ing [type=checkbox]:checked");
-          if (!checked.length) {
-            alert("재료를 선택해주세요.");
-            return;
+        
+      }); // DOMContentLoaded end
+
+      onload = () => {
+        printReviews();
+      }
+
+      /* 리뷰 전체 검색 */
+      const recipeId = document.querySelector("#reviewList").dataset.rid;
+      const printReviews = async function () {
+        body = new URLSearchParams({
+          key: "review",
+          methodName: "selectByRecipeId",
+          recipeId,
+        });
+
+        try {
+          const response = await fetch(CONTEXT_PATH + "/ajax", {
+            method: "POST",
+            body,
+          });
+
+          if (response.ok == false) {
+            throw new Error("서버 응답 에러: " + response.status);
+          }
+
+          const result = await response.json();
+          console.log("reviews: ", result);
+          
+          // 데이터 출력
+          let list = document.querySelector("#reviewList");
+          let str = "";
+          
+          if (result.length === 0) {
+            str = `<div class="muted2" style="margin: 10px">
+            아직 리뷰가 없습니다 <br>
+            첫 번째 리뷰를 작성해보세요!
+            </div>`
+          } else {        	  
+            result.forEach((review, index) => {
+              let originUser = review.userId;
+              let curUser = ${loginUser.userId};
+              // 별
+              let stars = "★".repeat(review.rating || 0);
+              
+              str += `<div class="card variant">`;
+              // 이미지가 있을 때만 img 태그
+              if (review.imageUrl) {
+                str += `<img src="${path}/${review.imageUrl}" alt="thumbnail"/>`;
+              }
+              str += `
+                <div class="rv">
+                  <div>
+                    <div class="muted2">${"${review.nickname}"} &nbsp; ${"${stars}"}</div>
+                    <div>${"${review.content}"}</div>               
+                  </div>`;
+              if (originUser == curUser) str += `<button class="rv-del" title="삭제" onclick="deleteReview(${"${review.reviewId}"})">🗑</button>`;
+              str += `</div></div>`;
+            });
           }
           
-          // ajax 서버 요청
-          for (const ch of checked) {
-            const row = ch.closest(".row");
-            const id = ch.dataset.productId;
-            const count = 1;
+          list.innerHTML = str;
+          
+        } catch (err) {
+          console.error("에러 발생: " + err);
+        }
+      };
 
-            if (id === null || id === 0) continue;  // productId 없는 경우 건너뜀
-            
-            try {
-              const duplicateChk = await fetch(CONTEXT_PATH + "/ajax", {
+      // insert review
+      const insertReviewBtn = document.querySelector("#insertReviewBtn");
+      insertReviewBtn?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        
+        let rid = document.querySelector("#reviewList").dataset.rid;
+        console.log("insert reveiw btn > rid: ", rid);
+        let content = document.querySelector("#content");
+        let imageUrl = document.querySelector("#imageUrl");
+        
+        // URLSearchParams는 텍스트 데이터 전송 전용이라 이미지 파일 보내면 null 나올 것...그래도 FormData로 변경
+        const form = new FormData();
+        form.append("key", "review");
+        form.append("methodName", "insertReview");
+        form.append("recipeId", rid);
+        form.append("rating", rating.dataset.rating);
+        form.append("content", content.value);
+        form.append("imageUrl", imageUrl.files[0]);
+
+        try {
+          const response = await fetch(CONTEXT_PATH + "/ajax", {
+            method: "POST",
+            //body,
+            body: form,
+          });
+
+          if (!response.ok) {
+            throw new Error("서버 응답 에러: " + response.status);
+          }
+          
+          // 값 초기화
+          content.value = "";
+          imageUrl.value = "";
+          rating.dataset.rating = 5;	// 평점 세팅
+          starBtns.forEach(b => {
+            b.textContent = "★";
+          })
+          
+          
+        } catch (err) {
+          console.error("리뷰 등록 실패: " + err);
+        }
+        // 리뷰 목록 다시 불러오기
+        printReviews();
+      });
+      
+      // delete review
+      const deleteReview = async function (id) {
+        try {
+          const response = await fetch(CONTEXT_PATH + "/ajax", {
+        	  method: "POST",
+        	  body: new URLSearchParams({
+        		  key: "review",
+        		  methodName: "deleteReview",
+        		  reviewId: id,
+        	  }),
+          });
+        
+          if (!response.ok) {
+            throw new Error("서버 응답 에러: " + response.status);
+          }
+        } catch (err) {
+        	console.error("리뷰 삭제 실패: " + err);
+        }
+          
+	    printReviews();
+      }
+              
+      // insert recipe
+      const writeBtn = document.querySelector("#writeBtn");
+      writeBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        location.href = "${path}/front?key=recipe&methodName=variantWrite&parentId=${recipe.recipeId}";
+      });
+      
+      // delete recipe
+      const deleteBtn = document.querySelector("#deleteBtn");
+      deleteBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (confirm("정말 레시피를 삭제하시겠습니까?")) {
+          location.href = "${path}/front?key=recipe&methodName=deleteRecipe&recipeId=${recipe.recipeId}";      	  
+        }
+      });
+
+      // 평점
+      const rating = document.querySelector("#rating");
+      const starBtns = rating.querySelectorAll("button");
+      
+      starBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const value = btn.dataset.star;
+          rating.dataset.rating = value;	// 평점 세팅
+          
+          starBtns.forEach(b => {
+            b.textContent = b.dataset.star <= value ? "★" : "☆";	// 별 색깔 바꾸기
+          })
+        })
+      });
+
+
+
+      /* 장바구니 */
+      // Add to cart // Ajax로 insertCart
+      window.addSelected = async function () {
+        const checked = document.querySelectorAll(".ing [type=checkbox]:checked");
+        if (!checked.length) {
+          alert("재료를 선택해주세요.");
+          return;
+        }
+        
+        // ajax 서버 요청
+        for (const ch of checked) {
+          const row = ch.closest(".row");
+          const id = ch.dataset.productId;
+          const count = 1;
+
+          if (id === null || id === 0) continue;  // productId 없는 경우 건너뜀
+          
+          try {
+            const duplicateChk = await fetch(CONTEXT_PATH + "/ajax", {
+              method: "POST",
+              body: new URLSearchParams({
+                key: "cart",
+                methodName: "duplicateCheck",
+                productId: id,
+              }),
+            });
+            const exists = await duplicateChk.json();
+            if (exists) {
+              const response = await fetch(conPath + "/ajax", {
                 method: "POST",
                 body: new URLSearchParams({
                   key: "cart",
-                  methodName: "duplicateCheck",
+                  methodName: "duplicatedCartCount",
                   productId: id,
+                  newCount: exists.count + count,
                 }),
               });
-              const exists = await duplicateChk.json();
-              if (exists) {
-                const response = await fetch(conPath + "/ajax", {
-                  method: "POST",
-                  body: new URLSearchParams({
-                    key: "cart",
-                    methodName: "duplicatedCartCount",
-                    productId: id,
-                    newCount: exists.count + count,
-                  }),
-                });
-                if (response.ok) {
-                  console.log("Cart count updated successfully");
-                } else {
-                  console.error("Failed to update cart count:", response.statusText);
-                }
+              if (response.ok) {
+                console.log("Cart count updated successfully");
               } else {
-                const res = await fetch(CONTEXT_PATH + "/ajax", {
-                  method: "POST",
-                  body: new URLSearchParams({
-                    key: "cart",
-                    methodName: "insertCart",
-                    productId: id,
-                    count: count,
-                  }),
-                });
-                if (!res.ok) {
-                  console.error("Failed to add to cart:", res.status, res.statusText);
-                  return;
-                }
+                console.error("Failed to update cart count:", response.statusText);
               }
-            } catch (err) {
-              console.error("recipe-detail > insertCart 오류: ", err);
+            } else {
+              const res = await fetch(CONTEXT_PATH + "/ajax", {
+                method: "POST",
+                body: new URLSearchParams({
+                  key: "cart",
+                  methodName: "insertCart",
+                  productId: id,
+                  count: count,
+                }),
+              });
+              if (!res.ok) {
+                console.error("Failed to add to cart:", res.status, res.statusText);
+                return;
+              }
             }
+          } catch (err) {
+            console.error("recipe-detail > insertCart 오류: ", err);
           }
-          
-          ensureBadge(); // 장바구니 새로고침
-          // 장바구니 추가 알림 (우측 하단)
-          try {
-            const n = document.createElement("div");
-            n.textContent = `${"${checked.length}"}개 재료가 장바구니에 추가되었습니다.`;
-            n.style.cssText =
-              "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
-            document.body.appendChild(n);
-            setTimeout(() => {
-              n.remove();
-              //location.href = "${path}/orders/cart.jsp";
-            }, 1000);
-          } catch (_) {
-            //location.href = "${path}/orders/cart.jsp";
-          }
-        };
-      }); // DOMContentLoaded end
+        }
+        
+        ensureBadge(); // 장바구니 새로고침
+        // 장바구니 추가 알림 (우측 하단)
+        try {
+          const n = document.createElement("div");
+          n.textContent = `${"${checked.length}"}개 재료가 장바구니에 추가되었습니다.`;
+          n.style.cssText =
+            "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
+          document.body.appendChild(n);
+          setTimeout(() => {
+            n.remove();
+          }, 1000);
+        } catch (_) { }
+      };
     </script>
   </body>
 </html>

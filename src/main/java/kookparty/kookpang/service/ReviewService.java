@@ -12,4 +12,14 @@ public interface ReviewService {
 	 * 리뷰 검색
 	 */
 	List<ReviewDTO> selectByRecipeId(long recipeId) throws Exception;
+	
+	/**
+	 * 리뷰 등록
+	 */
+	void insertReview(ReviewDTO reviewDTO) throws Exception;
+	
+	/**
+	 * 리뷰 삭제
+	 */
+	void deleteReview(long reviewId) throws Exception;
 }

@@ -1,10 +1,12 @@
 package kookparty.kookpang.dao;
 
+import java.awt.Window.Type;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -171,8 +173,13 @@ public class RecipeDAOImpl implements RecipeDAO {
 			ps.setString(2, recipeDTO.getTitle());
 			ps.setString(3, recipeDTO.getDescription());
 			ps.setString(4, recipeDTO.getThumbnailUrl());
-			ps.setString(5, recipeDTO.getWay());
-			ps.setString(6, recipeDTO.getCategory());
+			ps.setString(5, recipeDTO.getRecipeType().toString().toLowerCase());
+			ps.setString(6, recipeDTO.getWay());
+			ps.setString(7, recipeDTO.getCategory());
+			if (recipeDTO.getParentRecipeId() != 0)
+				ps.setLong(8, recipeDTO.getParentRecipeId());
+			else
+				ps.setNull(8, Types.BIGINT);
 
 			result = ps.executeUpdate();
 			
@@ -191,23 +198,42 @@ public class RecipeDAOImpl implements RecipeDAO {
 				}
 				
 				int[] results = ingredientDAO.insertIngredients(con, recipeDTO.getRecipeId(), recipeDTO.getIngredients());
-				for (int re : results) {
-					if (re != 1) {
-						con.rollback();
-						throw new SQLException("레시피-재료 등록 실패");
-					}
+				if (results != null) {
+					for (int re : results) {
+						if (re != 1) {
+							con.rollback();
+							throw new SQLException("레시피-재료 등록 실패");
+						}
+					}					
 				}
 				
 				results = stepDAO.insertSteps(con, recipeDTO.getRecipeId(), recipeDTO.getSteps());
-				for (int re : results) {
-					if (re != 1) {
-						con.rollback();
-						throw new SQLException("레시피-조리법 등록 실패");
-					}
+				if (results != null) {
+					for (int re : results) {
+						if (re != 1) {
+							con.rollback();
+							throw new SQLException("레시피-조리법 등록 실패");
+						}
+					}					
 				}
 				
 				con.commit();
 			}
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int deleteRecipeByRecipeId(long recipeId) throws SQLException {
+		int result = 0;
+		String sql = proFile.getProperty("recipe.deleteRecipeByRecipeId");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, recipeId);
+			
+			result = ps.executeUpdate();
 		}
 		
 		return result;

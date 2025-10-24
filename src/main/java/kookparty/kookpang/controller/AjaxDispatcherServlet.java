@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,10 @@ import jakarta.servlet.http.HttpServletResponse;
  *  사용자의 모든 요청을 처리할 진입점 Controller (FrontController의 역할)
  */
 @WebServlet(urlPatterns = "/ajax" , loadOnStartup = 1)
+@MultipartConfig(
+        maxFileSize = 1024 * 1024 * 5,
+        maxRequestSize = 1024 * 1024 * 50
+)
 public class AjaxDispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
