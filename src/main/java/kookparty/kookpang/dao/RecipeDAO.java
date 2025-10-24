@@ -26,4 +26,9 @@ public interface RecipeDAO {
 	 * 레시피 등록
 	 */
 	int insertRecipe(RecipeDTO recipeDTO) throws SQLException;
+	
+	/**
+	 * 레시피 삭제
+	 */
+	int deleteRecipeByRecipeId(long recipeId) throws SQLException;
 }

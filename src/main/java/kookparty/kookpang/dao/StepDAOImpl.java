@@ -59,6 +59,8 @@ public class StepDAOImpl implements StepDAO {
 		int[] result = null;
 		String sql = proFile.getProperty("step.insertSteps");
 		
+		if (steps == null) return null;
+		
 		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			for (int i = 0; i < steps.size(); i++) {
 				ps.setLong(1, recipeId);

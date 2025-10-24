@@ -55,4 +55,38 @@ public class ReviewDAOImpl implements ReviewDAO {
 		}
 		return reviews;
 	}
+	
+	@Override
+	public int insertReview(ReviewDTO reviewDTO) throws SQLException {
+		int result = 0;
+		String sql = proFile.getProperty("review.insertReview");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, reviewDTO.getRecipeId());
+			ps.setLong(2, reviewDTO.getUserId());
+			ps.setInt(3, reviewDTO.getRating());
+			ps.setString(4, reviewDTO.getContent());
+			ps.setString(5, reviewDTO.getImageUrl());
+			
+			result = ps.executeUpdate();
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public int deleteReview(long reviewId) throws SQLException {
+		int result = 0;
+		String sql = proFile.getProperty("review.deleteReview");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, reviewId);
+			
+			result = ps.executeUpdate();
+		}
+		
+		return result;
+	}
 }

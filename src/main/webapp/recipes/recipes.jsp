@@ -1,6 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8" %> <%@taglib uri="http://java.sun.com/jsp/jstl/core"
-prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -92,8 +92,7 @@ prefix="c" %>
               </div>
               <div class="body">
                 <div class="meta">
-                  <span class="label">공식 레시피</span>
-                  <span class="label green">쉬움</span>
+                  <span class="label">${"${recipe.recipeType.toString().toLowerCase() == 'base' ? '공식 레시피' : '유저 레시피'}"}</span>
                 </div>
                 <h3 style="margin: 8px 0">${"${recipe.RCP_NM}"}</h3>
                 <p class="small">${"${recipe.RCP_NA_TIP}"}</p>

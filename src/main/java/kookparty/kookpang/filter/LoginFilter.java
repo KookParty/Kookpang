@@ -65,6 +65,10 @@ public class LoginFilter implements Filter {
     if ("recipe".equals(key) && PUBLIC_RECIPE_METHODS.contains(methodName)) {
       needAuth = false;
     }
+    
+    if ("review".equals(key) && Set.of("selectByRecipeId").contains(methodName)) {
+      needAuth = false;
+    }
 
     if ("product".equals(key)) {
       if (PUBLIC_PRODUCT_READ_METHODS.contains(methodName)) {

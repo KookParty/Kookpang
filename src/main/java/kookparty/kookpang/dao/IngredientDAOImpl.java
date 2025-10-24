@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -59,11 +60,17 @@ public class IngredientDAOImpl implements IngredientDAO {
 		int[] result = null;
 		String sql = proFile.getProperty("ingredient.insertIngredients");
 		
+		if (ingredients == null) return null;
+		
 		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			for (IngredientDTO ingredientDTO : ingredients) {
 				ps.setLong(1, recipeId);
 				ps.setString(2, ingredientDTO.getName());
 				ps.setString(3, ingredientDTO.getQuantity());
+				if (ingredientDTO.getProductId() != 0)
+					ps.setLong(4, ingredientDTO.getProductId());
+				else
+					ps.setNull(4, Types.BIGINT);
 
 				//ps.executeUpdate();
 				ps.addBatch();

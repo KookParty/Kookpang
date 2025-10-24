@@ -26,4 +26,9 @@ public interface RecipeService {
 	 * 레시피 등록
 	 */
 	void insertRecipe(RecipeDTO recipeDTO) throws Exception;
+	
+	/**
+	 * 레시피 삭제
+	 */
+	void deleteRecipeByRecipeId(long recipeId) throws Exception;
 }
