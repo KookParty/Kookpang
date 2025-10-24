@@ -9,8 +9,9 @@ public interface RecipeDAO {
 
 	/**
 	 * 레시피 전체 검색
+	 * 파라미터 ("", "", "", 0)으로 줄 시, 전체 레시피 검색
 	 */
-	List<RecipeDTO> selectByOptions(String word, String category, String order) throws SQLException;
+	List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo) throws SQLException;
 	
 	/**
 	 * 레시피 단일 검색 (상세보기)

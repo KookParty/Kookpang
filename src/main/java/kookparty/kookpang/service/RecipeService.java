@@ -10,7 +10,7 @@ public interface RecipeService {
 	/**
 	 * 레시피 전체 검색 (기본/변형, 정렬, 키워드 포함)
 	 */
-	List<RecipeDTO> selectByOptions(String word, String category, String order) throws Exception;
+	List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo) throws Exception;
 	
 	/**
 	 * 레시피 상세보기

@@ -14,8 +14,10 @@ import java.util.Properties;
 import kookparty.kookpang.common.RecipeType;
 import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.util.DbUtil;
+import kookparty.kookpang.util.PageCnt;
 
 public class RecipeDAOImpl implements RecipeDAO {
+	private final int pageSize = 12;
 	private IngredientDAO ingredientDAO = IngredientDAOImpl.getInstance();
 	private StepDAO stepDAO = StepDAOImpl.getInstance();
 	
@@ -37,32 +39,48 @@ public class RecipeDAOImpl implements RecipeDAO {
 	}
 	
 	@Override
-	public List<RecipeDTO> selectByOptions(String word, String category, String order) throws SQLException {
+	public List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo) throws SQLException {
 		List<RecipeDTO> list = new ArrayList<>();
 		StringBuilder baseSql = new StringBuilder(proFile.getProperty("recipe.selectByOptions"));
+		String limitOffset = proFile.getProperty("page.limitOffset");
 		int index = 1;
 		
+		// 검색어, 카테고리, 정렬 조건들
+		boolean wordCond = word != null && word.isEmpty() == false;
+		boolean cateCond = "base".equals(category) || "variant".equals(category);
+		//boolean likeCond = ;	// TODO 좋아요수
+				
+		
 		// 검색어
-		if(word != null && word.isEmpty() == false) {
+		if(wordCond) {
 			baseSql.append(" where upper(replace(title, ' ', '')) like upper(replace(?, ' ', ''))");
 		}
 		
 		// 카테고리(기본/변형 선택했을 경우)
-		if ("base".equals(category) || "variant".equals(category)) {
-			baseSql.append(word == null || word.isEmpty() ? " where " : " and ");
+		if (cateCond) {
+			baseSql.append(wordCond == false ? " where " : " and ");
 			baseSql.append("recipe_type = ? ");
 		}
 		
 		// 정렬 기준 (최신순/인기순)
-		if(order == null || "recent".equals(order)) baseSql.append(" order by created_at desc");
+		if (order == null || "recent".equals(order)) baseSql.append(" order by created_at desc");
 		// else if ("like".equals(order)) baseSql.append(" order by  desc ");
+		
+		// 페이징
+		if (pageNo != 0) baseSql.append(limitOffset);
 		
 		try (Connection con = DbUtil.getConnection();
 				PreparedStatement ps = con.prepareStatement(baseSql.toString())) {
-			if (word != null && word.isEmpty() == false) 
+			if (wordCond) 
 				ps.setString(index++, "%" + word + "%");
-			if ("base".equals(category) || "variant".equals(category)) 
+			if (cateCond) 
 				ps.setString(index++, category);
+			if (pageNo != 0) {
+				int countAll = countByOptions(con, word, category);
+				PageCnt page = new PageCnt(countAll, pageSize, pageNo);
+				ps.setInt(index++, page.getLimit());
+				ps.setInt(index++, page.getOffset());
+			}
 				
 			
 			try (ResultSet rs = ps.executeQuery()) {
@@ -88,6 +106,39 @@ public class RecipeDAOImpl implements RecipeDAO {
 		}
 		
 		return list;
+	}
+	
+	private int countByOptions(Connection con, String word, String category) throws SQLException {
+		int result = 0;
+		StringBuilder baseSql = new StringBuilder(proFile.getProperty("recipe.count"));
+		int index = 1;
+		
+		// 검색어, 카테고리, 정렬 조건들
+		boolean wordCond = word != null && word.isEmpty() == false;
+		boolean cateCond = "base".equals(category) || "variant".equals(category);
+		//boolean likeCond = ;	// TODO 좋아요수
+		
+		if(wordCond) {
+			baseSql.append(" where upper(replace(title, ' ', '')) like upper(replace(?, ' ', ''))");
+		}
+		if (cateCond) {
+			baseSql.append(wordCond == false ? " where " : " and ");
+			baseSql.append("recipe_type = ? ");
+		}
+		
+		try (PreparedStatement ps = con.prepareStatement(baseSql.toString())) {
+			if (wordCond) 
+				ps.setString(index++, "%" + word + "%");
+			if (cateCond) 
+				ps.setString(index++, category);
+			
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					result = rs.getInt(1);
+				}
+			}
+		}
+		return result;
 	}
 	
 	

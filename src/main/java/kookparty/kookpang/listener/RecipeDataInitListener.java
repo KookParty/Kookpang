@@ -22,10 +22,10 @@ public class RecipeDataInitListener implements ServletContextListener {
     	try {
     		RecipeService service = RecipeServiceImpl.getInstance();
     		
-			if (service.selectByOptions("", "base", "").size() != 0) {
+			if (service.selectByOptions("", "base", "", 0).size() != 0) {
 				// recipes 테이블에 레코드가 있을 시
 				System.out.println("recipes 데이터 확인됨");
-				System.out.println("recipes size = " + service.selectByOptions("", "base", "").size());
+				System.out.println("recipes size = " + service.selectByOptions("", "base", "", 0).size());
 			} else {
 				// recipes 테이블에 레코드가 하나도 없을 시
 				// API로부터 레시피 데이터 가져오기
