@@ -230,16 +230,20 @@ public class ProductDAOImpl implements ProductDAO {
 	}
 
 	@Override
-	public int deleteProduct(long productId) throws SQLException {
+	public int[] deleteProduct(List<Long> productIdList) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
-		int result = 0;
+		int[] result = null;
 		String sql = proFile.getProperty("product.deleteProduct");
 		try {
 			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
-			ps.setLong(1, productId);
-			result = ps.executeUpdate();
+			for(Long id : productIdList) {
+				ps.setLong(1, id);
+				ps.addBatch();
+			}
+			
+			result = ps.executeBatch();
 		} finally {
 			DbUtil.dbClose(con, ps);
 		}

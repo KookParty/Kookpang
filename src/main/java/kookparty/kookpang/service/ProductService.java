@@ -54,7 +54,7 @@ public interface ProductService {
 	 * @return
 	 * @throws SQLException 
 	 */
-	int deleteProduct(long productId) throws SQLException;
+	int deleteProduct(String[] productIds) throws SQLException;
 	
 	
 	

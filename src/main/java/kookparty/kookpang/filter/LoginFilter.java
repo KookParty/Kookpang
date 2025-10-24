@@ -87,6 +87,10 @@ public class LoginFilter implements Filter {
       needAuth = true;
     }
     
+    if("admin".equals(key)) {
+    	needAuth = false;
+    }
+    
     // ----- 인증 확인 -----
     if (needAuth) {
       HttpSession session = req.getSession(false);

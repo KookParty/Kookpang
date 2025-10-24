@@ -108,7 +108,7 @@ create table ingredients(
     product_id bigint, -- 식재료id(fk), 무슨 재료인지
     name varchar(100) not null,
     quantity varchar(100),
-    foreign key(recipe_id) references recipes(recipe_id),
+    foreign key(recipe_id) references recipes(recipe_id) on delete cascade,
     foreign key(product_id) references products(product_id) on delete cascade
 );
 

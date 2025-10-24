@@ -19,7 +19,7 @@ public interface ProductDAO {
 	
 	int updateProduct(ProductDTO productDTO) throws SQLException;
 	
-	int deleteProduct(long productId) throws SQLException;
+	int[] deleteProduct(List<Long> productIdList) throws SQLException;
 
 	ProductDTO selectByProductId(long productId, Connection con) throws SQLException;
 }
