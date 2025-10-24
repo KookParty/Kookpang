@@ -54,13 +54,15 @@
       let word = "";
       let category = "base";	// 기본레시피
       let order = "recent"; // 최신순
+      const grid = document.querySelector("#list");
       
       onload = () => {
-    	document.querySelector("#list").innerHTML = "";
+    	grid.innerHTML = "";
+    	pageNo = 1;
         printData();
       };
 
-      const printData = async function () {
+      const printData = async function (append = false) {
         body = new URLSearchParams({
           key: "recipe",
           methodName: "selectByOptions",
@@ -84,7 +86,6 @@
           console.log("recipe: " + result);
           
           // 데이터 출력
-          let list = document.querySelector("#list");
           let str = "";
           result.forEach((recipe, index) => {
             str += `
@@ -107,7 +108,8 @@
             </article>`;
           });
           
-          list.innerHTML += str;
+          if (append) grid.innerHTML += str;
+          else grid.innerHTML = str;
           
         } catch (err) {
           console.error("에러 발생: " + err);
@@ -116,21 +118,27 @@
       
       // 검색어 입력
       document.querySelector("#keyword").onkeyup = async (e) => {
+    	grid.innerHTML = "";
         word = e.target.value;
-        printData();
+        pageNo = 1;
+        printData(false);
       }
       
       // 카테고리 변경
       document.querySelector("#category").onchange = async (e) => {
+    	grid.innerHTML = "";
         category = e.target.value;
-        printData();
+        pageNo = 1;
+        printData(false);
       }
       
       // 정렬 버튼 클릭 (토글)
       document.querySelector("#sort").onclick = async (e) => {
+    	grid.innerHTML = "";
         e.target.textContent = (e.target.textContent === "최신순") ? "인기순" : "최신순";
         order = (order === "recent") ? "popular" : "recent";
-        printData();
+        pageNo = 1;
+        printData(false);
       }
       
       // 페이징
@@ -150,7 +158,7 @@
       
       const loadNextPage = async function() {
     	  pageNo++;
-    	  await printData();
+    	  await printData(true);
       }
       
     </script>
