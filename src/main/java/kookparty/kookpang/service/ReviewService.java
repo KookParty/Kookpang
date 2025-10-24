@@ -10,6 +10,7 @@ public interface ReviewService {
 
 	/**
 	 * 리뷰 검색
+	 * 파라미터 ("", "", "", 0)으로 줄 시, 전체 레시피 검색
 	 */
 	List<ReviewDTO> selectByRecipeId(long recipeId) throws Exception;
 	
