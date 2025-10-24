@@ -86,8 +86,8 @@ public class RecipeController implements Controller {
 			String fileName = part.getSubmittedFileName();
 			if (fileName != null && !fileName.isEmpty()) {
 				fileName = Paths.get(fileName).getFileName().toString();
-				part.write(FilePath.getSavePath(request) + "/" + fileName);
-				thumbnailUrl = "../upload/" + fileName;
+				part.write(FilePath.getSavePath(request, "recipe_upload") + "/" + fileName);
+				thumbnailUrl = "../recipe_upload/" + fileName;
 			} else {
 				thumbnailUrl = null;
 			}
@@ -114,8 +114,8 @@ public class RecipeController implements Controller {
 		    	String fileName = part.getSubmittedFileName();
 				if (fileName != null && !fileName.isEmpty()) {
 					fileName = Paths.get(fileName).getFileName().toString();
-					stepPart.write(FilePath.getSavePath(request) + "/" + fileName);
-					step.setImageUrl("../upload/" + fileName);
+					stepPart.write(FilePath.getSavePath(request, "recipe_upload") + "/" + fileName);
+					step.setImageUrl("../recipe_upload/" + fileName);
 				} else {
 					step.setImageUrl(null);
 				}
