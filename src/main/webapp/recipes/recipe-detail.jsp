@@ -525,7 +525,7 @@
           } else {        	  
             result.forEach((review, index) => {
               let originUser = review.userId;
-              let curUser = ${loginUser.userId};
+              let curUser = ${loginUser != null ? loginUser.userId : 'null'};
               // 별
               let stars = "★".repeat(review.rating || 0);
               
