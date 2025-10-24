@@ -78,7 +78,7 @@ create table comments(
     content varchar(200) not null, -- 댓글 내용
     created_at datetime not null default now(), -- 등록일
 	foreign key(user_id) references users(user_id),
-    foreign key(post_id) references posts(post_id)
+    foreign key(post_id) references posts(post_id) on delete cascade
 );
 
 create table reviews(
@@ -89,7 +89,7 @@ create table reviews(
     content varchar(500) not null, -- 리뷰내용
     image_url varchar(200), -- 이미지 주소
     created_at datetime not null default now(),
-    foreign key(recipe_id) references recipes(recipe_id),
+    foreign key(recipe_id) references recipes(recipe_id) on delete cascade,
     foreign key(user_id) references users(user_id)
 );
 
@@ -99,7 +99,7 @@ create table steps(
     step_order int not null, -- 조리순서
     description varchar(200), -- 조리방법에 대한 설명
     image_url varchar(200), -- 이미지 주소
-    foreign key(recipe_id) references recipes(recipe_id)
+    foreign key(recipe_id) references recipes(recipe_id) on delete cascade
 );
 
 create table ingredients(
@@ -109,7 +109,7 @@ create table ingredients(
     name varchar(100) not null,
     quantity varchar(100),
     foreign key(recipe_id) references recipes(recipe_id),
-    foreign key(product_id) references products(product_id)
+    foreign key(product_id) references products(product_id) on delete cascade
 );
 
 create table orders(
