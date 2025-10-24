@@ -12,9 +12,9 @@ import kookparty.kookpang.dto.ProductDTO;
 public class ProductServiceImpl implements ProductService {
 	ProductDAO productDAO = new ProductDAOImpl();
 	@Override
-	public List<ProductDTO> selectAll(int pageNo) throws SQLException{
+	public List<ProductDTO> selectAll() throws SQLException{
 		
-		List<ProductDTO> productList = productDAO.selectAll(pageNo);
+		List<ProductDTO> productList = productDAO.selectAll();
 		return productList;
 	}
 	

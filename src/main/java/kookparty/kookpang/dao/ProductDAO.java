@@ -7,7 +7,7 @@ import java.util.List;
 import kookparty.kookpang.dto.ProductDTO;
 
 public interface ProductDAO {
-	List<ProductDTO> selectAll(int pageNo) throws SQLException;
+	List<ProductDTO> selectAll() throws SQLException;
 	
 	List<ProductDTO> selectByOptions(String word, String category, String order, int PageNo) throws SQLException;
 	

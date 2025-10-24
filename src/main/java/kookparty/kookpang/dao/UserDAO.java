@@ -85,4 +85,60 @@ public class UserDAO {
             }
         } catch (SQLException e) { throw new RuntimeException(e); }
     }
+    
+    /** 프로필 업데이트 (닉네임, 전화번호, 주소) */
+    public boolean updateProfile(Long userId, String nickname, String phone, String address) {
+        String sql;
+        if (phone == null || phone.trim().isEmpty()) {
+            sql = "UPDATE users SET nickname=?, address=? WHERE user_id=?";
+        } else {
+            sql = "UPDATE users SET nickname=?, phone=?, address=? WHERE user_id=?";
+        }
+        
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, nickname);
+            
+            if (phone == null || phone.trim().isEmpty()) {
+                ps.setString(2, address);
+                ps.setLong(3, userId);
+            } else {
+                ps.setString(2, phone);
+                ps.setString(3, address);
+                ps.setLong(4, userId);
+            }
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { 
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /** 비밀번호 변경 */
+    public boolean updatePassword(Long userId, String newPassword) {
+        String sql = "UPDATE users SET password=? WHERE user_id=?";
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newPassword);
+            ps.setLong(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { 
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /** 회원 탈퇴 */
+    public boolean deleteUser(Long userId) {
+        String sql = "UPDATE users SET status=0 WHERE user_id=?";
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { 
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -163,25 +163,22 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
                   <form id="ship-select-form">
                     <div style="margin-bottom: 8px">
                       받는 분: <b>${name}</b> / 연락처: <b>${phone}</b><br />
-                      <label style="display: block; margin-bottom: 6px">
-                        <input type="radio" name="ship_choice" value="addr1" id="normal" checked /> 주소:
-                        <b id="addr">${address}</b></label
-                      >
+                      <div id="normal-addr-area" style="margin-top: 8px">
+                        <label style="display: block; margin-bottom: 6px">
+                          <input type="radio" name="ship_choice" value="addr1" id="normal" checked /> 기본 주소:</label
+                        ><b id="addr">${address}</b>
+                      </div>
+
                       <label style="display: block; margin-bottom: 6px"
                         ><input type="radio" name="ship_choice" value="custom" id="custom" /> 직접 입력</label
                       >
-                    </div>
-                    <div id="ship-custom-area" style="margin-top: 8px">
-                      <div style="margin-bottom: 8px">
+                      <div style="margin-bottom: 8px; display: none" id="custom-addr-area">
                         <textarea
                           id="custom-address"
                           class="input"
                           placeholder="배송지 주소를 입력하세요"
                           style="width: 100%; height: 76px"
                         ></textarea>
-                      </div>
-                      <div style="display: flex; gap: 8px; justify-content: flex-end">
-                        <button type="button" id="custom-cancel" class="btn">취소</button>
                       </div>
                     </div>
                   </form>
@@ -206,7 +203,26 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
     <script>
-      //배송지 선택
+      const customRadio = document.getElementById("custom");
+      const normalRadio = document.getElementById("normal");
+      const customArea = document.getElementById("custom-addr-area");
+      const normalArea = document.getElementById("addr");
+
+      const toggleCustomArea = function () {
+        if (customRadio.checked) {
+          customArea.style.display = "block";
+          normalArea.style.display = "none";
+        } else {
+          customArea.style.display = "none";
+          normalArea.style.display = "block";
+        }
+      };
+
+      toggleCustomArea();
+
+      customRadio.addEventListener("change", toggleCustomArea);
+      normalRadio.addEventListener("change", toggleCustomArea);
+
       const shipSelect = function () {
         let addr = "";
         if (document.getElementById("normal").checked) {
@@ -214,11 +230,16 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
         } else if (document.getElementById("custom").checked) {
           addr = document.getElementById("custom-address").value;
         }
+
         return addr;
       };
 
       const payReady = async function () {
         const addr = shipSelect();
+        if (addr.trim() === "") {
+          alert("배송지 주소를 입력해주세요.");
+          return;
+        }
         const r = await fetch(CONTEXT_PATH + "/ajax", {
           method: "POST",
           headers: {
