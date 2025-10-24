@@ -59,7 +59,7 @@
       onload = () => {
     	grid.innerHTML = "";
     	pageNo = 1;
-        printData();
+        printData(false);
       };
 
       const printData = async function (append = false) {
@@ -88,12 +88,14 @@
           // 데이터 출력
           let str = "";
           result.forEach((recipe, index) => {
-            str += `
-            <article class="card tile">
-              <div class="thumb">
-                <img src="${"${recipe.ATT_FILE_NO_MAIN}"}" />
-              </div>
-              <div class="body">
+            str += `<article class="card tile">`;
+            if (recipe.ATT_FILE_NO_MAIN.substring(0,2) == '..') {
+              str += `<div class="thumb" style="background-image: url(${path}/${"${recipe.ATT_FILE_NO_MAIN}"}); background-repeat: no-repeat; background-size: cover; background-position: center;"></div>`;
+            } else {
+              str += `<div class="thumb" style="background-image: url(${"${recipe.ATT_FILE_NO_MAIN}"}); background-repeat: no-repeat; background-size: cover; background-position: center;"></div>`;
+            }
+            
+            str += `<div class="body">
                 <div class="meta">
                   <span class="label">${"${recipe.recipeType.toString().toLowerCase() == 'base' ? '공식 레시피' : '유저 레시피'}"}</span>
                 </div>
