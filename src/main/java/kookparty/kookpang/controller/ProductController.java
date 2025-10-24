@@ -32,18 +32,12 @@ public class ProductController implements Controller {
 	}
 	
 	public List<ProductDTO> selectAll(HttpServletRequest request, HttpServletResponse response){
-		String pageNoStr = request.getParameter("page_no");
-		System.out.println(pageNoStr);
-		int pageNo = 0;
-		if(pageNoStr == null || pageNoStr.trim().isEmpty()) {
-			pageNo = 1;
-		}else {
-			pageNo = Integer.parseInt(pageNoStr);
-		}
-		System.out.println(pageNo);
 		List<ProductDTO> list = null;
 		try {
-			list = productService.selectAll(pageNo);
+			list = productService.selectAll();
+			for(ProductDTO p : list) {
+				System.out.println(p);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

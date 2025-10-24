@@ -12,7 +12,7 @@ public interface ProductService {
 	 * @return
 	 * @throws SQLException 
 	 */
-	List<ProductDTO> selectAll(int pageNo) throws SQLException;
+	List<ProductDTO> selectAll() throws SQLException;
 
 	
 	/**

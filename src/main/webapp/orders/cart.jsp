@@ -153,19 +153,14 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           class="ov-card"
           style="display: none; padding: 48px 24px; text-align: center; margin-bottom: 16px"
         >
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; justify-content: flex-start">
-            <a href="${path}/recipes/recipes.jsp" class="btn" style="background: #f3f4f6; color: #111"
-              >← 쇼핑 계속하기</a
-            >
-          </div>
           <div style="max-width: 520px; margin: 0 auto">
             <div style="font-size: 56px; opacity: 0.5; line-height: 1.1">🛒</div>
             <h2 style="margin: 10px 0 6px; font-size: 22px">장바구니가 비어있습니다</h2>
             <p class="muted" style="margin: 0 0 16px">맛있는 요리를 위한 재료들을 담아보세요</p>
             <div style="display: flex; gap: 8px; justify-content: center">
-              <a href="${path}/recipes/recipes.jsp" class="btn">레시피 보러가기</a>
+              <a href="${path}/front?key=recipe&methodName=recipes" class="btn">레시피 보러가기</a>
               <a
-                href="${path}/orders/ingredients.jsp"
+                href="${path}/front?key=product&methodName=ingredients"
                 class="btn"
                 style="background: #fff; color: #111; border: 1px solid #e5e7eb"
                 >식재료 보러가기</a
@@ -185,11 +180,11 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
             </section>
             <aside class="ov-card ov-aside">
               <div class="ov-sec-title">결제 정보</div>
-              <div class="ov-row"><span>상품 금액</span><b id="ov-price">10,000원</b></div>
-              <div class="ov-row"><span>배송비</span><b id="ov-ship">3,000원</b></div>
+              <div class="ov-row"><span>상품 금액</span><b id="ov-price"></b></div>
+              <div class="ov-row"><span>배송비</span><b id="ov-ship"></b></div>
               <div class="ov-row" style="border-top: 1px solid #e5e7eb"></div>
               <div class="ov-row">
-                <span style="font-weight: 800">총 결제 금액</span><b id="ov-total" style="font-size: 18px">13,000원</b>
+                <span style="font-weight: 800">총 결제 금액</span><b id="ov-total" style="font-size: 18px"></b>
               </div>
               <button
                 id="ov-pay"

@@ -27,24 +27,17 @@ public class ProductDAOImpl implements ProductDAO {
 	}
 
 	@Override
-	public List<ProductDTO> selectAll(int pageNo) throws SQLException {
+	public List<ProductDTO> selectAll() throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		List<ProductDTO> productList = new ArrayList<ProductDTO>();
-		String preSql = proFile.getProperty("product.selectAll");
-		String limitOffset = proFile.getProperty("page.limitOffset");
-		String sql = preSql + " " + limitOffset;
+		String sql = proFile.getProperty("product.selectAll");
 
 		try {
 			con = DbUtil.getConnection();
 			con.setAutoCommit(false);
-			int countAll = countAll(con);
-			PageCnt page = new PageCnt(countAll, 20, pageNo);
-
 			ps = con.prepareStatement(sql);
-			ps.setInt(1, page.getLimit());
-			ps.setInt(2, page.getOffset());
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ProductDTO productDTO = new ProductDTO(rs.getInt("product_id"), rs.getString("name"),
@@ -58,24 +51,6 @@ public class ProductDAOImpl implements ProductDAO {
 		}
 
 		return productList;
-	}
-
-	private int countAll(Connection con) throws SQLException {
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		int result = 0;
-		String sql = proFile.getProperty("product.countAll");
-		try {
-			ps = con.prepareStatement(sql);
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				result = rs.getInt(1);
-			}
-		} finally {
-			DbUtil.dbClose(null, ps, rs);
-		}
-
-		return result;
 	}
 
 	@Override
