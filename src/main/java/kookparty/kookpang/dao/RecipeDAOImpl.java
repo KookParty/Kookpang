@@ -67,7 +67,7 @@ public class RecipeDAOImpl implements RecipeDAO {
 		// else if ("like".equals(order)) baseSql.append(" order by  desc ");
 		
 		// 페이징
-		if (pageNo != 0) baseSql.append(limitOffset);
+		if (pageNo != 0) baseSql.append(" " + limitOffset);
 		
 		try (Connection con = DbUtil.getConnection();
 				PreparedStatement ps = con.prepareStatement(baseSql.toString())) {

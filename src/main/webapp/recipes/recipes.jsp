@@ -56,6 +56,7 @@
       let order = "recent"; // 최신순
       
       onload = () => {
+    	document.querySelector("#list").innerHTML = "";
         printData();
       };
 
@@ -66,6 +67,7 @@
           word,
           category,
           order,
+          pageNo,
         });
 
         try {
@@ -105,7 +107,7 @@
             </article>`;
           });
           
-          list.innerHTML = str;
+          list.innerHTML += str;
           
         } catch (err) {
           console.error("에러 발생: " + err);
@@ -130,6 +132,27 @@
         order = (order === "recent") ? "popular" : "recent";
         printData();
       }
+      
+      // 페이징
+      let pageNo = 1;
+      let isLoading = false;
+      
+      window.addEventListener("scroll", async () => {
+    	  if (isLoading) return;
+    	  
+    	  const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+    	  if (nearBottom) {
+    		  isLoading = true;
+    		  await loadNextPage();
+    		  isLoading = false;
+    	  }
+      });
+      
+      const loadNextPage = async function() {
+    	  pageNo++;
+    	  await printData();
+      }
+      
     </script>
     <!--
       <script>
