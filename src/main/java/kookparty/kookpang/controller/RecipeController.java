@@ -20,8 +20,6 @@ import kookparty.kookpang.service.ProductService;
 import kookparty.kookpang.service.ProductServiceImpl;
 import kookparty.kookpang.service.RecipeService;
 import kookparty.kookpang.service.RecipeServiceImpl;
-import kookparty.kookpang.service.ReviewService;
-import kookparty.kookpang.service.ReviewServiceImpl;
 import kookparty.kookpang.util.FilePath;
 
 public class RecipeController implements Controller {
@@ -85,15 +83,14 @@ public class RecipeController implements Controller {
 		// form 속성에 enctype="multipart/form-data" 있는지 꼭 확인!
 		Part part = request.getPart("thumb");
 		if(part != null) {
-			String fileName = part.getSubmittedFileName(); //전송된 파일이름정보
-			//안전하게 파일명 추출
-			fileName = Paths.get(fileName).getFileName().toString();
-			if (fileName != null && !fileName.equals("")) {
-				// tomcat 서버 폴더에 파일 저장(업로드)
-	            part.write(FilePath.getSavePath(request) + "/" + fileName);
-				
+			String fileName = part.getSubmittedFileName();
+			if (fileName != null && !fileName.isEmpty()) {
+				fileName = Paths.get(fileName).getFileName().toString();
+				part.write(FilePath.getSavePath(request) + "/" + fileName);
 				thumbnailUrl = "../upload/" + fileName;
-	        }
+			} else {
+				thumbnailUrl = null;
+			}
 		}
 		
 		
@@ -114,9 +111,14 @@ public class RecipeController implements Controller {
 		    StepDTO step = steps.get(i);
 		    Part stepPart = request.getPart("stepImg" + (i + 1)); // stepImg1, stepImg2, ...
 		    if (stepPart != null && stepPart.getSize() > 0) {
-		        String fileName = Paths.get(stepPart.getSubmittedFileName()).getFileName().toString();
-		        stepPart.write(FilePath.getSavePath(request) + "/" + fileName);
-		        step.setImageUrl("../upload/" + fileName);
+		    	String fileName = part.getSubmittedFileName();
+				if (fileName != null && !fileName.isEmpty()) {
+					fileName = Paths.get(fileName).getFileName().toString();
+					stepPart.write(FilePath.getSavePath(request) + "/" + fileName);
+					step.setImageUrl("../upload/" + fileName);
+				} else {
+					step.setImageUrl(null);
+				}
 		    }
 		}
 

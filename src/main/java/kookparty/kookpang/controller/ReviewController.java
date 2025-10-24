@@ -43,11 +43,14 @@ public class ReviewController implements Controller {
 		// form 속성에 enctype="multipart/form-data" 있는지 꼭 확인!
 		Part part = request.getPart("imageUrl");
 		if(part != null) {
-			String fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-			if (fileName != null && !fileName.equals("")) {
-	            part.write(FilePath.getSavePath(request) + "/" + fileName);
-	            imageUrl = "../upload/" + fileName;
-	        }
+			String fileName = part.getSubmittedFileName();
+			if (fileName != null && !fileName.isEmpty()) {
+				fileName = Paths.get(fileName).getFileName().toString();
+				part.write(FilePath.getSavePath(request) + "/" + fileName);
+				imageUrl = "../upload/" + fileName;
+			} else {
+				imageUrl = null;
+			}
 		}
 		
 		

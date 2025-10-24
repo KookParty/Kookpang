@@ -237,10 +237,25 @@
         height: 90px;
         object-fit: cover;
         border-radius: 12px;
+        flex-shrink: 0; /* 텍스트 때문에 이미지 줄어듦 방지 */
       }
       
       h5 {
         margin: 10px;
+      }
+      
+      .rv {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      
+      .rv-del {
+        border: none;
+        background: #fff;
+        cursor: pointer;
+        font-size: 18px;
       }
       
     </style>
@@ -393,7 +408,7 @@
       <!-- 리뷰 -->
       <div id="panel-reviews" class="panel">
         <div class="card" style="padding: 16px">
-          <form enctype="multipart/form-data">
+          <form>
             <h3 style="margin: 10px">리뷰 작성하기</h3>
             <div style="padding: 10px">
             <div>평점</div>
@@ -444,10 +459,6 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        try {
-          initHeader && initHeader("recipes");
-        } catch (e) {}
-
         // Tabs
         document.addEventListener("click", (e) => {
           const t = e.target.closest(".tab");
@@ -467,191 +478,20 @@
           likeBtn.textContent = likeBtn.classList.contains("active") ? "❤️ 좋아요" : "♡ 좋아요";
         });
 
-        // insert recipe
-        const writeBtn = document.querySelector("#writeBtn");
-        writeBtn?.addEventListener("click", (e) => {
-          e.preventDefault();
-          location.href = "${path}/front?key=recipe&methodName=variantWrite&parentId=${recipe.recipeId}";
-        });
-        
-        // delete recipe
-        const deleteBtn = document.querySelector("#deleteBtn");
-        deleteBtn?.addEventListener("click", (e) => {
-          e.preventDefault();
-          if (confirm("정말 레시피를 삭제하시겠습니까?")) {
-            location.href = "${path}/front?key=recipe&methodName=deleteRecipe&recipeId=${recipe.recipeId}";      	  
-          }
-        });
-        
-        // insert review
-        const insertReviewBtn = document.querySelector("#insertReviewBtn");
-        insertReviewBtn?.addEventListener("click", async (e) => {
-          e.preventDefault();
-          
-          let rid = document.querySelector("#reviewList").dataset.rid;
-          let content = document.querySelector("#content");
-          let imageUrl = document.querySelector("#imageUrl");
-          
-          /*
-          body = new URLSearchParams({
-            key: "review",
-            methodName: "insertReview",
-            recipeId,
-            rating: rating.dataset.rating,
-            content: content.value,
-            imageUrl: imageUrl.value,
-          });
-          */
-          
-          // URLSearchParams는 텍스트 데이터 전송 전용이라 이미지 파일 보내면 null 나올 것...그래도 FormData로 변경
-          const form = new FormData();
-          form.append("key", "review");
-          form.append("methodName", "insertReview");
-          form.append("recipeId", rid);
-          form.append("rating", rating.dataset.rating);
-          form.append("content", content.value);
-          form.append("imageUrl", imageUrl.files[0]);
-
-          try {
-            const response = await fetch(CONTEXT_PATH + "/ajax", {
-              method: "POST",
-              //body,
-              body:form
-            });
-
-            if (response.ok == false) {
-              throw new Error("서버 응답 에러: " + response.status);
-            }
-
-            const result = await response.json();
-            console.log("result: ", result);
-            
-            // 값 초기화
-            content.value = "";
-            imageUrl.value = "";
-            rating.dataset.rating = 5;	// 평점 세팅
-       		starBtns.forEach(b => {
-       			b.textContent = "★";
-       		})
-            
-       		// 리뷰 목록 다시 불러오기
-            printReviews();
-            
-          } catch (err) {
-            console.error("에러 발생: " + err);
-          }
-        });
-        
-        // delete review
-        const deleteReviewBtn = document.querySelectorAll(".deleteReviewBtn");
-        deleteReviewBtn?.forEach((btn, i) => {
-        	btn.addEventListener("click", async (e) => {
-                
-            });
-        })
-        
-        // 평점
-        const rating = document.querySelector("#rating");
-        const starBtns = rating.querySelectorAll("button");
-        
-        starBtns.forEach(btn => {
-        	btn.addEventListener("click", () => {
-        		const value = btn.dataset.star;
-        		rating.dataset.rating = value;	// 평점 세팅
-        		
-        		starBtns.forEach(b => {
-        			b.textContent = b.dataset.star <= value ? "★" : "☆";	// 별 색깔 바꾸기
-        		})
-        	})
-        })
-        
-        
         // Checkboxes -> sum
         document.addEventListener("change", (e) => {
           if (e.target.matches(".ing [type=checkbox]")) sum();
         });
         sum();
 
-        // Add to cart // Ajax로 insertCart
-        window.addSelected = async function () {
-          const checked = document.querySelectorAll(".ing [type=checkbox]:checked");
-          if (!checked.length) {
-            alert("재료를 선택해주세요.");
-            return;
-          }
-          
-          // ajax 서버 요청
-          for (const ch of checked) {
-            const row = ch.closest(".row");
-            const id = ch.dataset.productId;
-            const count = 1;
-
-            if (id === null || id === 0) continue;  // productId 없는 경우 건너뜀
-            
-            try {
-              const duplicateChk = await fetch(CONTEXT_PATH + "/ajax", {
-                method: "POST",
-                body: new URLSearchParams({
-                  key: "cart",
-                  methodName: "duplicateCheck",
-                  productId: id,
-                }),
-              });
-              const exists = await duplicateChk.json();
-              if (exists) {
-                const response = await fetch(conPath + "/ajax", {
-                  method: "POST",
-                  body: new URLSearchParams({
-                    key: "cart",
-                    methodName: "duplicatedCartCount",
-                    productId: id,
-                    newCount: exists.count + count,
-                  }),
-                });
-                if (response.ok) {
-                  console.log("Cart count updated successfully");
-                } else {
-                  console.error("Failed to update cart count:", response.statusText);
-                }
-              } else {
-                const res = await fetch(CONTEXT_PATH + "/ajax", {
-                  method: "POST",
-                  body: new URLSearchParams({
-                    key: "cart",
-                    methodName: "insertCart",
-                    productId: id,
-                    count: count,
-                  }),
-                });
-                if (!res.ok) {
-                  console.error("Failed to add to cart:", res.status, res.statusText);
-                  return;
-                }
-              }
-            } catch (err) {
-              console.error("recipe-detail > insertCart 오류: ", err);
-            }
-          }
-          
-          ensureBadge(); // 장바구니 새로고침
-          // 장바구니 추가 알림 (우측 하단)
-          try {
-            const n = document.createElement("div");
-            n.textContent = `${"${checked.length}"}개 재료가 장바구니에 추가되었습니다.`;
-            n.style.cssText =
-              "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
-            document.body.appendChild(n);
-            setTimeout(() => {
-              n.remove();
-            }, 1000);
-          } catch (_) { }
-        };
-
-        printReviews();
+        
       }); // DOMContentLoaded end
 
-      /* 리뷰 전체 검색 */
+      onload = () => {
+        printReviews();
+      }
 
+      /* 리뷰 전체 검색 */
       const recipeId = document.querySelector("#reviewList").dataset.rid;
       const printReviews = async function () {
         body = new URLSearchParams({
@@ -682,15 +522,26 @@
             아직 리뷰가 없습니다 <br>
             첫 번째 리뷰를 작성해보세요!
             </div>`
-          } else {
+          } else {        	  
             result.forEach((review, index) => {
-              str += `<div class="card variant">
-                <img src="${path}/${"${review.imageUrl}"}" alt="thumbnail"/>
-                <div>
-                  <div class="muted2">${"${review.nickname}"}</div>
-                  <div>${"${review.content}"}</div>               
-                </div>
-              </div>`;
+              let originUser = review.userId;
+              let curUser = ${loginUser.userId};
+              // 별
+              let stars = "★".repeat(review.rating || 0);
+              
+              str += `<div class="card variant">`;
+              // 이미지가 있을 때만 img 태그
+              if (review.imageUrl) {
+                str += `<img src="${path}/${review.imageUrl}" alt="thumbnail"/>`;
+              }
+              str += `
+                <div class="rv">
+                  <div>
+                    <div class="muted2">${"${review.nickname}"} &nbsp; ${"${stars}"}</div>
+                    <div>${"${review.content}"}</div>               
+                  </div>`;
+              if (originUser == curUser) str += `<button class="rv-del" title="삭제" onclick="deleteReview(${"${review.reviewId}"})">🗑</button>`;
+              str += `</div></div>`;
             });
           }
           
@@ -699,6 +550,183 @@
         } catch (err) {
           console.error("에러 발생: " + err);
         }
+      };
+
+      // insert review
+      const insertReviewBtn = document.querySelector("#insertReviewBtn");
+      insertReviewBtn?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        
+        let rid = document.querySelector("#reviewList").dataset.rid;
+        console.log("insert reveiw btn > rid: ", rid);
+        let content = document.querySelector("#content");
+        let imageUrl = document.querySelector("#imageUrl");
+        
+        // URLSearchParams는 텍스트 데이터 전송 전용이라 이미지 파일 보내면 null 나올 것...그래도 FormData로 변경
+        const form = new FormData();
+        form.append("key", "review");
+        form.append("methodName", "insertReview");
+        form.append("recipeId", rid);
+        form.append("rating", rating.dataset.rating);
+        form.append("content", content.value);
+        form.append("imageUrl", imageUrl.files[0]);
+
+        try {
+          const response = await fetch(CONTEXT_PATH + "/ajax", {
+            method: "POST",
+            //body,
+            body: form,
+          });
+
+          if (!response.ok) {
+            throw new Error("서버 응답 에러: " + response.status);
+          }
+          
+          // 값 초기화
+          content.value = "";
+          imageUrl.value = "";
+          rating.dataset.rating = 5;	// 평점 세팅
+          starBtns.forEach(b => {
+            b.textContent = "★";
+          })
+          
+          
+        } catch (err) {
+          console.error("리뷰 등록 실패: " + err);
+        }
+        // 리뷰 목록 다시 불러오기
+        printReviews();
+      });
+      
+      // delete review
+      const deleteReview = async function (id) {
+        try {
+          const response = await fetch(CONTEXT_PATH + "/ajax", {
+        	  method: "POST",
+        	  body: new URLSearchParams({
+        		  key: "review",
+        		  methodName: "deleteReview",
+        		  reviewId: id,
+        	  }),
+          });
+        
+          if (!response.ok) {
+            throw new Error("서버 응답 에러: " + response.status);
+          }
+        } catch (err) {
+        	console.error("리뷰 삭제 실패: " + err);
+        }
+          
+	    printReviews();
+      }
+              
+      // insert recipe
+      const writeBtn = document.querySelector("#writeBtn");
+      writeBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        location.href = "${path}/front?key=recipe&methodName=variantWrite&parentId=${recipe.recipeId}";
+      });
+      
+      // delete recipe
+      const deleteBtn = document.querySelector("#deleteBtn");
+      deleteBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (confirm("정말 레시피를 삭제하시겠습니까?")) {
+          location.href = "${path}/front?key=recipe&methodName=deleteRecipe&recipeId=${recipe.recipeId}";      	  
+        }
+      });
+
+      // 평점
+      const rating = document.querySelector("#rating");
+      const starBtns = rating.querySelectorAll("button");
+      
+      starBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const value = btn.dataset.star;
+          rating.dataset.rating = value;	// 평점 세팅
+          
+          starBtns.forEach(b => {
+            b.textContent = b.dataset.star <= value ? "★" : "☆";	// 별 색깔 바꾸기
+          })
+        })
+      });
+
+
+
+      /* 장바구니 */
+      // Add to cart // Ajax로 insertCart
+      window.addSelected = async function () {
+        const checked = document.querySelectorAll(".ing [type=checkbox]:checked");
+        if (!checked.length) {
+          alert("재료를 선택해주세요.");
+          return;
+        }
+        
+        // ajax 서버 요청
+        for (const ch of checked) {
+          const row = ch.closest(".row");
+          const id = ch.dataset.productId;
+          const count = 1;
+
+          if (id === null || id === 0) continue;  // productId 없는 경우 건너뜀
+          
+          try {
+            const duplicateChk = await fetch(CONTEXT_PATH + "/ajax", {
+              method: "POST",
+              body: new URLSearchParams({
+                key: "cart",
+                methodName: "duplicateCheck",
+                productId: id,
+              }),
+            });
+            const exists = await duplicateChk.json();
+            if (exists) {
+              const response = await fetch(conPath + "/ajax", {
+                method: "POST",
+                body: new URLSearchParams({
+                  key: "cart",
+                  methodName: "duplicatedCartCount",
+                  productId: id,
+                  newCount: exists.count + count,
+                }),
+              });
+              if (response.ok) {
+                console.log("Cart count updated successfully");
+              } else {
+                console.error("Failed to update cart count:", response.statusText);
+              }
+            } else {
+              const res = await fetch(CONTEXT_PATH + "/ajax", {
+                method: "POST",
+                body: new URLSearchParams({
+                  key: "cart",
+                  methodName: "insertCart",
+                  productId: id,
+                  count: count,
+                }),
+              });
+              if (!res.ok) {
+                console.error("Failed to add to cart:", res.status, res.statusText);
+                return;
+              }
+            }
+          } catch (err) {
+            console.error("recipe-detail > insertCart 오류: ", err);
+          }
+        }
+        
+        ensureBadge(); // 장바구니 새로고침
+        // 장바구니 추가 알림 (우측 하단)
+        try {
+          const n = document.createElement("div");
+          n.textContent = `${"${checked.length}"}개 재료가 장바구니에 추가되었습니다.`;
+          n.style.cssText =
+            "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
+          document.body.appendChild(n);
+          setTimeout(() => {
+            n.remove();
+          }, 1000);
+        } catch (_) { }
       };
     </script>
   </body>
