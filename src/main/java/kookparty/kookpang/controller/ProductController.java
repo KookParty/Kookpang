@@ -75,7 +75,7 @@ public class ProductController implements Controller {
 			Part part = request.getPart("image");
 			String fileName = part.getSubmittedFileName();
 			fileName = Paths.get(fileName).getFileName().toString();
-			String savePath = FilePath.getSavePath(request);
+			String savePath = FilePath.getSavePath(request, "product_image");
 			String imageUrl = null;
 			if(fileName!=null) {
 				imageUrl = savePath + "/" + fileName;
@@ -109,7 +109,7 @@ public class ProductController implements Controller {
 			Part part = request.getPart("image");
 			String fileName = part.getSubmittedFileName();
 			fileName = Paths.get(fileName).getFileName().toString();
-			String savePath = FilePath.getSavePath(request);
+			String savePath = FilePath.getSavePath(request, "product_image");
 			String imageUrl = null;
 			if(fileName!=null) {
 				imageUrl = savePath + "/" + fileName;
@@ -133,25 +133,5 @@ public class ProductController implements Controller {
 		} catch (IOException | ServletException | SQLException e) {
 			e.printStackTrace();
 		} 
-	}
-	
-	public void deleteProduct(HttpServletRequest request, HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		UserDTO user = (UserDTO)session.getAttribute("loginUser");
-		if(user == null || !user.getRole().equals("admin")) {
-			return;
-		}
-		String str = request.getParameter("product_id");
-		long productId = Long.parseLong(str);
-		try {
-			int result = productService.deleteProduct(productId);
-			if(result == 0) {//update 실패시
-				
-			}else {//성공시
-				
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 }

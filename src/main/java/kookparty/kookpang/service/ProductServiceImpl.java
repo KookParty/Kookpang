@@ -2,6 +2,7 @@ package kookparty.kookpang.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.http.Part;
@@ -44,8 +45,19 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public int deleteProduct(long productId) throws SQLException{
-		int result = productDAO.deleteProduct(productId);
+	public int deleteProduct(String[] productIds) throws SQLException{
+		List<Long> productIdList = new ArrayList<Long>();
+		int result = 1;
+		for(String s : productIds) {
+			productIdList.add(Long.parseLong(s));
+		}
+		
+		int[] results = productDAO.deleteProduct(productIdList);
+		for(int r : results) {
+			if(r==0) {
+				result = 0;
+			}
+		}
 		return result;
 	}
 

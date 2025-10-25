@@ -46,8 +46,8 @@ public class ReviewController implements Controller {
 			String fileName = part.getSubmittedFileName();
 			if (fileName != null && !fileName.isEmpty()) {
 				fileName = Paths.get(fileName).getFileName().toString();
-				part.write(FilePath.getSavePath(request) + "/" + fileName);
-				imageUrl = "../upload/" + fileName;
+				part.write(FilePath.getSavePath(request, "review_upload") + "/" + fileName);
+				imageUrl = "../review_upload/" + fileName;
 			} else {
 				imageUrl = null;
 			}

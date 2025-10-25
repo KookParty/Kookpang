@@ -108,7 +108,7 @@ create table ingredients(
     product_id bigint, -- 식재료id(fk), 무슨 재료인지
     name varchar(100) not null,
     quantity varchar(100),
-    foreign key(recipe_id) references recipes(recipe_id),
+    foreign key(recipe_id) references recipes(recipe_id) on delete cascade,
     foreign key(product_id) references products(product_id) on delete cascade
 );
 
@@ -117,7 +117,14 @@ create table orders(
     user_id bigint not null, -- user_id(fk)
     created_at datetime not null default now(),
     total_price int not null,
+    delivery_fee int not null,
     shipping_address varchar(200) not null,
+    order_name varchar(40),
+    cid varchar(30),
+    tid varchar(30),
+    partner_order_id varchar(40),
+    partner_user_id varchar(40),
+    pg_token varchar(30),
     status tinyint not null default 1, -- 1(true) 결제완료상태, 0(false) 결제취소상태
     foreign key(user_id) references users(user_id)
 );
