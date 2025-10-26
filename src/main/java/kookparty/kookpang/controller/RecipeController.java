@@ -171,7 +171,7 @@ public class RecipeController implements Controller {
 		
 		String word = request.getParameter("word");
 		String category = request.getParameter("category");
-		String order = request.getParameter("sort");
+		String order = request.getParameter("order");
 		
 		List<RecipeDTO> list = recipeService.selectByOptions(word, category, order, pageNo);
 		return list;

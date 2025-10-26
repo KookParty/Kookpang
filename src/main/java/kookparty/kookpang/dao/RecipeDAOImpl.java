@@ -43,36 +43,40 @@ public class RecipeDAOImpl implements RecipeDAO {
 	@Override
 	public List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo) throws SQLException {
 		List<RecipeDTO> list = new ArrayList<>();
-		StringBuilder baseSql = new StringBuilder(proFile.getProperty("recipe.selectByOptions"));
+		List<String> sql = new ArrayList<String>();
+		sql.add(proFile.getProperty("recipe.selectByOptions"));
 		String limitOffset = proFile.getProperty("page.limitOffset");
 		int index = 1;
 		
 		// 검색어, 카테고리, 정렬 조건들
 		boolean wordCond = word != null && word.isEmpty() == false;
 		boolean cateCond = "base".equals(category) || "variant".equals(category);
-		//boolean likeCond = ;	// TODO 좋아요수
 				
 		
 		// 검색어
 		if(wordCond) {
-			baseSql.append(" where upper(replace(title, ' ', '')) like upper(replace(?, ' ', ''))");
+			sql.add("where upper(replace(title, ' ', '')) like upper(replace(?, ' ', ''))");
 		}
 		
 		// 카테고리(기본/변형 선택했을 경우)
 		if (cateCond) {
-			baseSql.append(wordCond == false ? " where " : " and ");
-			baseSql.append("recipe_type = ? ");
+			sql.add(wordCond == false ? "where" : "and");
+			sql.add("r.recipe_type = ? ");
 		}
 		
 		// 정렬 기준 (최신순/인기순)
-		if (order == null || "recent".equals(order)) baseSql.append(" order by created_at desc");
-		// else if ("like".equals(order)) baseSql.append(" order by  desc ");
+		if (order == null || "recent".equals(order)) {
+			sql.add("order by r.created_at desc");
+		} else if ("popular".equals(order)) {
+			sql.set(0, proFile.getProperty("recipe.selectByLike"));
+			sql.add("group by r.recipe_id order by like_cnt desc");
+		}
 		
 		// 페이징
-		if (pageNo != 0) baseSql.append(" " + limitOffset);
+		if (pageNo != 0) sql.add(" " + limitOffset);
 		
 		try (Connection con = DbUtil.getConnection();
-				PreparedStatement ps = con.prepareStatement(baseSql.toString())) {
+				PreparedStatement ps = con.prepareStatement(String.join(" ", sql))) {
 			if (wordCond) 
 				ps.setString(index++, "%" + word + "%");
 			if (cateCond) 

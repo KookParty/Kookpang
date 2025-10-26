@@ -673,7 +673,6 @@
         let count = parseInt(likeCntEl.textContent);
     	  
         // UI 반영
-        likeBtn.classList.toggle("active");
         if (likeBtn.classList.contains("active")) {
           likeBtn.textContent = "🤍 좋아요";
           likeCntEl.textContent = count - 1;
@@ -681,6 +680,7 @@
           likeBtn.textContent = "❤️ 좋아요";
           likeCntEl.textContent = count + 1;
         }
+        likeBtn.classList.toggle("active");
         
         // 서버에 좋아요 등록/삭제
         try {
