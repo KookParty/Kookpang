@@ -1,5 +1,6 @@
 package kookparty.kookpang.dao;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import kookparty.kookpang.dto.LikeDTO;
@@ -19,4 +20,9 @@ public interface LikeDAO {
 	 * 좋아요 삭제
 	 */
 	int deleteLike(LikeDTO likeDTO) throws SQLException;
+	
+	/**
+	 * 좋아요 수
+	 */
+	int selectLikeCnt(Connection con, LikeDTO likeDTO) throws SQLException;
 }

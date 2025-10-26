@@ -1,6 +1,5 @@
 package kookparty.kookpang.dao;
 
-import java.awt.Window.Type;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Properties;
 
 import kookparty.kookpang.common.RecipeType;
+import kookparty.kookpang.common.TargetType;
+import kookparty.kookpang.dto.LikeDTO;
 import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.util.DbUtil;
 import kookparty.kookpang.util.PageCnt;
@@ -20,6 +21,7 @@ public class RecipeDAOImpl implements RecipeDAO {
 	private final int pageSize = 12;
 	private IngredientDAO ingredientDAO = IngredientDAOImpl.getInstance();
 	private StepDAO stepDAO = StepDAOImpl.getInstance();
+	private LikeDAO likeDAO = LikeDAOImpl.getInstance();
 	
 	private Properties proFile = new Properties();
 	private static RecipeDAO instance = new RecipeDAOImpl();
@@ -99,7 +101,8 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getInt(9),
 							rs.getString(10),
 							ingredientDAO.selectByRecipeId(con, recipeId),
-							stepDAO.selectByRecipeId(con, recipeId)
+							stepDAO.selectByRecipeId(con, recipeId),
+							likeDAO.selectLikeCnt(con, new LikeDTO(TargetType.RECIPE, recipeId))
 							));
 				}
 			}
@@ -166,7 +169,8 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getInt(9),
 							rs.getString(10),
 							ingredientDAO.selectByRecipeId(con, recipeId),
-							stepDAO.selectByRecipeId(con, recipeId)
+							stepDAO.selectByRecipeId(con, recipeId),
+							likeDAO.selectLikeCnt(con, new LikeDTO(TargetType.RECIPE, recipeId))
 							);
 					
 				}
@@ -201,7 +205,8 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getInt(9),
 							rs.getString(10),
 							ingredientDAO.selectByRecipeId(con, recipeId),
-							stepDAO.selectByRecipeId(con, recipeId)
+							stepDAO.selectByRecipeId(con, recipeId),
+							likeDAO.selectLikeCnt(con, new LikeDTO(TargetType.RECIPE, recipeId))
 							));
 				}
 			}

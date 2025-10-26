@@ -78,4 +78,22 @@ public class LikeDAOImpl implements LikeDAO {
 		}
 		return result;
 	}
+	
+	@Override
+	public int selectLikeCnt(Connection con, LikeDTO likeDTO) throws SQLException {
+		int result = 0;
+		String sql = proFile.getProperty("like.selectLikeCnt");
+		
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, likeDTO.getTargetType().toString());
+			ps.setLong(2, likeDTO.getTargetId());
+			
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					result = rs.getInt(1);
+				}
+			}
+		}
+		return result;
+	}
 }

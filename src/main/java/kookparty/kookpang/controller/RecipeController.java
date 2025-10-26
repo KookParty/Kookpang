@@ -10,12 +10,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import kookparty.kookpang.common.TargetType;
 import kookparty.kookpang.dto.IngredientDTO;
+import kookparty.kookpang.dto.LikeDTO;
 import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.dto.RecipeDTO;
-import kookparty.kookpang.dto.ReviewDTO;
 import kookparty.kookpang.dto.StepDTO;
 import kookparty.kookpang.dto.UserDTO;
+import kookparty.kookpang.service.LikeService;
+import kookparty.kookpang.service.LikeServiceImpl;
 import kookparty.kookpang.service.ProductService;
 import kookparty.kookpang.service.ProductServiceImpl;
 import kookparty.kookpang.service.RecipeService;
@@ -24,6 +27,7 @@ import kookparty.kookpang.util.FilePath;
 
 public class RecipeController implements Controller {
 	private RecipeService recipeService = RecipeServiceImpl.getInstance();
+	private LikeService likeService = LikeServiceImpl.getInstance();
 	ProductService productService = new ProductServiceImpl();
 	
 	public ModelAndView recipes(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -40,6 +44,15 @@ public class RecipeController implements Controller {
 		// 변형 레시피
 		List<RecipeDTO> variants = recipeService.selectVariantsByParentId(recipeId);
 		request.setAttribute("variants", variants);
+		
+		// 좋아요 상태
+		HttpSession session = request.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		if (user != null) {
+			long userId = user.getUserId();
+			boolean likeStatus = likeService.isLiked(new LikeDTO(userId, TargetType.RECIPE, recipeId));
+			request.setAttribute("likeStatus", likeStatus);
+		}
 		
 		return new ModelAndView("recipes/recipe-detail.jsp");
 	}

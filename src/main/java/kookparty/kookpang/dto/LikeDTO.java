@@ -12,23 +12,27 @@ public class LikeDTO {
 	public LikeDTO() {}
 	
 	/**
+	 * 좋아요 수 조회 시
+	 */
+	public LikeDTO(TargetType targetType, long targetId) {
+		this.targetType = targetType;
+		this.targetId = targetId;
+	}
+	
+	/**
 	 * 좋아요 등록 시 사용
 	 */
 	public LikeDTO(long userId, TargetType targetType, long targetId) {
+		this(targetType, targetId);
 		this.userId = userId;
-		this.targetType = targetType;
-		this.targetId = targetId;
 	}
 
 	/**
 	 * 모든 멤버필드 들어간 생성자
 	 */
 	public LikeDTO(long likeId, long userId, TargetType targetType, long targetId, String createdAt) {
-		super();
+		this(userId, targetType, targetId);
 		this.likeId = likeId;
-		this.userId = userId;
-		this.targetType = targetType;
-		this.targetId = targetId;
 		this.createdAt = createdAt;
 	}
 

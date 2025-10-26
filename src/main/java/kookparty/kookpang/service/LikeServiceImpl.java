@@ -32,5 +32,4 @@ public class LikeServiceImpl implements LikeService {
 		if (result == 0)
 			throw new DBAccessException("좋아요 토글 실패!!");
 	}
-	
 }
