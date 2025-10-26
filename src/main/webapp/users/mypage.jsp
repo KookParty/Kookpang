@@ -71,6 +71,129 @@
           padding: 6px 10px;
           font-size: 14px
         }
+
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h3 {
+      margin: 0 0 16px 0;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .post-item {
+      padding: 12px;
+      border-bottom: 1px solid #eef1f4;
+      cursor: pointer;
+    }
+
+    .post-item:hover {
+      background: #f9fafb;
+    }
+
+    .post-item:last-child {
+      border-bottom: none;
+    }
+
+    .post-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .post-meta {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .order-item {
+      padding: 12px;
+      border-bottom: 1px solid #eef1f4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .order-item:last-child {
+      border-bottom: none;
+    }
+
+    .order-left {
+      flex: 1;
+    }
+
+    .order-title {
+      font-weight: 800;
+    }
+
+    .order-meta {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .recipe-card {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .recipe-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #9ca3af;
+    }
       </style>
     </head>
 
@@ -83,200 +206,381 @@
         <div class="mpp-grid">
           <!-- 왼쪽: 프로필 카드 -->
           <aside class="card profile">
-            <div class="avatar">${user.nickname.substring(0,1).toUpperCase()}</div>
-            <div class="name" style="font-weight:800;" id="mypageNickname">${user.nickname}</div>
-            <div class="email muted">${user.email}</div>
+        <div class="avatar" id="userAvatar">?</div>
+        <div class="name" style="font-weight:800;" id="userName">로딩중...</div>
+        <div class="email muted" id="userEmail">loading...</div>
             <div class="meta" style="margin:10px 0;">
-              <span class="muted">작성한 게시글 <b>4</b></span>
-              <span class="muted">주문내역 <b>12</b></span>
+          <span class="muted">작성한 게시글 <b id="postCount">0</b></span>
+          <span class="muted">주문내역 <b id="orderCount">0</b></span>
             </div>
 
             <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
-              <button class="btn edit-profile">정보수정</button>
-              <button class="btn logout">로그아웃</button>
-              <button class="btn danger delete-account">회원탈퇴</button>
+          <button class="btn edit-profile" onclick="openEditModal()">정보수정</button>
+          <button class="btn logout" onclick="handleLogout()">로그아웃</button>
             </div>
           </aside>
 
           <!-- 오른쪽: 콘텐츠 -->
           <section class="list-stack">
+        <!-- 좋아요한 레시피 -->
             <article class="card liked">
               <div class="section-head">
                 <h4>좋아요한 레시피</h4>
-                <a href="#" class="muted"></a>
               </div>
-              <div class="grid cols-3">
-                <div class="card tile">
-                  <div class="thumb">
-                    <img src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop"
-                      alt="" />
-                  </div>
-                  <div class="body">
-                    <div class="title" style="font-weight:700;">김치찌개</div>
-                    <div class="muted">⏱ 30분 · 👥 4인분 · ♥ 1247</div>
-                  </div>
-                </div>
-                <div class="card tile">
-                  <div class="thumb">
-                    <img
-                      src="https://images.unsplash.com/photo-1604908553729-01ba09a7e7be?q=80&w=800&auto=format&fit=crop"
-                      alt="" />
-                  </div>
-                  <div class="body">
-                    <div class="title" style="font-weight:700;">불고기</div>
-                    <div class="muted">⏱ 45분 · 👥 3인분 · ♥ 892</div>
-                  </div>
-                </div>
-                <div class="card tile">
-                  <div class="thumb">
-                    <img
-                      src="https://images.unsplash.com/photo-1625944528108-4ab1ab696648?q=80&w=800&auto=format&fit=crop"
-                      alt="" />
-                  </div>
-                  <div class="body">
-                    <div class="title" style="font-weight:700;">비빔밥</div>
-                    <div class="muted">⏱ 25분 · 👥 2인분 · ♥ 1712</div>
-                  </div>
-                </div>
+          <div class="grid cols-3" id="likedRecipes">
+            <div class="empty-state">좋아요한 레시피가 없습니다.</div>
               </div>
             </article>
 
+        <!-- 내가 작성한 게시글 -->
             <article class="card posts">
               <div class="section-head">
                 <h4>내가 작성한 게시글</h4>
-                <a href="#" class="muted">게시물 쓰기</a>
+            <a href="${path}/boards/board-write.jsp" class="muted">게시물 쓰기</a>
+          </div>
+          <div id="myPosts">
+            <div class="empty-state">작성한 글이 없습니다.</div>
               </div>
-              <div class="empty muted">작성한 글이 없습니다.</div>
             </article>
 
+        <!-- 주문 내역 -->
             <article class="card orders">
               <div class="section-head">
                 <h4>주문 내역</h4>
               </div>
-              <div class="list">
-                <!-- 주문 아이템 예시 -->
-                <div class="item">
-                  <div class="left">
-                    <div style="font-weight:800;">주문번호 1759595615292</div>
-                    <div class="meta">합계 24,000원 · 2025. 10. 5 13:05</div>
-                  </div>
-                  <div class="right">
-                    <a class="link" href="${path}/orders/order-detail.jsp">상세 보기</a>
-                  </div>
-                </div>
-                <div class="item">
-                  <div class="left">
-                    <div style="font-weight:800;">주문번호 1759620398828</div>
-                    <div class="meta">합계 11,000원 · 2025. 10. 5 11:03</div>
-                  </div>
-                  <div class="right">
-                    <a class="link" href="${path}/orders/order-detail.jsp">상세 보기</a>
-                  </div>
-                </div>
+          <div id="myOrders">
+            <div class="empty-state">주문 내역이 없습니다.</div>
               </div>
             </article>
           </section>
         </div>
       </main>
 
-      <script src="../js/mypage.js"></script>
+  <!-- 프로필 수정 모달 (통합) -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <h3>정보 수정</h3>
       
-      <!-- 마이페이지 서버 연동 기능 -->
-      <script>
-        // 로그아웃 기능
-        document.querySelector('.btn.logout').addEventListener('click', function() {
-          if (confirm('로그아웃 하시겠습니까?')) {
-            fetch(CONTEXT_PATH + '/ajax?key=user&methodName=logout', {
-              method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-              alert('로그아웃 되었습니다.');
-              window.location.href = CONTEXT_PATH + '/users/login.jsp';
-            })
-            .catch(error => {
-              console.error('Logout error:', error);
-              // 세션 만료 등으로 서버 오류가 있어도 로그인 페이지로 이동
-              window.location.href = CONTEXT_PATH + '/users/login.jsp';
-            });
-          }
-        });
+      <div class="form-group">
+        <label>닉네임</label>
+        <input type="text" id="editNickname" placeholder="닉네임 입력" />
+      </div>
+      
+      <div class="form-group">
+        <label>주소</label>
+        <input type="text" id="editAddress" placeholder="주소 입력" />
+      </div>
+      
+      <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
+      
+      <h4 style="margin: 0 0 12px 0; font-size: 16px;">비밀번호 변경 (선택)</h4>
+      
+      <div class="form-group">
+        <label>현재 비밀번호</label>
+        <input type="password" id="currentPassword" placeholder="현재 비밀번호" />
+      </div>
+      
+      <div class="form-group">
+        <label>새 비밀번호</label>
+        <input type="password" id="newPassword" placeholder="새 비밀번호 (6자 이상)" />
+      </div>
+      
+      <div class="form-group">
+        <label>새 비밀번호 확인</label>
+        <input type="password" id="confirmPassword" placeholder="새 비밀번호 확인" />
+      </div>
+      
+      <div class="form-actions">
+        <button class="btn" onclick="closeEditModal()">취소</button>
+        <button class="btn primary" onclick="saveProfile()">저장</button>
+      </div>
+    </div>
+  </div>
 
-        // 회원탈퇴 기능
-        document.querySelector('.btn.danger.delete-account').addEventListener('click', function() {
-          if (confirm('정말로 회원탈퇴를 하시겠습니까?\n탈퇴 후 복구할 수 없습니다.')) {
-            const password = prompt('비밀번호를 입력해주세요:');
-            if (password) {
-              fetch(CONTEXT_PATH + '/ajax?key=user&methodName=deleteAccount', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                  password: password
-                })
-              })
-              .then(response => response.json())
-              .then(data => {
-                alert(data.msg);
-                if (data.ok) {
-                  window.location.href = CONTEXT_PATH + '/index.jsp';
-                }
-              })
-              .catch(error => {
-                console.error('Delete account error:', error);
-                alert('회원탈퇴 중 오류가 발생했습니다.');
-              });
-            }
-          }
-        });
-      </script>
-      
       <script>
-        (function () {
-          function getUserKey() {
-            return ['user', 'currentUser', 'authUser'].find(k => localStorage.getItem(k)) || 'user';
+    const BASE = CONTEXT_PATH || '';
+    let currentUser = null;
+
+    // 페이지 로드 시 데이터 가져오기
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadUserData();
+      await loadMyPageData();
+    });
+
+    // 사용자 정보 로드
+    async function loadUserData() {
+      try {
+        const res = await fetch(BASE + '/ajax?key=user&methodName=getMyPageData', {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        
+        if (data.ok) {
+          currentUser = data;
+          displayUserProfile(data);
+        } else {
+          alert('로그인이 필요합니다.');
+          location.href = BASE + '/users/login.jsp';
+        }
+      } catch (err) {
+        console.error('사용자 정보 로드 실패:', err);
+      }
+    }
+
+    // 마이페이지 데이터 로드
+    async function loadMyPageData() {
+      try {
+        const [posts, recipes, orders] = await Promise.all([
+          fetch(BASE + '/ajax?key=mypage&methodName=getMyPosts&page=1&size=10', {
+            credentials: 'include'
+          }).then(r => r.json()),
+          fetch(BASE + '/ajax?key=mypage&methodName=getLikedRecipes&page=1&size=6', {
+            credentials: 'include'
+          }).then(r => r.json()),
+          fetch(BASE + '/ajax?key=mypage&methodName=getMyOrders', {
+            credentials: 'include'
+          }).then(r => r.json())
+        ]);
+
+        if (posts.ok) displayMyPosts(posts.posts, posts.total);
+        if (recipes.ok) displayLikedRecipes(recipes.recipes);
+        if (orders.ok) displayMyOrders(orders.orders);
+      } catch (err) {
+        console.error('마이페이지 데이터 로드 실패:', err);
+      }
+    }
+
+    // 프로필 표시
+    function displayUserProfile(data) {
+      const initial = (data.nickname || data.name || '?')[0].toUpperCase();
+      document.getElementById('userAvatar').textContent = initial;
+      document.getElementById('userName').textContent = data.nickname || data.name || '사용자';
+      document.getElementById('userEmail').textContent = data.email || '';
+    }
+
+    // 내가 작성한 게시글 표시
+    function displayMyPosts(posts, total) {
+      const container = document.getElementById('myPosts');
+      document.getElementById('postCount').textContent = total || 0;
+      
+      if (!posts || posts.length === 0) {
+        container.innerHTML = '<div class="empty-state">작성한 글이 없습니다.</div>';
+        return;
+      }
+
+      container.innerHTML = posts.map(p => 
+        '<div class="post-item" onclick="location.href=\'' + BASE + '/boards/board-write.jsp?postId=' + p.postId + '\'">' +
+          '<div class="post-title">' + escapeHtml(p.title) + '</div>' +
+          '<div class="post-meta">' +
+            (p.category === 'notice' ? '[공지] ' : '') + 
+            '조회 ' + p.viewCount + ' · 댓글 ' + p.commentCount + ' · 좋아요 ' + p.likeCount +
+            '<span style="margin-left:8px;">' + formatDate(p.createdAt) + '</span>' +
+          '</div>' +
+        '</div>'
+      ).join('');
+    }
+
+    // 좋아요한 레시피 표시
+    function displayLikedRecipes(recipes) {
+      const container = document.getElementById('likedRecipes');
+      
+      if (!recipes || recipes.length === 0) {
+        container.innerHTML = '<div class="empty-state">좋아요한 레시피가 없습니다.</div>';
+        return;
+      }
+
+      container.innerHTML = recipes.map(r => 
+        '<div class="card tile recipe-card" onclick="location.href=\'' + BASE + '/recipes/recipe-detail.jsp?recipeId=' + r.recipeId + '\'">' +
+          '<div class="thumb">' +
+            '<img src="' + (r.imageUrl || 'https://via.placeholder.com/300x200') + '" alt="' + escapeHtml(r.title) + '" />' +
+          '</div>' +
+          '<div class="body">' +
+            '<div class="title" style="font-weight:700;">' + escapeHtml(r.title) + '</div>' +
+            '<div class="muted">' + escapeHtml(r.description || '') + '</div>' +
+          '</div>' +
+        '</div>'
+      ).join('');
+    }
+
+    // 주문 내역 표시
+    function displayMyOrders(orders) {
+      const container = document.getElementById('myOrders');
+      document.getElementById('orderCount').textContent = orders ? orders.length : 0;
+      
+      if (!orders || orders.length === 0) {
+        container.innerHTML = '<div class="empty-state">주문 내역이 없습니다.</div>';
+        return;
+      }
+
+      container.innerHTML = orders.map(o => 
+        '<div class="order-item">' +
+          '<div class="order-left">' +
+            '<div class="order-title">주문번호 ' + o.orderId + '</div>' +
+            '<div class="order-meta">' +
+              '합계 ' + Number(o.totalPrice).toLocaleString() + '원 · ' + formatDate(o.createdAt) +
+            '</div>' +
+          '</div>' +
+          '<div class="order-right">' +
+            '<a class="link" href="' + BASE + '/orders/order-detail.jsp?orderId=' + o.orderId + '">상세 보기</a>' +
+          '</div>' +
+        '</div>'
+      ).join('');
+    }
+
+    // 프로필 수정 모달 열기
+    function openEditModal() {
+      if (!currentUser) return;
+      document.getElementById('editNickname').value = currentUser.nickname || '';
+      document.getElementById('editAddress').value = currentUser.address || '';
+      document.getElementById('currentPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmPassword').value = '';
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('active');
+    }
+
+    // 프로필 저장 (통합)
+    async function saveProfile() {
+      const nickname = document.getElementById('editNickname').value.trim();
+      const address = document.getElementById('editAddress').value.trim();
+      const currentPassword = document.getElementById('currentPassword').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+      if (!nickname) {
+        alert('닉네임을 입력하세요.');
+        return;
+      }
+
+      const changePassword = currentPassword || newPassword || confirmPassword;
+      if (changePassword) {
+        if (!currentPassword) {
+          alert('현재 비밀번호를 입력하세요.');
+          return;
+        }
+        if (!newPassword) {
+          alert('새 비밀번호를 입력하세요.');
+          return;
+        }
+        if (newPassword.length < 6) {
+          alert('새 비밀번호는 6자 이상이어야 합니다.');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          alert('새 비밀번호가 일치하지 않습니다.');
+          return;
+        }
+      }
+
+      try {
+        let updated = false;
+
+        if (nickname !== currentUser.nickname) {
+          const nickRes = await fetch(BASE + '/ajax?key=user&methodName=updateNickname', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ nickname })
+          });
+          const nickData = await nickRes.json();
+          if (!nickData.ok) {
+            alert(nickData.msg);
+            return;
           }
-          function readUser() {
-            try {
-              const k = getUserKey();
-              const u = JSON.parse(localStorage.getItem(k) || '{}'); u.__key = k;
-              return u;
-            } catch (e) {
-              return { __key: getUserKey() };
-            }
+          updated = true;
+        }
+
+        if (address !== currentUser.address) {
+          const addrRes = await fetch(BASE + '/ajax?key=user&methodName=updateAddress', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ address })
+          });
+          const addrData = await addrRes.json();
+          if (!addrData.ok) {
+            alert(addrData.msg);
+            return;
           }
-          const u = readUser();
-          const loginLink = document.querySelector('.login-link');
-          const logoutBtn = document.querySelector('.logout-link');
-          const navNick = document.getElementById('navNickname');
-          if (u && (u.nickname || u.nick)) {
-            loginLink?.classList.add('hidden');
-            logoutBtn?.classList.remove('hidden');
-            navNick && (navNick.textContent = u.nickname || u.nick);
+          updated = true;
+        }
+
+        if (changePassword) {
+          const pwRes = await fetch(BASE + '/ajax?key=user&methodName=updatePassword', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ currentPassword, newPassword, confirmPassword })
+          });
+          const pwData = await pwRes.json();
+          if (!pwData.ok) {
+            alert(pwData.msg);
+            return;
+          }
+          updated = true;
+        }
+
+        if (updated) {
+          alert('정보가 수정되었습니다.');
+          closeEditModal();
+          location.reload();
           } else {
-            loginLink?.classList.remove('hidden');
-            logoutBtn?.classList.add('hidden');
-            navNick && (navNick.textContent = '마이페이지');
-          }
-          logoutBtn?.addEventListener('click', function () {
-            const k = u.__key;
-            try {
-              localStorage.removeItem(k);
-            } catch (e) {
+          alert('변경된 내용이 없습니다.');
+        }
+      } catch (err) {
+        alert('정보 수정 중 오류가 발생했습니다.');
+        console.error(err);
+      }
+    }
 
-            }
-            location.href = '${path}/index.jsp';
-          });
-          const path = (location.pathname.split('/').pop() || '${path}/index.jsp').toLowerCase();
-          document.querySelectorAll('.kp-header .menu a').forEach(a => {
-            const href = (a.getAttribute('href') || '').toLowerCase();
-            if (href === path) {
-              a.style.color = '#0b0f1a';
-              a.style.fontWeight = '800';
-            }
-          });
-        })();
+    async function handleLogout() {
+      if (!confirm('로그아웃 하시겠습니까?')) return;
+
+      try {
+        await fetch(BASE + '/ajax?key=user&methodName=logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        location.href = BASE + '/index.jsp';
+      } catch (err) {
+        console.error('로그아웃 실패:', err);
+        location.href = BASE + '/index.jsp';
+      }
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return (text || '').replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace(/\. /g, '.').replace(' ', ' ');
+            } catch (e) {
+        return dateStr;
+      }
+    }
+
+    document.getElementById('editModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'editModal') closeEditModal();
+    });
       </script>
 
     </body>

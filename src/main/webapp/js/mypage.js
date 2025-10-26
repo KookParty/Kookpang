@@ -26,7 +26,6 @@
     localStorage.setItem(u.__key, JSON.stringify(copy));
   }
 
-  // 1) Build modal once (no HTML changes needed)
   if (!document.getElementById("kpEditModal")) {
     const wrap = document.createElement("div");
     wrap.id = "kpEditModal";
@@ -63,31 +62,11 @@
   const $con = document.getElementById("kpPwCon");
 
   function openModal() {
-    // 서버에서 최신 사용자 정보 가져오기
-    fetch(CONTEXT_PATH + '/ajax?key=user&methodName=profile')
-      .then(response => response.json())
-      .then(data => {
-        if (data.ok && data.user) {
-          $nick.value = data.user.nickname || "";
-          $addr.value = data.user.address || "";
-        } else {
-          // 서버 오류시 localStorage 백업 사용
-          const u = readUser();
-          $nick.value = u.nickname || u.nick || "";
-          $addr.value = u.address || "";
-        }
-        $old.value = $new.value = $con.value = "";
-        modal.classList.remove("hidden");
-      })
-      .catch(error => {
-        console.error('Profile fetch error:', error);
-        // 오류시 localStorage 사용
-        const u = readUser();
-        $nick.value = u.nickname || u.nick || "";
-        $addr.value = u.address || "";
-        $old.value = $new.value = $con.value = "";
-        modal.classList.remove("hidden");
-      });
+    const u = readUser();
+    $nick.value = u.nickname || u.nick || "";
+    $addr.value = u.address || "";
+    $old.value = $new.value = $con.value = "";
+    modal.classList.remove("hidden");
   }
   function closeModal() {
     modal.classList.add("hidden");
@@ -112,8 +91,9 @@
     if (e.key === "Escape") closeModal();
   });
 
-  // Save handler - 서버 연동
-  document.getElementById("kpSave").addEventListener("click", async function () {
+  // Save handler
+  document.getElementById("kpSave").addEventListener("click", function () {
+    const u = readUser();
     const newNick = ($nick.value || "").trim();
     if (!newNick) return alert("닉네임을 입력하세요.");
 
@@ -122,85 +102,39 @@
     const newPw = $new.value || "";
     const conPw = $con.value || "";
 
-    // 비밀번호 변경 검증
+    // password change if any field filled
     if (oldPw || newPw || conPw) {
+      const stored = u.password || u.pw || "";
+      if (!stored) {
+        return alert("저장된 비밀번호가 없어 변경할 수 없습니다.");
+      }
+      if (oldPw !== stored) {
+        return alert("현재 비밀번호가 일치하지 않습니다.");
+      }
       if (newPw.length < 6) {
         return alert("새 비밀번호는 6자 이상이어야 합니다.");
       }
       if (newPw !== conPw) {
         return alert("새 비밀번호 확인이 일치하지 않습니다.");
       }
+      u.password = newPw;
+      u.pw = newPw;
     }
 
-    try {
-      // 1. 프로필 정보 업데이트
-      const profileResponse = await fetch(CONTEXT_PATH + '/ajax?key=user&methodName=updateProfile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          nickname: newNick,
-          address: newAddr
-        })
+    u.nickname = newNick;
+    u.nick = newNick;
+    u.address = newAddr;
+    saveUser(u);
+
+    // 화면에 닉네임 노출 영역 갱신
+    document
+      .querySelectorAll("#userNickname, #mypageNickname, .profile .name")
+      .forEach(function (n) {
+        n.textContent = newNick;
       });
 
-      const profileResult = await profileResponse.json();
-      if (!profileResult.ok) {
-        return alert(profileResult.msg || '프로필 업데이트에 실패했습니다.');
-      }
-
-      // 2. 비밀번호 변경 (입력된 경우에만)
-      if (oldPw && newPw) {
-        const passwordResponse = await fetch(CONTEXT_PATH + '/ajax?key=user&methodName=changePassword', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            currentPassword: oldPw,
-            newPassword: newPw,
-            confirmPassword: conPw
-          })
-        });
-
-        const passwordResult = await passwordResponse.json();
-        if (!passwordResult.ok) {
-          return alert(passwordResult.msg || '비밀번호 변경에 실패했습니다.');
-        }
-      }
-
-      // 3. 성공 처리
-      // localStorage 업데이트 (기존 로직 유지)
-      const u = readUser();
-      u.nickname = newNick;
-      u.nick = newNick;
-      u.address = newAddr;
-      if (newPw) {
-        u.password = newPw;
-        u.pw = newPw;
-      }
-      saveUser(u);
-
-      // 화면에 닉네임 노출 영역 갱신
-      document
-        .querySelectorAll("#userNickname, #mypageNickname, .profile .name")
-        .forEach(function (n) {
-          n.textContent = newNick;
-        });
-
-      closeModal();
-      alert("정보가 수정되었습니다.");
-      
-      // 페이지 새로고침으로 서버 최신 데이터 반영
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-
-    } catch (error) {
-      console.error('Update error:', error);
-      alert("정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
-    }
+    closeModal();
+    alert("정보가 수정되었습니다.");
   });
 
   // 2) 기존 하단 인라인 회원정보수정 폼 "숨김" (삭제 없이 화면에서만 제거)

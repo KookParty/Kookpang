@@ -75,8 +75,9 @@ public class BoardController implements Controller {
         m.put("category", d.getCategory());
         m.put("title", d.getTitle());
         m.put("content", d.getContent());
-    m.put("viewCount", d.getViewCount());
-    m.put("commentCount", d.getCommentCount());
+        m.put("viewCount", d.getViewCount());
+        m.put("commentCount", d.getCommentCount());
+        m.put("likeCount", d.getLikeCount());
         m.put("createdAt", iso(d.getCreatedAt()));
         m.put("nickname", d.getNickname());
         return m;
