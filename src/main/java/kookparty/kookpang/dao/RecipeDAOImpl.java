@@ -42,6 +42,11 @@ public class RecipeDAOImpl implements RecipeDAO {
 	
 	@Override
 	public List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo) throws SQLException {
+		return this.selectByOptions(word, category, order, pageNo, pageSize);
+	}
+	
+	@Override
+	public List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo, int size) throws SQLException {
 		List<RecipeDTO> list = new ArrayList<>();
 		List<String> sql = new ArrayList<String>();
 		sql.add(proFile.getProperty("recipe.selectByOptions"));
@@ -71,7 +76,7 @@ public class RecipeDAOImpl implements RecipeDAO {
 			sql.set(0, proFile.getProperty("recipe.selectByLike"));
 			sql.add("group by r.recipe_id order by like_cnt desc");
 		}
-		
+		System.out.println("sql: " + String.join(" ", sql));
 		// 페이징
 		if (pageNo != 0) sql.add(" " + limitOffset);
 		
@@ -83,7 +88,7 @@ public class RecipeDAOImpl implements RecipeDAO {
 				ps.setString(index++, category);
 			if (pageNo != 0) {
 				int countAll = countByOptions(con, word, category);
-				PageCnt page = new PageCnt(countAll, pageSize, pageNo);
+				PageCnt page = new PageCnt(countAll, size, pageNo);
 				ps.setInt(index++, page.getLimit());
 				ps.setInt(index++, page.getOffset());
 			}

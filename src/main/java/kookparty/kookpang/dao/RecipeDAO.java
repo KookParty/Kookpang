@@ -14,6 +14,11 @@ public interface RecipeDAO {
 	List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo) throws SQLException;
 	
 	/**
+	 * 레시피 전체 검색 (페이지 사이즈 크기 직접 지정)
+	 */
+	List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo, int size) throws SQLException;
+	
+	/**
 	 * 레시피 단일 검색 (상세보기)
 	 */
 	RecipeDTO selectById(long recipeId) throws SQLException;

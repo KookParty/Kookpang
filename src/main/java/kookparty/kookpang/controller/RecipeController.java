@@ -160,21 +160,28 @@ public class RecipeController implements Controller {
 	 * 카테고리(기본/변형), 키워드 포함 레시피 전체 검색
 	 */
 	public Object selectByOptions(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String pageNoStr = request.getParameter("pageNo");
-		System.out.println(pageNoStr);
-		int pageNo = 0;
-		if(pageNoStr == null || pageNoStr.trim().isEmpty()) {
-			pageNo = 0;
-		}else {
-			pageNo = Integer.parseInt(pageNoStr);
-		}
-		
 		String word = request.getParameter("word");
 		String category = request.getParameter("category");
 		String order = request.getParameter("order");
+
+		String pageNoStr = request.getParameter("pageNo");
+		String pageSizeStr = request.getParameter("pageSize");
 		
-		List<RecipeDTO> list = recipeService.selectByOptions(word, category, order, pageNo);
-		return list;
+		int pageNo = 0;
+		if (pageNoStr == null || pageNoStr.trim().isEmpty()) {
+			pageNo = 0;
+		} else {
+			pageNo = Integer.parseInt(pageNoStr);
+		}
+		
+		if (pageSizeStr == null || pageSizeStr.trim().isEmpty()) {
+			List<RecipeDTO> list = recipeService.selectByOptions(word, category, order, pageNo);
+			return list;
+		} else {
+			int pageSize = Integer.parseInt(pageSizeStr);
+			List<RecipeDTO> list = recipeService.selectByOptions(word, category, order, pageNo, pageSize);
+			return list;
+		}
 	}
 	
 }

@@ -24,6 +24,13 @@ public class RecipeServiceImpl implements RecipeService {
 	}
 	
 	@Override
+	public List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo, int pageSize)
+			throws Exception {
+		List<RecipeDTO> list = recipeDAO.selectByOptions(word, category, order, pageNo, pageSize);
+		return list;
+	}
+	
+	@Override
 	public RecipeDTO selectById(long recipeId) throws Exception {
 		RecipeDTO recipeDTO = recipeDAO.selectById(recipeId);
 		return recipeDTO;

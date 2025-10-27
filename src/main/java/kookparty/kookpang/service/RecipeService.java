@@ -13,6 +13,11 @@ public interface RecipeService {
 	List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo) throws Exception;
 	
 	/**
+	 * 레시피 전체 검색 (사이즈 크기 직접 지정)
+	 */
+	List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo, int pageSize) throws Exception;
+	
+	/**
 	 * 레시피 상세보기
 	 */
 	RecipeDTO selectById(long recipeId) throws Exception;
