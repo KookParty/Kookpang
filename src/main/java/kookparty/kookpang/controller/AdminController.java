@@ -1,18 +1,21 @@
 package kookparty.kookpang.controller;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.servlet.ServletException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import kookparty.kookpang.dto.ChartDataDTO;
+import kookparty.kookpang.dto.IngredientDTO;
 import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.dto.RecipeDTO;
+import kookparty.kookpang.dto.StepDTO;
 import kookparty.kookpang.service.OrderService;
 import kookparty.kookpang.service.OrderServiceImpl;
 import kookparty.kookpang.service.ProductService;
@@ -146,6 +149,7 @@ public class AdminController implements Controller {
 	}
 	
 	
+	/* 레시피 */
 	public ModelAndView recipeList(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			List<RecipeDTO> list = recipeService.selectByOptions(null, null, null, 0);
@@ -156,5 +160,96 @@ public class AdminController implements Controller {
 			return new ModelAndView("/common/error.jsp");
 		}
 		return new ModelAndView("/admin/recipes.jsp");
+	}
+	
+	public ModelAndView recipeInsertPage(HttpServletRequest request, HttpServletResponse response) {
+		
+		return new ModelAndView("/admin/recipe-insert.jsp");
+	}
+	
+	public ModelAndView insertRecipe(HttpServletRequest request, HttpServletResponse response) {
+		String title = request.getParameter("title");
+		String description = request.getParameter("description");
+		String thumbnailUrl = request.getParameter("thumbnailUrl");
+		String way = request.getParameter("way");
+		String category = request.getParameter("category");
+		String contextPath = request.getContextPath();
+		
+		// 재료 및 조리법 데이터 받기
+		String ingredientsJson = request.getParameter("ingredients");
+		String stepsJson = request.getParameter("steps");
+		
+		Gson gson = new Gson();
+		
+		// 재료 파싱
+		List<IngredientDTO> ingredients = gson.fromJson(
+				ingredientsJson, new TypeToken<List<IngredientDTO>>() {}.getType());
+		// 조리법 파싱
+		List<StepDTO> steps = gson.fromJson(
+				stepsJson, new TypeToken<List<StepDTO>>() {}.getType());
+		
+		RecipeDTO recipeDTO = new RecipeDTO(1, title, description, thumbnailUrl, way, category, 0);
+		recipeDTO.setIngredients(ingredients);
+		recipeDTO.setSteps(steps);
+		
+		try {
+			int result = recipeService.insertRecipe(recipeDTO);
+			if(result == 0) {
+				request.setAttribute("errMsg", "레시피가 등록되지 않았습니다.");
+				return new ModelAndView("/common/error.jsp");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("errMsg", "레시피가 등록되지 않았습니다.");
+			return new ModelAndView("/common/error.jsp");
+			
+		}
+		
+		return new ModelAndView(contextPath+"/front?key=admin&methodName=recipeList", true);
+	}
+	
+	public String uploadRecipeImage(HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("test");
+		String saveUrl = null;
+		String imageUrl = null;
+		try {
+			Part part = request.getPart("image");
+			String fileName = part.getSubmittedFileName();
+			fileName = UUID.randomUUID() + Paths.get(fileName).getFileName().toString();
+			String savePath = FilePath.getSavePath(request, "recipe_image");
+			
+			if(fileName!=null) {
+				saveUrl = savePath + "/" + fileName;
+				part.write(saveUrl);
+				imageUrl = "../recipe_image/" + fileName;
+			}
+		} catch (Exception e) {
+			return null;
+		} 
+		return imageUrl;
+	}
+	
+	public ModelAndView deleteRecipes(HttpServletRequest request, HttpServletResponse response) {
+		String contextPath = request.getContextPath();
+		String[] items = request.getParameterValues("selectedItems");
+		if(items == null || items.length == 0) {
+			request.setAttribute("errMsg", "선택된 항목이 없습니다.");
+		    return new ModelAndView("/common/error.jsp");
+		}
+		try {
+			for(String s : items) {
+				int result = recipeService.deleteRecipeByRecipeId(Long.parseLong(s));
+				if(result == 0) {
+					request.setAttribute("errMsg", "삭제에 실패했습니다.");
+					return new ModelAndView("/common/error.jsp");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("errMsg", "삭제에 실패했습니다.");
+			return new ModelAndView("/common/error.jsp");
+		}
+		
+		return new ModelAndView(contextPath + "/front?key=admin&methodName=productList", true);
 	}
 }
