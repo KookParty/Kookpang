@@ -1,6 +1,7 @@
 package kookparty.kookpang.dao;
 
 import kookparty.kookpang.dto.BoardDTO;
+import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.dto.BoardDTO.Image;
 import kookparty.kookpang.dto.BoardDTO.Comment;
 import kookparty.kookpang.util.DbUtil;
@@ -478,6 +479,39 @@ public class BoardDAO {
             }
         }
         return false;
+    }
+    
+    public List<BoardDTO> selectAll() throws SQLException{
+    	Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		String sql = proFile.getProperty("board.post.selectAll");
+
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+                BoardDTO d = new BoardDTO();
+                d.setPostId(rs.getLong("post_id"));
+                d.setTitle(rs.getString("title"));
+                d.setContent(rs.getString("content"));
+                d.setViewCount(rs.getLong("view_count"));
+                d.setCommentCount(rs.getLong("comment_count"));
+                d.setLikeCount(rs.getLong("like_count"));
+                Timestamp ts = rs.getTimestamp("created_at");
+                if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
+                d.setNickname(rs.getString("nickname"));
+                d.setCategory(rs.getString("category"));
+                list.add(d);
+            }
+
+		} finally {
+			DbUtil.dbClose(con, ps, rs);
+		}
+
+		return list;
     }
 
     // ===== utils =====

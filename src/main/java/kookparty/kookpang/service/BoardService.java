@@ -94,4 +94,6 @@ public interface BoardService {
      * @throws SQLException
      */
     boolean deleteComment(Long commentId, Long userId, Long postId) throws SQLException;
+    
+    List<BoardDTO> selectAll() throws SQLException;
 }

@@ -189,4 +189,12 @@ public class BoardServiceImpl implements BoardService {
             throw new SQLException("댓글 삭제 중 오류가 발생했습니다.", e);
         }
     }
+
+	@Override
+	public List<BoardDTO> selectAll() throws SQLException {
+		List<BoardDTO> list = boardDAO.selectAll();
+		return list;
+	}
+    
+    
 }
