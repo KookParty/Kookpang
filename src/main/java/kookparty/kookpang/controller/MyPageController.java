@@ -67,7 +67,6 @@ public class MyPageController implements Controller {
         return recipeService.selectByUserIdAndLike(user.getUserId());
     }
 
-    /*
     public Object getMyOrders(HttpServletRequest req, HttpServletResponse resp) {
         try {
             HttpSession s = req.getSession(false);
@@ -92,7 +91,7 @@ public class MyPageController implements Controller {
             e.printStackTrace();
             return Map.of("ok", false, "msg", e.getMessage());
         }
-    }*/
+    }
 
     /*
     public Object getMyPageSummary(HttpServletRequest req, HttpServletResponse resp) {
