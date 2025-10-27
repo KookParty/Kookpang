@@ -169,7 +169,6 @@
             }
 
             const result = await response.json();
-            console.log("vari recipes: ", result);
             
             // 데이터 출력
             let str = "";
@@ -187,7 +186,6 @@
                   <b>${"${recipe.RCP_NM}"}</b>`;
               
               if (recipe.RCP_NA_TIP.length > 35) {
-            	  console.log("length: ", recipe.RCP_NA_TIP.length);
             	  let shortCut = recipe.RCP_NA_TIP.substring(0, 35) + "...";
             	  str += `<p class="small" style="margin:0;color:#6b7280">${shortCut}</p>`;
               } else {

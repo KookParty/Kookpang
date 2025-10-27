@@ -76,7 +76,7 @@ public class RecipeDAOImpl implements RecipeDAO {
 			sql.set(0, proFile.getProperty("recipe.selectByLike"));
 			sql.add("group by r.recipe_id order by like_cnt desc");
 		}
-		System.out.println("sql: " + String.join(" ", sql));
+		
 		// 페이징
 		if (pageNo != 0) sql.add(" " + limitOffset);
 		
