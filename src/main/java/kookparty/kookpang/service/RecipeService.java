@@ -31,4 +31,9 @@ public interface RecipeService {
 	 * 레시피 삭제
 	 */
 	void deleteRecipeByRecipeId(long recipeId) throws Exception;
+	
+	/**
+	 * 현재 사용자가 좋아요 한 레시피 검색 (페이징X)
+	 */
+	List<RecipeDTO> selectByUserIdAndLike(long userId) throws Exception;
 }

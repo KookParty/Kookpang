@@ -1,6 +1,5 @@
 package kookparty.kookpang.dao;
 
-import java.awt.Window.Type;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Properties;
 
 import kookparty.kookpang.common.RecipeType;
+import kookparty.kookpang.common.TargetType;
+import kookparty.kookpang.dto.LikeDTO;
 import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.util.DbUtil;
 import kookparty.kookpang.util.PageCnt;
@@ -20,6 +21,7 @@ public class RecipeDAOImpl implements RecipeDAO {
 	private final int pageSize = 12;
 	private IngredientDAO ingredientDAO = IngredientDAOImpl.getInstance();
 	private StepDAO stepDAO = StepDAOImpl.getInstance();
+	private LikeDAO likeDAO = LikeDAOImpl.getInstance();
 	
 	private Properties proFile = new Properties();
 	private static RecipeDAO instance = new RecipeDAOImpl();
@@ -41,36 +43,40 @@ public class RecipeDAOImpl implements RecipeDAO {
 	@Override
 	public List<RecipeDTO> selectByOptions(String word, String category, String order, int pageNo) throws SQLException {
 		List<RecipeDTO> list = new ArrayList<>();
-		StringBuilder baseSql = new StringBuilder(proFile.getProperty("recipe.selectByOptions"));
+		List<String> sql = new ArrayList<String>();
+		sql.add(proFile.getProperty("recipe.selectByOptions"));
 		String limitOffset = proFile.getProperty("page.limitOffset");
 		int index = 1;
 		
 		// 검색어, 카테고리, 정렬 조건들
 		boolean wordCond = word != null && word.isEmpty() == false;
 		boolean cateCond = "base".equals(category) || "variant".equals(category);
-		//boolean likeCond = ;	// TODO 좋아요수
 				
 		
 		// 검색어
 		if(wordCond) {
-			baseSql.append(" where upper(replace(title, ' ', '')) like upper(replace(?, ' ', ''))");
+			sql.add("where upper(replace(title, ' ', '')) like upper(replace(?, ' ', ''))");
 		}
 		
 		// 카테고리(기본/변형 선택했을 경우)
 		if (cateCond) {
-			baseSql.append(wordCond == false ? " where " : " and ");
-			baseSql.append("recipe_type = ? ");
+			sql.add(wordCond == false ? "where" : "and");
+			sql.add("r.recipe_type = ? ");
 		}
 		
 		// 정렬 기준 (최신순/인기순)
-		if (order == null || "recent".equals(order)) baseSql.append(" order by created_at desc");
-		// else if ("like".equals(order)) baseSql.append(" order by  desc ");
+		if (order == null || "recent".equals(order)) {
+			sql.add("order by r.created_at desc");
+		} else if ("popular".equals(order)) {
+			sql.set(0, proFile.getProperty("recipe.selectByLike"));
+			sql.add("group by r.recipe_id order by like_cnt desc");
+		}
 		
 		// 페이징
-		if (pageNo != 0) baseSql.append(" " + limitOffset);
+		if (pageNo != 0) sql.add(" " + limitOffset);
 		
 		try (Connection con = DbUtil.getConnection();
-				PreparedStatement ps = con.prepareStatement(baseSql.toString())) {
+				PreparedStatement ps = con.prepareStatement(String.join(" ", sql))) {
 			if (wordCond) 
 				ps.setString(index++, "%" + word + "%");
 			if (cateCond) 
@@ -99,7 +105,8 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getInt(9),
 							rs.getString(10),
 							ingredientDAO.selectByRecipeId(con, recipeId),
-							stepDAO.selectByRecipeId(con, recipeId)
+							stepDAO.selectByRecipeId(con, recipeId),
+							likeDAO.selectLikeCnt(con, new LikeDTO(TargetType.RECIPE, recipeId))
 							));
 				}
 			}
@@ -166,7 +173,8 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getInt(9),
 							rs.getString(10),
 							ingredientDAO.selectByRecipeId(con, recipeId),
-							stepDAO.selectByRecipeId(con, recipeId)
+							stepDAO.selectByRecipeId(con, recipeId),
+							likeDAO.selectLikeCnt(con, new LikeDTO(TargetType.RECIPE, recipeId))
 							);
 					
 				}
@@ -201,7 +209,8 @@ public class RecipeDAOImpl implements RecipeDAO {
 							rs.getInt(9),
 							rs.getString(10),
 							ingredientDAO.selectByRecipeId(con, recipeId),
-							stepDAO.selectByRecipeId(con, recipeId)
+							stepDAO.selectByRecipeId(con, recipeId),
+							likeDAO.selectLikeCnt(con, new LikeDTO(TargetType.RECIPE, recipeId))
 							));
 				}
 			}
@@ -288,5 +297,37 @@ public class RecipeDAOImpl implements RecipeDAO {
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public List<RecipeDTO> selectByUserIdAndLike(long userId) throws SQLException {
+		List<RecipeDTO> list = new ArrayList<>();
+		String sql = proFile.getProperty("recipe.selectByUserIdAndLike");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, userId);
+			
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					long recipeId = rs.getLong(1);
+					list.add(new RecipeDTO(
+							recipeId, 
+							rs.getLong(2),
+							rs.getString(3),
+							rs.getString(4),
+							rs.getString(5),
+							rs.getString(6).toLowerCase().equals("base") ?
+									RecipeType.BASE : RecipeType.VARIANT,
+							rs.getString(7),
+							rs.getString(8),
+							rs.getInt(9),
+							rs.getString(10)
+							));
+				}
+			}
+		}
+		
+		return list;
 	}
 }
