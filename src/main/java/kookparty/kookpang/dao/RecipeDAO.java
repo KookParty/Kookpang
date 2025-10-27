@@ -32,4 +32,9 @@ public interface RecipeDAO {
 	 * 레시피 삭제
 	 */
 	int deleteRecipeByRecipeId(long recipeId) throws SQLException;
+	
+	/**
+	 * 현재 사용자가 좋아요 한 레시피 검색 (페이징X)
+	 */
+	List<RecipeDTO> selectByUserIdAndLike(long userId) throws SQLException;
 }

@@ -54,8 +54,8 @@
           padding: 0;
         }
 
-        #mypage .section .section-head {
-          padding: 10px 14px;
+        #mypage section .section-head {
+          padding: 0px 20px;
           border-bottom: 1px solid #eef1f4;
           font-weight: 700;
           display: flex;
@@ -194,6 +194,11 @@
       padding: 40px 20px;
       color: #9ca3af;
     }
+    
+    .muted {
+        color: #9ca3af;
+        font-size: 12px;
+      }
       </style>
     </head>
 
@@ -228,7 +233,7 @@
                 <h4>좋아요한 레시피</h4>
               </div>
           <div class="grid cols-3" id="likedRecipes">
-            <div class="empty-state">좋아요한 레시피가 없습니다.</div>
+            
               </div>
             </article>
 
@@ -330,21 +335,42 @@
     // 마이페이지 데이터 로드
     async function loadMyPageData() {
       try {
-        const [posts, recipes, orders] = await Promise.all([
+        // 좋아요한 레시피 ajax...로 가져오기
+        body = new URLSearchParams({
+            key: "mypage",
+            methodName: "getLikedRecipes",
+          });
+        
+        const response = await fetch(CONTEXT_PATH + "/ajax", {
+            method: "POST",
+            body,
+          });
+
+        
+        
+        if (response.ok == false) {
+          throw new Error("서버 응답 에러: " + response.status);
+        }
+
+        const result = await response.json();
+        console.log(result);
+        displayLikedRecipes(result);
+    	  
+    	  
+        //const [posts, orders] = await Promise.all([
+        const [posts] = await Promise.all([
           fetch(BASE + '/ajax?key=mypage&methodName=getMyPosts&page=1&size=10', {
             credentials: 'include'
           }).then(r => r.json()),
-          fetch(BASE + '/ajax?key=mypage&methodName=getLikedRecipes&page=1&size=6', {
-            credentials: 'include'
-          }).then(r => r.json()),
-          fetch(BASE + '/ajax?key=mypage&methodName=getMyOrders', {
-            credentials: 'include'
-          }).then(r => r.json())
+          //fetch(BASE + '/ajax?key=mypage&methodName=getMyOrders', {
+          //  credentials: 'include'
+          //}).then(r => r.json())
         ]);
 
         if (posts.ok) displayMyPosts(posts.posts, posts.total);
-        if (recipes.ok) displayLikedRecipes(recipes.recipes);
-        if (orders.ok) displayMyOrders(orders.orders);
+        //if (orders.ok) displayMyOrders(orders.orders);
+        
+        
       } catch (err) {
         console.error('마이페이지 데이터 로드 실패:', err);
       }
@@ -382,6 +408,7 @@
 
     // 좋아요한 레시피 표시
     function displayLikedRecipes(recipes) {
+    	console.log("display: ", recipes);
       const container = document.getElementById('likedRecipes');
       
       if (!recipes || recipes.length === 0) {
@@ -389,6 +416,28 @@
         return;
       }
 
+      let str = "";
+      recipes.forEach((recipe, index) => {
+    	  str += `<div class="card tile recipe-card">
+    		  <a href="${path}/front?key=recipe&methodName=recipeDetail&recipeId=${"${recipe.recipeId}"}">
+    	    <div class="thumb">`;
+    	  
+    	  if (recipe.ATT_FILE_NO_MAIN.substring(0,2) == '..') {
+    	    str += `<img src="${path}/${"${recipe.ATT_FILE_NO_MAIN}"}" />`;
+          } else {
+            str += `<img src="${"${recipe.ATT_FILE_NO_MAIN}"}" />`;
+          }
+    	    
+    	  str += `</div>
+    	    <div class="body">
+    	      <div class="title" style="font-weight:700;">${"${recipe.RCP_NM}"}</div>
+    	      <div class="muted">${"${recipe.RCP_NA_TIP}"}</div>
+    	    </div></a>
+    	  </div>`;
+      });
+      container.innerHTML += str;
+      
+      /*
       container.innerHTML = recipes.map(r => 
         '<div class="card tile recipe-card" onclick="location.href=\'' + BASE + '/recipes/recipe-detail.jsp?recipeId=' + r.recipeId + '\'">' +
           '<div class="thumb">' +
@@ -400,6 +449,7 @@
           '</div>' +
         '</div>'
       ).join('');
+      */
     }
 
     // 주문 내역 표시
