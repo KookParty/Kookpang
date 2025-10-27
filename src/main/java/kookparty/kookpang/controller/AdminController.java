@@ -163,7 +163,15 @@ public class AdminController implements Controller {
 	}
 	
 	public ModelAndView recipeInsertPage(HttpServletRequest request, HttpServletResponse response) {
-		
+		try {
+			List<ProductDTO> products = productService.selectAll();
+			request.setAttribute("ingredientList", products);
+			System.out.println("products: " + products);
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("errMsg", "오류");
+			return new ModelAndView("/common/error.jsp");
+		}
 		return new ModelAndView("/admin/recipe-insert.jsp");
 	}
 	
@@ -174,6 +182,7 @@ public class AdminController implements Controller {
 		String way = request.getParameter("way");
 		String category = request.getParameter("category");
 		String contextPath = request.getContextPath();
+
 		
 		// 재료 및 조리법 데이터 받기
 		String ingredientsJson = request.getParameter("ingredients");

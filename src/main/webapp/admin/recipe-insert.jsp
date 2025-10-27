@@ -20,68 +20,82 @@ uri="jakarta.tags.core" prefix="c" %>
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">식재료 등록</h1>
+            <h1 class="mt-4">레시피 등록</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item"><a href="${path}/front?key=admin&methodName=adminPage">Dashboard</a></li>
-              <li class="breadcrumb-item active">식재료 등록</li>
+              <li class="breadcrumb-item active">레시피 등록</li>
             </ol>
             <div class="card mb-4">
-              <div class="card-body">식재료를 등록할 수 있는 페이지</div>
+              <div class="card-body">레시피를 등록할 수 있는 페이지</div>
             </div>
             <div class="card mb-4">
               <div class="card-header">
                 <i class="fas fa-table me-1"></i>
-                식재료 등록
+                레시피 등록
               </div>
               <form
-                action="${path}/front?key=admin&methodName=insertProduct"
+                action="${path}/front?key=admin&methodName=insertRecipe"
                 method="post"
               >
+                
+                <input type="hidden" name="ingredients" id="ingredientsInput">
+                <input type="hidden" name="steps" id="stepsInput">
+
                 <div class="card-body row">
                   <div class="col-md-6">
                     <div class="mb-3">
-                      <label for="productImage" class="form-label">이미지</label>
-                      <input type="file" class="form-control" id="productImage" accept="image/*" required />
+                      <label for="recipeImage" class="form-label">이미지</label>
+                      <input type="file" class="form-control" id="recipeImage" accept="image/*" required />
                     </div>
+
                     <div class="mb-3">
-                      <!--이미지 미리보기-->
-                      <img
-                        id="imagePreview"
-                        src="#"
-                        alt="이미지 미리보기"
-                        style="max-width: 100%; height: auto; display: none"
-                      />
+                      <label class="form-label">재료 검색 및 추가</label>
+                      <div class="row">
+                        <input list="productList" id="ingInput" class="form-control col" placeholder="재료를 검색해보세요">
+                        <datalist id="productList">
+                          <c:forEach items="${ingredientList}" var="product">
+                            <option value="${product.name}" data-id="${product.productId}"></option>
+                          </c:forEach>
+                        </datalist>
+                        <button type="button" id="addIng" class="col-auto">추가</button>
+                      </div>
+                      <ul id="ingList" class="form-text" style="margin:10px 0 0; padding-left:18px"></ul>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">조리법</label>
+                      <div id="steps"></div>
+                      <button type="button" class="button" id="addStep">+ 단계 추가</button>
                     </div>
                   </div>
+
                   <div class="col-md-6">
-                    <input type="hidden" name="imageUrl" id="imageUrl" />
+                    <input type="hidden" name="thumbnailUrl" id="imageUrl" />
                     <div class="mb-3">
-                      <label for="productName" class="form-label">이름</label>
-                      <input type="text" class="form-control" id="productName" name="name" required />
+                      <label for="recipeTitle" class="form-label">제목</label>
+                      <input type="text" class="form-control" id="recipeTitle" name="title" required />
                     </div>
+                    
                     <div class="mb-3">
-                      <label for="productPrice" class="form-label">가격</label>
-                      <input type="number" class="form-control" id="productPrice" name="price" required />
-                    </div>
-                    <div class="mb-3">
-                      <label for="productCategory" class="form-label">카테고리</label>
-                      <select class="form-select" id="productCategory" name="category" required>
-                        <option value="">선택하세요</option>
-                        <option value="vegetable">채소</option>
-                        <option value="fruit">과일</option>
-                        <option value="meat">육류</option>
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label for="productDescription" class="form-label">설명</label>
+                      <label for="recipeDescription" class="form-label">설명</label>
                       <textarea
-                        class="form-control"
-                        id="productDescription"
-                        name="description"
-                        rows="5"
-                        required
+                      class="form-control"
+                      id="recipeDescription"
+                      name="description"
+                      rows="5"
+                      required
                       ></textarea>
                     </div>
+
+                    <div class="mb-3">
+                      <label for="pattern" class="form-label">요리 종류</label>
+                      <input type="text" class="form-control" id="pattern" name="category" required />
+                    </div>
+                    <div class="mb-3">
+                      <label for="way" class="form-label">조리 방법</label>
+                      <input type="text" class="form-control" id="way" name="way" required />
+                    </div>
+
                   </div>
                     <div class="col-md-12 text-end">
                         <button type="submit" class="btn btn-primary">등록</button>
@@ -107,40 +121,94 @@ uri="jakarta.tags.core" prefix="c" %>
     ></script>
     <script src="${path}/admin/js/datatables-simple-demo.js"></script>
     <script>
-      document.getElementById("productImage").addEventListener("change", function (event) {
-        const file = event.target.files[0];
-        console.log(file);
-        let imgUrl = "";
-        async function uploadImage(file) {
-          const formData = new FormData();
-          formData.append("image", file);
+      document.querySelectorAll(".recipeImage").forEach((img) => {
+        img.addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          console.log(file);
+          let imgUrl = "";
+          async function uploadImage(file) {
+            const formData = new FormData();
+            formData.append("image", file);
 
-          try {
-            const response = await fetch("${path}/ajax?key=admin&methodName=uploadImage", {
-              method: "POST",
-              body: formData,
-            });
+            try {
+              const response = await fetch("${path}/ajax?key=admin&methodName=uploadRecipeImage", {
+                method: "POST",
+                body: formData,
+              });
 
-            if (!response.ok) {
-              throw new Error("이미지 업로드 실패");
+              if (!response.ok) {
+                throw new Error("이미지 업로드 실패");
+              }
+
+              const data = await response.json();
+              imgUrl = data;
+              console.log("Uploaded Image URL:", imgUrl);
+              document.getElementById("imageUrl").value = imgUrl;
+            } catch (error) {
+              console.error("Error uploading image:", error);
+              alert("이미지 업로드 중 오류가 발생했습니다.");
+              return null;
             }
+          }
+          if (file) {
+            uploadImage(file);
+          }
+        })
+      });
 
-            const data = await response.json();
-            imgUrl = data;
-            console.log("Uploaded Image URL:", imgUrl);
-            document.getElementById("imageUrl").value = imgUrl;
-            document.getElementById("imagePreview").src = imgUrl;
-            document.getElementById("imagePreview").style.display = "block";
-          } catch (error) {
-            console.error("Error uploading image:", error);
-            alert("이미지 업로드 중 오류가 발생했습니다.");
-            return null;
+      // 재료 추가
+      const ingredientsName = [];
+      const ingredientsPid = [];
+      let productId = null;
+
+      document.getElementById('ingInput').onchange = function() {
+        const datalist = document.getElementById('productList');
+        for (const option of datalist.options) {
+          if (option.value === this.value) {
+            productId = option.dataset.id;
+            break;
           }
         }
-        if (file) {
-          uploadImage(file);
-        }
-      });
+      }
+
+      document.getElementById('addIng').onclick = () => {
+        const name = document.getElementById('ingInput').value; 
+        if (!name) return;
+        ingredientsName.push(name);
+        ingredientsPid.push(productId);
+        
+        //비우기
+        document.getElementById('ingInput').value = '';
+        productId = null;
+
+        renderIng();
+      };
+
+      // 추가된 재료 렌더링
+      function renderIng() {
+        const ul = document.getElementById('ingList');
+        ul.innerHTML = '';
+        ingredientsName.forEach((ing, i) => { 
+          const li = document.createElement('li');
+          li.textContent = ing; 
+          ul.appendChild(li);
+        });
+      }
+
+      // 단계 추가
+      let index = 0;
+      function addStep() {
+        const i = ++index;
+        const box = document.createElement('div'); 
+        box.className = 'card'; 
+        box.style.padding = '12px'; 
+        box.style.marginTop = '8px';
+        box.innerHTML = `<b class="small">단계 ${i}</b>
+          <div class="form-row"><textarea class="form-control" rows="3" placeholder="이 단계의 조리 방법을 자세히 설명해주세요"></textarea></div>
+          <div class="row"><input type="file" name="stepImg${i}" class="form-control" placeholder="이미지 URL을 입력해주세요" style="flex:1"></div>`;
+        document.getElementById('steps').appendChild(box);
+      }
+      document.getElementById('addStep').onclick = addStep;
     </script>
   </body>
 </html>
