@@ -1,6 +1,9 @@
 package kookparty.kookpang.controller;
 
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -95,12 +98,26 @@ public class OrderController implements Controller {
 			if(userId != order.getUserId()) {
 				throw new AuthenticationException("허가되지 않은 접근입니다.");
 			}
+			boolean timeout = false;
+			String createdAtStr = order.getCreatedAt();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			
+			LocalDateTime createdAt = LocalDateTime.parse(createdAtStr, formatter);
+			LocalDateTime now = LocalDateTime.now();
+			
+			Duration duration = Duration.between(createdAt, now);
+			
+			if(duration.toHours() <= 3) {
+				timeout = true;
+			}
+			
 			int count = list.size();
 			request.setAttribute("order", order);
 			request.setAttribute("list", list);
 			request.setAttribute("count", count);
 			request.setAttribute("name", user.getNickname());
 			request.setAttribute("phone", user.getPhone());
+			request.setAttribute("timeout", timeout);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (NullPointerException e) {

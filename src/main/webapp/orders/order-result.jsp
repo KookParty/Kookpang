@@ -24,7 +24,7 @@ uri="jakarta.tags.core" prefix="c" %>
         <div>
           <span class="small">주문번호: ORDER1</span>
         </div>
-        <c:if test="${order.status}">
+        <c:if test="${order.status and timeout}">
           <a class="btn" href="${path}/front?key=order&methodName=deleteOrder&order_id=${order.orderId}" id="cancelBtn"
             >주문 취소</a
           >
