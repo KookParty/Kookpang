@@ -179,6 +179,13 @@
                   newCount: exists.count + count,
                 }),
               });
+              
+              if (response.status === 401) {
+             	 alert("로그인이 필요합니다.");
+             	 location.href = CONTEXT_PATH + "/front?key=user&methodName=loginForm";
+             	 return;
+              }
+              
               if (response.ok) {
                 updateCartBadgeAndToast();
               } else {
@@ -194,6 +201,13 @@
                   count: count,
                 }),
               });
+              
+              if (response.status === 401) {
+             	 alert("로그인이 필요합니다.");
+             	 location.href = CONTEXT_PATH + "/front?key=user&methodName=loginForm";
+             	 return;
+              }
+              
               if (res.ok) {
                 updateCartBadgeAndToast();
               }
