@@ -77,9 +77,11 @@ public class ProductController implements Controller {
 			fileName = Paths.get(fileName).getFileName().toString();
 			String savePath = FilePath.getSavePath(request, "product_image");
 			String imageUrl = null;
+			String saveUrl = null;
 			if(fileName!=null) {
-				imageUrl = savePath + "/" + fileName;
-				part.write(imageUrl);
+				saveUrl = savePath + "/" + fileName;
+				part.write(saveUrl);
+				imageUrl = "../product_image/" + fileName; 
 			}
 			
 			ProductDTO productDTO = new ProductDTO(request.getParameter("name"),
@@ -87,7 +89,7 @@ public class ProductController implements Controller {
 					request.getParameter("description"),
 					request.getParameter("category"),
 					request.getParameter("brand"),
-					imageUrl);
+					saveUrl);
 			int result = productService.insertProduct(productDTO);
 			if(result == 0) {//insert 실패시
 				
