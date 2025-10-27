@@ -17,8 +17,7 @@
       <!-- header시작 -->
       <jsp:include page="../common/header.jsp"></jsp:include>
       <!-- header끝 -->
-      <script>document.addEventListener('DOMContentLoaded', () => { initHeader('recipes'); requireAuth(); });</script>
-
+      
       <main class="container page" style="max-width: 980px; padding: 16px;">
         <h2 style="margin:0 0 6px">변형 레시피 작성</h2>
         <p class="small">“<span id="fromTitle">${parentTitle}</span>” 레시피를 바탕으로 나만의 변형 레시피를 만들어보세요.</p>
