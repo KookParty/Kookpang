@@ -63,7 +63,7 @@ public class DispatcherServlet extends HttpServlet {
 			                ? e.getCause().getMessage() 
 			                : e.getMessage();
 			request.setAttribute("errorMsg", errMsg);
-			request.getRequestDispatcher("error/error.jsp").forward(request, response);
+			request.getRequestDispatcher("common/error.jsp").forward(request, response);
 		}
 		
 	} //service end

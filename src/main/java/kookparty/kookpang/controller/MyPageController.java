@@ -4,12 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import kookparty.kookpang.dao.BoardDAO;
-import kookparty.kookpang.dao.LikesDAO;
 import kookparty.kookpang.dao.OrderDAO;
 import kookparty.kookpang.dao.OrderDAOImpl;
 import kookparty.kookpang.dto.BoardDTO;
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.UserDTO;
+import kookparty.kookpang.service.RecipeService;
+import kookparty.kookpang.service.RecipeServiceImpl;
 
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 public class MyPageController implements Controller {
     
     private final BoardDAO boardDAO = new BoardDAO();
-    private final LikesDAO likesDAO = new LikesDAO();
+	private RecipeService recipeService = RecipeServiceImpl.getInstance();
     private final OrderDAO orderDAO = new OrderDAOImpl();
     
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -56,33 +57,17 @@ public class MyPageController implements Controller {
         }
     }
 
-    public Object getLikedRecipes(HttpServletRequest req, HttpServletResponse resp) {
-        try {
-            HttpSession s = req.getSession(false);
-            if (s == null || s.getAttribute("loginUser") == null) {
-                return Map.of("ok", false, "msg", "로그인이 필요합니다.");
-            }
-            
-            UserDTO user = (UserDTO) s.getAttribute("loginUser");
-            int page = parseIntParam(req.getParameter("page"), 1);
-            int size = parseIntParam(req.getParameter("size"), 10);
-            
-            List<Map<String, Object>> recipes = likesDAO.findLikedRecipesByUser(user.getUserId(), page, size);
-            int total = likesDAO.countLikedRecipesByUser(user.getUserId());
-            
-            return Map.of(
-                "ok", true,
-                "recipes", recipes,
-                "total", total,
-                "page", page,
-                "size", size
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Map.of("ok", false, "msg", e.getMessage());
+    public Object getLikedRecipes(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        HttpSession s = req.getSession();
+        if (s == null || s.getAttribute("loginUser") == null) {
+            return Map.of("ok", false, "msg", "로그인이 필요합니다.");
         }
+        UserDTO user = (UserDTO) s.getAttribute("loginUser");
+        
+        return recipeService.selectByUserIdAndLike(user.getUserId());
     }
 
+    /*
     public Object getMyOrders(HttpServletRequest req, HttpServletResponse resp) {
         try {
             HttpSession s = req.getSession(false);
@@ -107,8 +92,9 @@ public class MyPageController implements Controller {
             e.printStackTrace();
             return Map.of("ok", false, "msg", e.getMessage());
         }
-    }
+    }*/
 
+    /*
     public Object getMyPageSummary(HttpServletRequest req, HttpServletResponse resp) {
         try {
             HttpSession s = req.getSession(false);
@@ -142,7 +128,7 @@ public class MyPageController implements Controller {
             e.printStackTrace();
             return Map.of("ok", false, "msg", e.getMessage());
         }
-    }
+    }*/
 
     private int parseIntParam(String param, int defaultValue) {
         if (param == null || param.isEmpty()) return defaultValue;
