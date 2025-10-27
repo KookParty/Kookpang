@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import kookparty.kookpang.dao.BoardDAO;
-import kookparty.kookpang.dao.LikesDAO;
 import kookparty.kookpang.dao.OrderDAO;
 import kookparty.kookpang.dao.OrderDAOImpl;
 import kookparty.kookpang.dto.BoardDTO;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 public class MyPageController implements Controller {
     
     private final BoardDAO boardDAO = new BoardDAO();
-    private final LikesDAO likesDAO = new LikesDAO();
+    //private final LikesDAO likesDAO = new LikesDAO();
     private final OrderDAO orderDAO = new OrderDAOImpl();
     
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -55,7 +54,7 @@ public class MyPageController implements Controller {
             return Map.of("ok", false, "msg", e.getMessage());
         }
     }
-
+    /*
     public Object getLikedRecipes(HttpServletRequest req, HttpServletResponse resp) {
         try {
             HttpSession s = req.getSession(false);
@@ -82,7 +81,8 @@ public class MyPageController implements Controller {
             return Map.of("ok", false, "msg", e.getMessage());
         }
     }
-
+	*/
+	
     public Object getMyOrders(HttpServletRequest req, HttpServletResponse resp) {
         try {
             HttpSession s = req.getSession(false);
@@ -108,7 +108,7 @@ public class MyPageController implements Controller {
             return Map.of("ok", false, "msg", e.getMessage());
         }
     }
-
+    /*
     public Object getMyPageSummary(HttpServletRequest req, HttpServletResponse resp) {
         try {
             HttpSession s = req.getSession(false);
@@ -143,7 +143,8 @@ public class MyPageController implements Controller {
             return Map.of("ok", false, "msg", e.getMessage());
         }
     }
-
+	*/
+	
     private int parseIntParam(String param, int defaultValue) {
         if (param == null || param.isEmpty()) return defaultValue;
         try {
