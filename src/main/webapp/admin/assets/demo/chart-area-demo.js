@@ -15,10 +15,7 @@ const getDailySales = async () => {
     const labels = result.chartLabels;
     const data = result.chartDatas;
 
-    console.log("Daily Sales Labels:", labels);
-    console.log("Daily Sales Data:", data);
-
-    new Chart(ctx, {
+    await new Chart(ctx, {
       type: "line",
       data: {
         labels: labels,

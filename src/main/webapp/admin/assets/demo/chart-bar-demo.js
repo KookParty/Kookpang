@@ -4,7 +4,7 @@ Chart.defaults.global.defaultFontFamily =
 Chart.defaults.global.defaultFontColor = "#292b2c";
 
 // Bar Chart Example
-var ctx = document.getElementById("myBarChart");
+var ctx2 = document.getElementById("myBarChart");
 
 const getBestItems = async () => {
   try {
@@ -16,7 +16,7 @@ const getBestItems = async () => {
     const labels = result.chartLabels;
     const data = result.chartDatas;
 
-    new Chart(ctx, {
+    await new Chart(ctx2, {
       type: "bar",
       data: {
         labels: labels,

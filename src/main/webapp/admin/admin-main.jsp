@@ -33,7 +33,7 @@ uri="jakarta.tags.core" prefix="c" %>
                 <div class="card mb-4">
                   <div class="card-header">
                     <i class="fas fa-chart-area me-1"></i>
-                    Area Chart Example
+                    최근 일주일간 일매출 현황
                   </div>
                   <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
                 </div>
@@ -42,7 +42,7 @@ uri="jakarta.tags.core" prefix="c" %>
                 <div class="card mb-4">
                   <div class="card-header">
                     <i class="fas fa-chart-bar me-1"></i>
-                    Bar Chart Example
+                    가장 잘 팔리는 식재료 Top 10
                   </div>
                   <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
                 </div>
