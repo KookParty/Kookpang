@@ -85,60 +85,69 @@ public class UserDAO {
             }
         } catch (SQLException e) { throw new RuntimeException(e); }
     }
-    
-    /** 프로필 업데이트 (닉네임, 전화번호, 주소) */
-    public boolean updateProfile(Long userId, String nickname, String phone, String address) {
-        String sql;
-        if (phone == null || phone.trim().isEmpty()) {
-            sql = "UPDATE users SET nickname=?, address=? WHERE user_id=?";
-        } else {
-            sql = "UPDATE users SET nickname=?, phone=?, address=? WHERE user_id=?";
-        }
-        
+
+    public Optional<UserDTO> findById(long userId) {
+        String sql = """
+            SELECT user_id, email, name, nickname, phone, address, role, status
+            FROM users
+            WHERE user_id=? AND status=1
+        """;
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return Optional.empty();
+                UserDTO u = new UserDTO();
+                u.setUserId(rs.getLong("user_id"));
+                u.setEmail(rs.getString("email"));
+                u.setName(rs.getString("name"));
+                u.setNickname(rs.getString("nickname"));
+                u.setPhone(rs.getString("phone"));
+                u.setAddress(rs.getString("address"));
+                u.setRole(rs.getString("role"));
+                u.setStatus(rs.getInt("status"));
+                return Optional.of(u);
+            }
+        } catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+    public boolean updateNickname(long userId, String nickname) {
+        String sql = "UPDATE users SET nickname=? WHERE user_id=?";
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, nickname);
-            
-            if (phone == null || phone.trim().isEmpty()) {
-                ps.setString(2, address);
-                ps.setLong(3, userId);
-            } else {
-                ps.setString(2, phone);
-                ps.setString(3, address);
-                ps.setLong(4, userId);
-            }
-            
+            ps.setLong(2, userId);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { 
-            e.printStackTrace();
-            return false;
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
-    
-    /** 비밀번호 변경 */
-    public boolean updatePassword(Long userId, String newPassword) {
+
+    public boolean updateAddress(long userId, String address) {
+        String sql = "UPDATE users SET address=? WHERE user_id=?";
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, address);
+            ps.setLong(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+    public boolean checkPassword(long userId, String password) {
+        String sql = "SELECT 1 FROM users WHERE user_id=? AND password=?";
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setString(2, password);
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
+        } catch (SQLException e) { throw new RuntimeException(e); }
+    }
+
+    public boolean updatePassword(long userId, String newPassword) {
         String sql = "UPDATE users SET password=? WHERE user_id=?";
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newPassword);
             ps.setLong(2, userId);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { 
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    /** 회원 탈퇴 */
-    public boolean deleteUser(Long userId) {
-        String sql = "UPDATE users SET status=0 WHERE user_id=?";
-        try (Connection conn = DbUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { 
-            e.printStackTrace();
-            return false;
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 }
