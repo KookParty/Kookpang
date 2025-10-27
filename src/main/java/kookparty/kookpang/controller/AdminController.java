@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.service.OrderService;
@@ -113,6 +114,37 @@ public class AdminController implements Controller {
 		
 		return new ModelAndView(contextPath + "/front?key=admin&methodName=productList", true);
 	}
+	
+	public ChartDataDTO getDailySales(HttpServletRequest request, HttpServletResponse response) {
+		ChartDataDTO dailySales = null;
+		System.out.println("getDailySales 들어옴");
+		try {
+			dailySales = orderService.getDailySales();
+			for(int i : dailySales.getChartDatas()) {
+				System.out.println(i);
+			}
+			for(String s : dailySales.getChartLabels()) {
+				System.out.println(s);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return dailySales;
+	}
+	
+	public ChartDataDTO getBestItems(HttpServletRequest request, HttpServletResponse response) {
+		ChartDataDTO bestItems = null;
+		System.out.println("???");
+		try {
+			bestItems = orderService.getBestItems();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			
+		}
+		return bestItems;
+	}
+	
 	
 	public ModelAndView recipeList(HttpServletRequest request, HttpServletResponse response) {
 		try {

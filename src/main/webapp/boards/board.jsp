@@ -66,6 +66,7 @@
   var $writeBtn=document.querySelector("#kp-board-write")||document.querySelector("#newBtn");
 
     function escapeHtml(s){return (s||"").replace(/[&<>\"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m];});}
+    function stripHtml(s){return (s||"").replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').trim();}
     function fmtDate(iso){return (iso||"").replace("T"," ").slice(0,16);}
 
   var isLoading = false;
@@ -73,7 +74,11 @@
   var sort = (new URLSearchParams(location.search)).get('sort') || 'latest';
   var $sortBtn = document.querySelector('#kp-sort-btn');
   var $sortMenu = document.querySelector('#kp-sort-menu');
-  function setSortLabel(s){ if(s==='views') $sortBtn.textContent='조회수 ▾'; else $sortBtn.textContent='최신순 ▾'; }
+  function setSortLabel(s){ 
+    if(s==='views') $sortBtn.textContent='조회순 ▾'; 
+    else if(s==='likes') $sortBtn.textContent='좋아요순 ▾'; 
+    else $sortBtn.textContent='최신순 ▾'; 
+  }
   setSortLabel(sort);
   // sort menu toggle
   $sortBtn && $sortBtn.addEventListener('click', function(e){ e.stopPropagation(); $sortMenu.style.display = $sortMenu.style.display === 'none' ? 'block' : 'none'; });
@@ -120,10 +125,11 @@
                 '<span class="small">'+fmtDate(r.createdAt)+'</span>'+
               '</div>'+
               '<p class="small" style="margin:6px 0 8px">👤 '+escapeHtml(r.nickname||"익명")+'</p>'+
-              '<p>'+escapeHtml((r.content||"").slice(0,140))+'</p>'+
+              '<p>'+escapeHtml(stripHtml(r.content||"").slice(0,140))+'</p>'+
               '<div class="meta" style="justify-content:flex-end">'+
-                '<span>조회수 '+r.viewCount+'</span>'+
+                '<span>👁 '+r.viewCount+'</span>'+
                 '<span>💬 '+r.commentCount+'</span>'+
+                '<span>❤ '+(r.likeCount||0)+'</span>'+
               '</div>'+
             '</a>'+
           '</article>';

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.OrderItemDTO;
 import kookparty.kookpang.dto.PaymentDTO;
@@ -148,7 +149,7 @@ public class OrderDAOImpl implements OrderDAO {
 				pk = rs.getLong(1);
 			}
 		} finally {
-			DbUtil.dbClose(null, ps);
+			DbUtil.dbClose(null, ps, rs);
 		}
 		return pk;
 	}
@@ -219,4 +220,59 @@ public class OrderDAOImpl implements OrderDAO {
 		
 		return result;
 	}
+
+	@Override
+	public ChartDataDTO getDailySales() throws SQLException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ChartDataDTO chartData = new ChartDataDTO();
+		String sql = proFile.getProperty("order.selectDailySales");
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			rs = ps.executeQuery();
+			List<String> chartLabels = new ArrayList<String>();
+			List<Integer> chartDatas = new ArrayList<Integer>();
+			while(rs.next()) {
+				chartLabels.add(rs.getString("order_date"));
+				chartDatas.add(rs.getInt("daily_sales"));
+			}
+			chartData.setChartDatas(chartDatas);
+			chartData.setChartLabels(chartLabels);
+		} finally {
+			DbUtil.dbClose(con, ps, rs);
+		}
+		
+		return chartData;
+	}
+
+	@Override
+	public ChartDataDTO getBestItems() throws SQLException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ChartDataDTO chartData = new ChartDataDTO();
+		String sql = proFile.getProperty("order.countBestItems");
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			rs = ps.executeQuery();
+			List<String> chartLabels = new ArrayList<String>();
+			List<Integer> chartDatas = new ArrayList<Integer>();
+			while(rs.next()) {
+				chartLabels.add(rs.getString("name"));
+				chartDatas.add(rs.getInt("total_sold"));
+			}
+			chartData.setChartDatas(chartDatas);
+			chartData.setChartLabels(chartLabels);
+		} finally {
+			DbUtil.dbClose(con, ps, rs);
+		}
+		return chartData;
+	}
+	
+	
 }

@@ -66,7 +66,7 @@ public class RecipeDTO {
 	}
 	
 	/**
-	 * ingredients와 steps 없는 생성자 (등록 시)
+	 * ingredients와 steps 없는 생성자
 	 */
 	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl,
 			RecipeType recipeType, String way, String category, long parentRecipeId, String createdAt) {

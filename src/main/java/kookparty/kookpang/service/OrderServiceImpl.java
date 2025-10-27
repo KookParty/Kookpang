@@ -12,6 +12,7 @@ import kookparty.kookpang.dao.OrderDAOImpl;
 import kookparty.kookpang.dao.ProductDAO;
 import kookparty.kookpang.dao.ProductDAOImpl;
 import kookparty.kookpang.dto.CartDTO;
+import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.OrderItemDTO;
 import kookparty.kookpang.dto.PaymentDTO;
@@ -61,6 +62,7 @@ public class OrderServiceImpl implements OrderService {
 			con = DbUtil.getConnection();
 			con.setAutoCommit(false);
 			pk = orderDAO.insertOrder(order, paymentDTO, con);
+			System.out.println(pk);
 			List<CartDTO> cartList = cartDAO.selectByUserId(order.getUserId(), con);
 			List<OrderItemDTO> itemList = new ArrayList<OrderItemDTO>();
 			for(CartDTO c : cartList) {
@@ -72,10 +74,11 @@ public class OrderServiceImpl implements OrderService {
 				itemList.add(itemDTO);
 			}
 			orderDAO.insertOrderItems(con, itemList);
-			cartDAO.deleteCartByUserId(order.getUserId());
+			cartDAO.deleteCartByUserId(order.getUserId(), con);
 			
 			con.commit();
 		} finally {
+			System.out.println("test");
 			DbUtil.dbClose(con, null);
 		}
 		return pk;
@@ -86,6 +89,19 @@ public class OrderServiceImpl implements OrderService {
 		int result = orderDAO.deleteOrder(orderId);
 		return result;
 	}
+
+	@Override
+	public ChartDataDTO getDailySales() throws SQLException {
+		ChartDataDTO dailySales = orderDAO.getDailySales();
+		return dailySales;
+	}
+
+	@Override
+	public ChartDataDTO getBestItems() throws SQLException {
+		ChartDataDTO bestItems = orderDAO.getBestItems();
+		return bestItems;
+	}
+	
 	
 
 }

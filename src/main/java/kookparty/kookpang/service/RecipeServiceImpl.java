@@ -50,4 +50,10 @@ public class RecipeServiceImpl implements RecipeService {
 		if (result == 0)
 			throw new DBAccessException("레시피가 삭제되지 않았습니다.");
 	}
+	
+	@Override
+	public List<RecipeDTO> selectByUserIdAndLike(long userId) throws Exception {
+		List<RecipeDTO> list = recipeDAO.selectByUserIdAndLike(userId);
+		return list;
+	}
 }

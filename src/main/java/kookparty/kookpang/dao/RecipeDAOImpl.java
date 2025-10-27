@@ -298,4 +298,36 @@ public class RecipeDAOImpl implements RecipeDAO {
 		
 		return result;
 	}
+	
+	@Override
+	public List<RecipeDTO> selectByUserIdAndLike(long userId) throws SQLException {
+		List<RecipeDTO> list = new ArrayList<>();
+		String sql = proFile.getProperty("recipe.selectByUserIdAndLike");
+		
+		try (Connection con = DbUtil.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, userId);
+			
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					long recipeId = rs.getLong(1);
+					list.add(new RecipeDTO(
+							recipeId, 
+							rs.getLong(2),
+							rs.getString(3),
+							rs.getString(4),
+							rs.getString(5),
+							rs.getString(6).toLowerCase().equals("base") ?
+									RecipeType.BASE : RecipeType.VARIANT,
+							rs.getString(7),
+							rs.getString(8),
+							rs.getInt(9),
+							rs.getString(10)
+							));
+				}
+			}
+		}
+		
+		return list;
+	}
 }

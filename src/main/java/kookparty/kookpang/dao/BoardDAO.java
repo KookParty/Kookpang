@@ -74,8 +74,9 @@ public class BoardDAO {
                     d.setPostId(rs.getLong("post_id"));
                     d.setTitle(rs.getString("title"));
                     d.setContent(rs.getString("content"));
-                        d.setViewCount(rs.getLong("view_count"));
+                    d.setViewCount(rs.getLong("view_count"));
                     d.setCommentCount(rs.getLong("comment_count"));
+                    d.setLikeCount(rs.getLong("like_count"));
                     Timestamp ts = rs.getTimestamp("created_at");
                     if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
                     d.setNickname(rs.getString("nickname"));
@@ -101,6 +102,53 @@ public class BoardDAO {
             ps.setString(i++, nullToEmpty(q));
             ps.setString(i++, nullToEmpty(q));
 
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<BoardDTO> listByUser(long userId, int page, int size) {
+        List<BoardDTO> list = new ArrayList<>();
+        String sql = Q("board.post.listByUser");
+        int off = (page - 1) * size;
+
+        try (Connection con = DbUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setInt(2, size);
+            ps.setInt(3, off);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    BoardDTO d = new BoardDTO();
+                    d.setPostId(rs.getLong("post_id"));
+                    d.setTitle(rs.getString("title"));
+                    d.setContent(rs.getString("content"));
+                    d.setViewCount(rs.getLong("view_count"));
+                    d.setCommentCount(rs.getLong("comment_count"));
+                    d.setLikeCount(rs.getLong("like_count"));
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
+                    d.setNickname(rs.getString("nickname"));
+                    d.setCategory(rs.getString("category"));
+                    list.add(d);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countByUser(long userId) {
+        String sql = Q("board.post.countByUser");
+        try (Connection con = DbUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
@@ -165,6 +213,7 @@ public class BoardDAO {
                     d.setContent(rs.getString("content"));
                     d.setViewCount(rs.getLong("view_count"));
                     d.setCommentCount(rs.getLong("comment_count"));
+                    d.setLikeCount(rs.getLong("like_count"));
                     Timestamp ts = rs.getTimestamp("created_at");
                     if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
                     d.setNickname(rs.getString("nickname"));
@@ -233,15 +282,18 @@ public class BoardDAO {
     public boolean deletePost(long postId, long userId) {
         String sql = Q("board.post.delete");
         int r = 0;
-        try (Connection con = DbUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, postId);
-            ps.setLong(2, userId);
-            r = ps.executeUpdate();
-            // 이미지/댓글은 FK ON DELETE CASCADE가 아니면 별도 삭제 필요
+        try (Connection con = DbUtil.getConnection()) {
+            // 1단계: 먼저 이미지 삭제 (외래 키 제약 조건 때문에 순서 중요)
             try (PreparedStatement delImg = con.prepareStatement(Q("board.image.deleteByPost"))) {
                 delImg.setLong(1, postId);
                 delImg.executeUpdate();
+            }
+            
+            // 2단계: 게시글 삭제 (작성자 본인만 가능)
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setLong(1, postId);
+                ps.setLong(2, userId);
+                r = ps.executeUpdate();
             }
         } catch (Exception e) { e.printStackTrace(); }
         return r > 0;

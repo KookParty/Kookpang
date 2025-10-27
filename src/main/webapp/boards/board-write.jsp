@@ -47,8 +47,9 @@
       <div class="meta">
         <span data-nick>익명</span>
         <span data-date></span>
-        <span>조회 <b data-views>0</b></span>
-        <span>댓글 <b data-cmts>0</b></span>
+        <span>👁 <b data-views>0</b></span>
+        <span>💬 <b data-cmts>0</b></span>
+        <span>❤ <b data-likes>0</b></span>
       </div>
       <div class="img-list" data-images></div>
       <!-- HTML 내용은 그대로 보여줘야 하므로 escape 제거 -->
@@ -71,8 +72,8 @@
     </article>
 
     <!-- 작성/수정 -->
-    <article id="kp-write-form" class="card" style="padding:16px; display:none"><form enctype="multipart/form-data"></form>
-      <form>
+    <article id="kp-write-form" class="card" style="padding:16px; display:none">
+      <form id="kp-post-form">
         <input type="hidden" name="postId" id="postId" />
         <div class="form-row">
           <select name="category" class="input" style="width:auto">
@@ -187,6 +188,7 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
     qs("[data-date]").textContent=fmt(p.createdAt);
     qs("[data-views]").textContent=p.viewCount;
     qs("[data-cmts]").textContent=p.commentCount;
+    qs("[data-likes]").textContent=p.likeCount||0;
 
     // 보기 페이지에서는 HTML 그대로 그려주기 (XSS 방어는 서버/에디터에서 별도 처리 권장)
     qs("[data-content]").innerHTML = p.content || "";
@@ -275,7 +277,7 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
   });
 
   //글쓰기/수정: URLSearchParams로 모든 필드 전송 (서버는 getParameter로 안전하게 수신)
-  qs("#kp-write-form form")&&qs("#kp-write-form form").addEventListener("submit",async function(e){
+  qs("#kp-post-form")&&qs("#kp-post-form").addEventListener("submit",async function(e){
     e.preventDefault();
     var title=(qs("#titleInput").value||"").trim();
     var content=(qs("#editor").innerHTML||"").trim();

@@ -59,6 +59,7 @@ create table posts(
     content text not null, -- 내용
     view_count bigint not null default 0, -- 조회수
     comment_count bigint not null default 0, -- 댓글수
+    like_count bigint not null default 0, -- 좋아요수
     created_at datetime not null default now(), -- 등록일
 	foreign key(user_id) references users(user_id)
 );

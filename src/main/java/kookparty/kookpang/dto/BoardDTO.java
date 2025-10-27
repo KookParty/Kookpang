@@ -11,6 +11,7 @@ public class BoardDTO {
     private String content;
     private long viewCount;
     private long commentCount;
+    private long likeCount;
     private LocalDateTime createdAt;
     private String nickname;              // users.nickname
     private List<Image> images;           // post_images
@@ -67,6 +68,8 @@ public class BoardDTO {
     public void setViewCount(long v) { viewCount = v; }
     public long getCommentCount() { return commentCount; }
     public void setCommentCount(long v) { commentCount = v; }
+    public long getLikeCount() { return likeCount; }
+    public void setLikeCount(long v) { likeCount = v; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime v) { createdAt = v; }
     public String getNickname() { return nickname; }

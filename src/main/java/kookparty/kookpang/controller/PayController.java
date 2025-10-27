@@ -55,15 +55,11 @@ public class PayController implements Controller {
 		payService.payApprove(paymentDTO);
 
 		UserDTO user = (UserDTO) session.getAttribute("loginUser");
-		long userId = 0;
-		if (user == null) {
-			userId = 1;
-		} else {
-			userId = user.getUserId();
-		}
+		long userId = user.getUserId();
 		String shippingAddress = (String) session.getAttribute("address");
 		int totalAmount = paymentDTO.getTotalAmount();
 		OrderDTO order = new OrderDTO(userId, paymentDTO.getTotalAmount(), paymentDTO.getDeliveryFee(), shippingAddress, null);
+		System.out.println("order : " + order);
 		long pk = 0;
 		try {
 			pk = orderService.insertOrder(order, paymentDTO);
