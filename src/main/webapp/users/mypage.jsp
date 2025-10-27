@@ -227,6 +227,7 @@
         <div class="name" style="font-weight:800;" id="userName">로딩중...</div>
         <div class="email muted" id="userEmail">loading...</div>
             <div class="meta" style="margin:10px 0;">
+          <span class="muted">보유 포인트 <b style="color:#f39c12;" id="userPoint">0P</b></span>
           <span class="muted">작성한 게시글 <b id="postCount">0</b></span>
           <span class="muted">주문내역 <b id="orderCount">0</b></span>
             </div>
@@ -393,6 +394,12 @@
       document.getElementById('userAvatar').textContent = initial;
       document.getElementById('userName').textContent = data.nickname || data.name || '사용자';
       document.getElementById('userEmail').textContent = data.email || '';
+      
+      // 포인트 표시
+      const pointElement = document.getElementById('userPoint');
+      if (pointElement) {
+        pointElement.textContent = (data.point || 0).toLocaleString();
+      }
     }
 
     // 내가 작성한 게시글 표시

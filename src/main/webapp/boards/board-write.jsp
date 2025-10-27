@@ -75,10 +75,8 @@
       <form id="kp-post-form">
         <input type="hidden" name="postId" id="postId" />
         <div class="form-row">
-          <select name="category" class="input" style="width:auto">
-            <option value="free" selected>자유</option>
-            <option value="notice">공지</option>
-          </select>
+          <span style="display:inline-block;padding:8px 12px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px;color:#666;font-size:14px;">자유</span>
+          <input type="hidden" name="category" value="free" />
         </div>
         <div class="form-row"><input id="titleInput" name="title" class="input" placeholder="제목(*)"></div>
 
