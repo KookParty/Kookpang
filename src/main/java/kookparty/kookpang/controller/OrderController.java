@@ -69,6 +69,7 @@ public class OrderController implements Controller {
 			request.setAttribute("name", user.getName());
 			request.setAttribute("phone", user.getPhone());
 			request.setAttribute("address", user.getAddress());
+			request.setAttribute("point", user.getPoint());
 			request.setAttribute("price", price);
 			request.setAttribute("deliveryFee", deliveryFee);
 			request.setAttribute("totalPrice", totalPrice);
@@ -160,7 +161,7 @@ public class OrderController implements Controller {
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
 		try {
 			long userId = user.getUserId();//검증메서드 추가 예정
-			int result = orderService.deleteOrder(orderId);
+			int result = orderService.deleteOrder(user, orderId);
 			if(result == 0) {
 				
 			}else {

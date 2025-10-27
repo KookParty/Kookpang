@@ -9,6 +9,7 @@ public class PaymentDTO {
 	private String pgToken;
 	private int totalAmount;
 	private int deliveryFee;
+	private int usedPoint;
 	public PaymentDTO() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -16,20 +17,23 @@ public class PaymentDTO {
 	
 	
 	/**
-	 * 카카오페이 정보 세션 저장용
+	 * 카카오페이 세션저장용
 	 * @param orderName
 	 * @param cid
 	 * @param partnerOrderId
 	 * @param partnerUserId
 	 * @param totalAmount
+	 * @param deliveryFee
+	 * @param usedPoint
 	 */
-	public PaymentDTO(String orderName, String cid, String partnerOrderId, String partnerUserId, int totalAmount, int deliveryFee) {
+	public PaymentDTO(String orderName, String cid, String partnerOrderId, String partnerUserId, int totalAmount, int deliveryFee, int usedPoint) {
 		this.OrderName = orderName;
 		this.cid = cid;
 		this.partnerOrderId = partnerOrderId;
 		this.partnerUserId = partnerUserId;
 		this.totalAmount = totalAmount;
 		this.deliveryFee = deliveryFee;
+		this.usedPoint = usedPoint;
 	}
 
 
@@ -85,6 +89,17 @@ public class PaymentDTO {
 
 	public void setDeliveryFee(int deliveryFee) {
 		this.deliveryFee = deliveryFee;
+	}
+	
+	
+
+	public int getUsedPoint() {
+		return usedPoint;
+	}
+
+
+	public void setUsedPoint(int usedPoint) {
+		this.usedPoint = usedPoint;
 	}
 
 

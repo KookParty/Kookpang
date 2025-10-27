@@ -9,6 +9,7 @@ public class OrderDTO {
 	private String createdAt;
 	private int totalPrice;
 	private int deliveryFee;
+	private int usedPoint;
 	private String shippingAddress;
 	private String OrderName;
 	private String cid;
@@ -30,6 +31,7 @@ public class OrderDTO {
 	 * @param createdAt
 	 * @param totalPrice
 	 * @param deliveryFee
+	 * @param usedPoint
 	 * @param shippingAddress
 	 * @param orderName
 	 * @param cid
@@ -40,7 +42,7 @@ public class OrderDTO {
 	 * @param status
 	 * @param itemList
 	 */
-	public OrderDTO(long orderId, long userId, String createdAt, int totalPrice, int deliveryFee,
+	public OrderDTO(long orderId, long userId, String createdAt, int totalPrice, int deliveryFee, int usedPoint,
 			String shippingAddress, String orderName, String cid, String tid, String partnerOrderId,
 			String partnerUserId, String pgToken, boolean status, List<OrderItemDTO> itemList) {
 		super();
@@ -49,6 +51,7 @@ public class OrderDTO {
 		this.createdAt = createdAt;
 		this.totalPrice = totalPrice;
 		this.deliveryFee = deliveryFee;
+		this.usedPoint = usedPoint;
 		this.shippingAddress = shippingAddress;
 		OrderName = orderName;
 		this.cid = cid;
@@ -70,11 +73,12 @@ public class OrderDTO {
 	 * @param status
 	 * @param itemList
 	 */
-	public OrderDTO(long userId, int totalPrice, int deliveryFee, String shippingAddress, List<OrderItemDTO> itemList) {
+	public OrderDTO(long userId, int totalPrice, int deliveryFee, int usedPoint, String shippingAddress, List<OrderItemDTO> itemList) {
 		super();
 		this.userId = userId;
 		this.totalPrice = totalPrice;
 		this.deliveryFee = deliveryFee;
+		this.usedPoint = usedPoint;
 		this.shippingAddress = shippingAddress;
 		this.itemList = itemList;
 	}
@@ -190,15 +194,27 @@ public class OrderDTO {
 	public void setItemList(List<OrderItemDTO> itemList) {
 		this.itemList = itemList;
 	}
+	
+	
+	
+	public int getUsedPoint() {
+		return usedPoint;
+	}
+
+	public void setUsedPoint(int usedPoint) {
+		this.usedPoint = usedPoint;
+	}
 
 	@Override
 	public String toString() {
 		return "OrderDTO [orderId=" + orderId + ", userId=" + userId + ", createdAt=" + createdAt + ", totalPrice="
-				+ totalPrice + ", deliveryFee=" + deliveryFee + ", shippingAddress=" + shippingAddress + ", OrderName="
-				+ OrderName + ", cid=" + cid + ", tid=" + tid + ", partnerOrderId=" + partnerOrderId
-				+ ", partnerUserId=" + partnerUserId + ", pgToken=" + pgToken + ", status=" + status + ", itemList="
-				+ itemList + "]";
+				+ totalPrice + ", deliveryFee=" + deliveryFee + ", usedPoint=" + usedPoint + ", shippingAddress="
+				+ shippingAddress + ", OrderName=" + OrderName + ", cid=" + cid + ", tid=" + tid + ", partnerOrderId="
+				+ partnerOrderId + ", partnerUserId=" + partnerUserId + ", pgToken=" + pgToken + ", status=" + status
+				+ ", itemList=" + itemList + "]";
 	}
+
+	
 
 
 	

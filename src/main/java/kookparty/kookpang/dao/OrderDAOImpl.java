@@ -50,6 +50,7 @@ public class OrderDAOImpl implements OrderDAO {
 						rs.getString("created_at"),
 						rs.getInt("total_price"), 
 						rs.getInt("delivery_fee"),
+						rs.getInt("used_point"),
 						rs.getString("shipping_address"), 
 						rs.getString("order_name"),
 						rs.getString("cid"),
@@ -91,6 +92,7 @@ public class OrderDAOImpl implements OrderDAO {
 						rs.getString("created_at"),
 						rs.getInt("total_price"), 
 						rs.getInt("delivery_fee"),
+						rs.getInt("used_point"),
 						rs.getString("shipping_address"), 
 						rs.getString("order_name"),
 						rs.getString("cid"),
@@ -105,6 +107,41 @@ public class OrderDAOImpl implements OrderDAO {
 			con.commit();
 		} finally {
 			DbUtil.dbClose(con, ps, rs);
+		}
+		return order;
+	}
+	
+	@Override
+	public OrderDTO selectByOrderId(long orderId, Connection con) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		OrderDTO order = null;
+		String sql = proFile.getProperty("order.selectByOrderId");
+		try {
+			con.setAutoCommit(false);
+			ps = con.prepareStatement(sql);
+			ps.setLong(1, orderId);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				order = new OrderDTO(rs.getLong("order_id"),
+						rs.getLong("user_id"), 
+						rs.getString("created_at"),
+						rs.getInt("total_price"), 
+						rs.getInt("delivery_fee"),
+						rs.getInt("used_point"),
+						rs.getString("shipping_address"), 
+						rs.getString("order_name"),
+						rs.getString("cid"),
+						rs.getString("tid"),
+						rs.getString("partner_order_id"),
+						rs.getString("partner_user_id"),
+						rs.getString("pg_token"),
+						rs.getInt("status") == 1, null);
+				List<OrderItemDTO> itemlist = selectItemsByOrderId(con, orderId);
+				order.setItemList(itemlist);
+			}
+		} finally {
+			DbUtil.dbClose(null, ps, rs);
 		}
 		return order;
 	}
@@ -136,13 +173,14 @@ public class OrderDAOImpl implements OrderDAO {
 			ps.setLong(1, order.getUserId());
 			ps.setInt(2, order.getTotalPrice());
 			ps.setInt(3, order.getDeliveryFee());
-			ps.setString(4, order.getShippingAddress());
-			ps.setString(5, paymentDTO.getOrderName());
-			ps.setString(6, paymentDTO.getCid());
-			ps.setString(7, paymentDTO.getTid());
-			ps.setString(8, paymentDTO.getPartnerOrderId());
-			ps.setString(9, paymentDTO.getPartnerUserId());
-			ps.setString(10, paymentDTO.getPgToken());
+			ps.setInt(4, order.getUsedPoint());
+			ps.setString(5, order.getShippingAddress());
+			ps.setString(6, paymentDTO.getOrderName());
+			ps.setString(7, paymentDTO.getCid());
+			ps.setString(8, paymentDTO.getTid());
+			ps.setString(9, paymentDTO.getPartnerOrderId());
+			ps.setString(10, paymentDTO.getPartnerUserId());
+			ps.setString(11, paymentDTO.getPgToken());
 			ps.executeUpdate();
 			rs = ps.getGeneratedKeys();
 			if(rs.next()) {
@@ -155,19 +193,17 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public int deleteOrder(long orderId) throws SQLException {
-		Connection con = null;
+	public int deleteOrder(Connection con, long orderId) throws SQLException {
 		PreparedStatement ps = null;
 		int result = 0;
 		String sql = proFile.getProperty("order.deleteOrder");
 
 		try {
-			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
 			ps.setLong(1, orderId);
 			result = ps.executeUpdate();
 		} finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(null, ps);
 		}
 		return result;
 	}
@@ -189,7 +225,7 @@ public class OrderDAOImpl implements OrderDAO {
 				list.add(item);
 			}
 		} finally {
-			DbUtil.dbClose(null, ps);
+			DbUtil.dbClose(null, ps, rs);
 		}
 
 		return list;

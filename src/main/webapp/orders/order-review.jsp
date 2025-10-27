@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> <%@taglib
-uri="jakarta.tags.core" prefix="c"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> <%@taglib uri="jakarta.tags.core"
+prefix="c"%>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -144,6 +144,8 @@ uri="jakarta.tags.core" prefix="c"%>
               <div class="ov-row"><span>상품 금액</span><b id="ov-price">${price}원</b></div>
               <div class="ov-row"><span>배송비</span><b id="ov-ship">${deliveryFee}원</b></div>
               <div class="ov-row" style="border-top: 1px solid #e5e7eb"></div>
+              <div class="ov-row"><span>보유 포인트</span><b id="ov-point">${point}</b></div>
+              <div class="ov-row"><span>사용 포인트</span><input type="text" id="used_point" value="0" /></div>
               <div class="ov-row">
                 <span style="font-weight: 800">총 결제 금액</span
                 ><b id="ov-total" style="font-size: 18px">${totalPrice}원</b>
@@ -203,6 +205,23 @@ uri="jakarta.tags.core" prefix="c"%>
     <jsp:include page="../common/footer.jsp"></jsp:include>
     <!-- footer 끝 -->
     <script>
+      document.getElementById("used_point").addEventListener("keyup", (e) => {
+        const maxPoint = document.getElementById("ov-point").innerText;
+        let usedPoint = parseInt(e.target.value) || 0;
+
+        if (usedPoint < 0) usedPoint = 0;
+        if (usedPoint > maxPoint) usedPoint = maxPoint;
+
+        e.target.value = usedPoint;
+
+        const itemPrice = ${price};
+        const itemDeliveryFee = ${deliveryFee};
+        const totalPrice = itemPrice + itemDeliveryFee - usedPoint;
+
+        document.getElementById("ov-total").innerText = totalPrice + "원";
+      });
+    </script>
+    <script>
       const customRadio = document.getElementById("custom");
       const normalRadio = document.getElementById("normal");
       const customArea = document.getElementById("custom-addr-area");
@@ -240,6 +259,7 @@ uri="jakarta.tags.core" prefix="c"%>
           alert("배송지 주소를 입력해주세요.");
           return;
         }
+        const point = document.getElementById("used_point").value || "0";
         const r = await fetch(CONTEXT_PATH + "/ajax", {
           method: "POST",
           headers: {
@@ -249,6 +269,7 @@ uri="jakarta.tags.core" prefix="c"%>
             key: "pay",
             methodName: "payReady",
             address: addr,
+            point: point,
           }),
         });
         const json = await r.json();

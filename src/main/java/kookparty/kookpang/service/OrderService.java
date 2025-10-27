@@ -7,6 +7,7 @@ import java.util.Map;
 import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.PaymentDTO;
+import kookparty.kookpang.dto.UserDTO;
 
 public interface OrderService {
 	/**
@@ -47,14 +48,14 @@ public interface OrderService {
 	 * @param userId
 	 * @return
 	 */
-	long insertOrder(OrderDTO order, PaymentDTO paymentDTO) throws SQLException;
+	long insertOrder(UserDTO user, OrderDTO order, PaymentDTO paymentDTO) throws SQLException;
 	
 	/**
 	 * orderId로 주문을 삭제. 삭제하면 on delete cascade로 order-items의 레코드도 삭제
 	 * @param orderId
 	 * @return
 	 */
-	int deleteOrder(long orderId) throws SQLException;
+	int deleteOrder(UserDTO user, long orderId) throws SQLException;
 	
 	/**
 	 * chart.js용. 일주일간의 일별 매출 가지고 오기

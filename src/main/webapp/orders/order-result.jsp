@@ -25,19 +25,21 @@ uri="jakarta.tags.core" prefix="c" %>
           <span class="small">주문번호: ORDER1</span>
         </div>
         <c:if test="${order.status}">
-        <a class="btn" href="${path}/front?key=order&methodName=deleteOrder&order_id=${order.orderId}">주문 취소</a>
+          <a class="btn" href="${path}/front?key=order&methodName=deleteOrder&order_id=${order.orderId}" id="cancelBtn"
+            >주문 취소</a
+          >
         </c:if>
       </div>
       <div class="grid cols-2">
         <section class="grid" style="gap: 16px">
           <article class="card" style="padding: 16px">
             <h3 style="margin: 0 0 8px">주문 상품 (${count}개)</h3>
-			<!-- 반복 -->
-			<c:forEach var="item" items="${list}">
-            <div class="list-row">
-              <span>${item.name} / ${item.count}</span>
-              <b>${item.price * item.count}원</b>
-            </div>
+            <!-- 반복 -->
+            <c:forEach var="item" items="${list}">
+              <div class="list-row">
+                <span>${item.name} / ${item.count}</span>
+                <b>${item.price * item.count}원</b>
+              </div>
             </c:forEach>
             <!-- 반복 -->
           </article>
@@ -63,11 +65,16 @@ uri="jakarta.tags.core" prefix="c" %>
             <h3 style="margin: 0 0 8px">주문 요약</h3>
             <div class="list-row">
               <span>상품 금액</span>
-              <b>${order.totalPrice }원</b>
+              <b>${order.totalPrice + order.usedPoint}원</b>
             </div>
             <div class="list-row">
               <span>배송비</span>
               <b>${order.deliveryFee }원</b>
+            </div>
+            <hr />
+            <div class="list-row">
+              <span>사용 포인트</span>
+              <b>${order.usedPoint}</b>
             </div>
             <div class="list-row" style="font-weight: 700">
               <span>총 결제 금액</span>
@@ -78,12 +85,12 @@ uri="jakarta.tags.core" prefix="c" %>
             <h3 style="margin: 0 0 8px">결제 정보</h3>
             <p class="small">결제 수단 kakaoPay</p>
             <c:choose>
-            	<c:when test="${order.status}">
-            	<span class="badge">결제 완료</span>
-            	</c:when>
-            	<c:otherwise>
-            	<span class="badge-cancel">주문 취소</span>
-            	</c:otherwise>
+              <c:when test="${order.status}">
+                <span class="badge">결제 완료</span>
+              </c:when>
+              <c:otherwise>
+                <span class="badge-cancel">주문 취소</span>
+              </c:otherwise>
             </c:choose>
           </article>
           <article class="card" style="padding: 16px">
@@ -102,85 +109,12 @@ uri="jakarta.tags.core" prefix="c" %>
         </section>
       </div>
     </main>
-    <!-- 
     <script>
-      requireAuth();
-      const id = +q("id");
-      const orders = S.get(KP_KEYS.ORDERS, []);
-      const o = orders.find((x) => x.id === id) || orders[orders.length - 1];
-      let itemsHtml = o.items
-        .map(
-          (it) => `
-            <div class='list-row'>
-              <span>${"${it.title}"}</span>
-              <b>${"${(it.price * it.qty).toLocaleString()}"}원</b>
-            </div>`
-        )
-        .join("");
-      root.innerHTML = `
-      <div class="section-head">
-        <div>
-          <span class="small">주문번호: ORDER${"${id}"}</span>
-        </div>
-        <a class="btn" href="order-cancel.html?orderId=${"${id}"}">주문 취소</a>
-      </div>
-      <div class="grid cols-2">
-        <section class="grid" style="gap:16px">
-          <article class="card" style="padding:16px">
-            <h3 style="margin:0 0 8px">주문 상품 (${"${o.items.length}"}개)</h3>
-            ${"${itemsHtml}"}
-          </article>
-          <article class="card" style="padding:16px">
-            <h3 style="margin:0 0 8px">배송 정보</h3>
-            <p class="small">받는 분: 김테스트 · 연락처 010-1234-5678</p>
-            <p class="small">배송 주소: 서울시 강남구 테헤란로 123번길 45</p>
-            <div class="card" style="padding:12px;margin-top:10px;background:#f3f4f6;border-style:dashed">
-              <b>배송 상태</b>
-              <ul class="small">
-                <li>● 주문 접수</li>
-                <li>○ 배송 준비중</li>
-                <li>○ 배송 중</li>
-                <li>○ 배송 완료</li>
-              </ul>
-            </div>
-          </article>
-        </section>
-        <section class="grid" style="gap:16px">
-          <article class="card" style="padding:16px">
-            <h3 style="margin:0 0 8px">주문 요약</h3>
-            <div class="list-row">
-              <span>상품 금액</span>
-              <b>${"${(o.total - 3000).toLocaleString()}"}원</b>
-            </div>
-            <div class="list-row">
-              <span>배송비</span>
-              <b>3,000원</b>
-            </div>
-            <div class="list-row" style="font-weight:700">
-                <span>총 결제 금액</span>
-                <span>${"${o.total.toLocaleString()}"}원</span>
-            </div>
-          </article>
-          <article class="card" style="padding:16px">
-            <h3 style="margin:0 0 8px">결제 정보</h3>
-            <p class="small">결제 수단 kakaoPayt</p>
-            <span class="badge">결제 완료</span>
-          </article>
-          <article class="card" style="padding:16px">
-            <h3 style="margin:0 0 8px">주문자 정보</h3>
-            <p class="small">test@example.com · 010-1234-5678</p>
-          </article>
-          <article class="card" style="padding:16px">
-            <h3 style="margin:0 0 8px">고객 지원</h3>
-            <p class="small">배송 문의: 1588-1234<br>
-              교환/환불: 1588-5678<br>
-              운영시간: 평일 9:00-18:00
-            </p>
-            <button class="btn full">고객센터 문의</button>
-          </article>
-        </section>
-      </div>`;
+      document.getElementById("cancelBtn")?.addEventListener("click", function (event) {
+        if (!confirm("정말로 주문을 취소하시겠습니까?")) {
+          location.href = CONTEXT_PATH + "/front?key=order&methodName=deleteOrder&order_id=${order.orderId}";
+        }
+      });
     </script>
-     -->
   </body>
 </html>
