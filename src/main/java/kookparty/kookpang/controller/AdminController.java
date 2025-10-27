@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import kookparty.kookpang.dto.ProductDTO;
+import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.service.OrderService;
 import kookparty.kookpang.service.OrderServiceImpl;
 import kookparty.kookpang.service.ProductService;
@@ -72,6 +73,7 @@ public class AdminController implements Controller {
 	
 	public String uploadImage(HttpServletRequest request, HttpServletResponse response) {
 		System.out.println("test");
+		String saveUrl = null;
 		String imageUrl = null;
 		try {
 			Part part = request.getPart("image");
@@ -80,8 +82,9 @@ public class AdminController implements Controller {
 			String savePath = FilePath.getSavePath(request, "product_image");
 			
 			if(fileName!=null) {
-				imageUrl = savePath + "/" + fileName;
-				part.write(imageUrl);
+				saveUrl = savePath + "/" + fileName;
+				part.write(saveUrl);
+				imageUrl = "../product_image/" + fileName;
 			}
 		} catch (Exception e) {
 			return null;
@@ -109,5 +112,17 @@ public class AdminController implements Controller {
 		}
 		
 		return new ModelAndView(contextPath + "/front?key=admin&methodName=productList", true);
+	}
+	
+	public ModelAndView recipeList(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			List<RecipeDTO> list = recipeService.selectByOptions(null, null, null, 0);
+			request.setAttribute("list", list);
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("errMsg", "오류");
+			return new ModelAndView("/common/error.jsp");
+		}
+		return new ModelAndView("/admin/recipes.jsp");
 	}
 }
