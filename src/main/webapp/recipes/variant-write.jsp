@@ -11,9 +11,6 @@
       <script type="text/javascript">
         const CONTEXT_PATH = "${pageContext.request.contextPath}";
       </script>
-      <script src="${path}/js/config.js"></script>
-      <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/seed.js"></script>
     </head>
 
     <body>

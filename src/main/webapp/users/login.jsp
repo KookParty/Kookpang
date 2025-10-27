@@ -19,11 +19,6 @@ uri="jakarta.tags.core" prefix="c" %>
     <!-- header시작 -->
     <jsp:include page="../common/header.jsp"></jsp:include>
     <!-- header끝 -->
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        initHeader(PAGE_ACTIVE);
-      });
-    </script>
 
     <main class="container page">
       <section class="card" style="max-width: 520px; margin: 80px auto; padding: 24px">
