@@ -107,19 +107,29 @@ public class CartDAOImpl implements CartDAO {
 	@Override
 	public int deleteCartByUserId(long userId) throws SQLException{
 		Connection con = null;
+		int result = 0;
+		try {
+			con = DbUtil.getConnection();
+			result = deleteCartByUserId(userId, con);
+		} finally {
+			DbUtil.dbClose(con, null);
+		}
+		return result;
+	}
+	
+	@Override
+	public int deleteCartByUserId(long userId, Connection con) throws SQLException{
 		PreparedStatement ps = null;
 		int result = 0;
 		String sql = proFile.getProperty("cart.deleteCartByUserId");
 		try {
-			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
 			ps.setLong(1, userId);
 			result = ps.executeUpdate();
 		} finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(null, ps);
 		}
 		return result;
-		
 	}
 
 	@Override
