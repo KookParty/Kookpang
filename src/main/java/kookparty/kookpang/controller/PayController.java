@@ -27,11 +27,11 @@ public class PayController implements Controller {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO) session.getAttribute("loginUser");
 		String shippingAddress = request.getParameter("address");
-
+		int usedPoint = Integer.parseInt(request.getParameter("point"));
 		JsonObject payReady = null;
 		PaymentDTO paymentDTO = null;
 		try {
-			Map<String, Object> resultMap = payService.payReady(user.getNickname(), user.getUserId());
+			Map<String, Object> resultMap = payService.payReady(user.getNickname(), user.getUserId(), usedPoint);
 			payReady = (JsonObject) resultMap.get("result");
 			paymentDTO = (PaymentDTO) resultMap.get("payment");
 			String tid = payReady.get("tid").getAsString();
@@ -58,11 +58,11 @@ public class PayController implements Controller {
 		long userId = user.getUserId();
 		String shippingAddress = (String) session.getAttribute("address");
 		int totalAmount = paymentDTO.getTotalAmount();
-		OrderDTO order = new OrderDTO(userId, paymentDTO.getTotalAmount(), paymentDTO.getDeliveryFee(), shippingAddress, null);
+		OrderDTO order = new OrderDTO(userId, paymentDTO.getTotalAmount()-paymentDTO.getUsedPoint(), paymentDTO.getDeliveryFee(), paymentDTO.getUsedPoint(), shippingAddress, null);
 		System.out.println("order : " + order);
 		long pk = 0;
 		try {
-			pk = orderService.insertOrder(order, paymentDTO);
+			pk = orderService.insertOrder(user, order, paymentDTO);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

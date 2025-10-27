@@ -35,6 +35,8 @@ public interface OrderDAO {
 	 */
 	OrderDTO selectByOrderId(long orderId) throws SQLException;
 	
+	OrderDTO selectByOrderId(long orderId, Connection con) throws SQLException;
+	
 	/**
 	 * userId로 장바구니와 유저정보를 불러오고 장바구니 id로 product정보를 불러와서
 	 * order테이블과, order-items테이블에 정보를 insert함
@@ -59,7 +61,7 @@ public interface OrderDAO {
 	 * @return
 	 * @throws SQLException 
 	 */
-	int deleteOrder(long orderId) throws SQLException;
+	int deleteOrder(Connection con, long orderId) throws SQLException;
 	
 	int insertOrderItems(Connection con, List<OrderItemDTO> list) throws SQLException;
 	

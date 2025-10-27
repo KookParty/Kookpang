@@ -11,18 +11,21 @@ import kookparty.kookpang.dao.OrderDAO;
 import kookparty.kookpang.dao.OrderDAOImpl;
 import kookparty.kookpang.dao.ProductDAO;
 import kookparty.kookpang.dao.ProductDAOImpl;
+import kookparty.kookpang.dao.UserDAO;
 import kookparty.kookpang.dto.CartDTO;
 import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.OrderItemDTO;
 import kookparty.kookpang.dto.PaymentDTO;
 import kookparty.kookpang.dto.ProductDTO;
+import kookparty.kookpang.dto.UserDTO;
 import kookparty.kookpang.util.DbUtil;
 
 public class OrderServiceImpl implements OrderService {
 	OrderDAO orderDAO = new OrderDAOImpl();
 	ProductDAO productDAO = new ProductDAOImpl();
 	CartDAO cartDAO = new CartDAOImpl();
+	UserDAO userDAO = new UserDAO();
 
 	@Override
 	public List<OrderDTO> selectByUserId(long userId) throws SQLException {
@@ -55,9 +58,12 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public long insertOrder(OrderDTO order, PaymentDTO paymentDTO) throws SQLException {
+	public long insertOrder(UserDTO user, OrderDTO order, PaymentDTO paymentDTO) throws SQLException {
 		Connection con = null;
 		long pk = 0;
+		int point = user.getPoint();
+		point = point + (order.getTotalPrice()-order.getUsedPoint())/20 - order.getUsedPoint();
+		user.setPoint(point);
 		try {
 			con = DbUtil.getConnection();
 			con.setAutoCommit(false);
@@ -75,6 +81,7 @@ public class OrderServiceImpl implements OrderService {
 			}
 			orderDAO.insertOrderItems(con, itemList);
 			cartDAO.deleteCartByUserId(order.getUserId(), con);
+			userDAO.updatePoint(user.getUserId(), user.getPoint(), con);
 			
 			con.commit();
 		} finally {
@@ -85,8 +92,22 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public int deleteOrder(long orderId) throws SQLException {
-		int result = orderDAO.deleteOrder(orderId);
+	public int deleteOrder(UserDTO user, long orderId) throws SQLException {
+		Connection con = null;
+		int result;
+		try {
+			con = DbUtil.getConnection();
+			con.setAutoCommit(false);
+			int point = user.getPoint();
+			OrderDTO order = orderDAO.selectByOrderId(orderId, con);
+			point = point + order.getUsedPoint();
+			user.setPoint(point);
+			result = orderDAO.deleteOrder(con, orderId);
+			userDAO.updatePoint(user.getUserId(), user.getPoint(), con);
+			con.commit();
+		} finally {
+			DbUtil.dbClose(con, null);
+		}
 		return result;
 	}
 

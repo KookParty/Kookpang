@@ -9,6 +9,7 @@ public class UserDTO {
     private String phone;
     private String address;
     private String role;
+    private int point;
     private int status;
 
     public long getUserId() { return userId; }
@@ -37,4 +38,13 @@ public class UserDTO {
 
     public int getStatus() { return status; }
     public void setStatus(int status) { this.status = status; }
+	
+    public int getPoint() {
+		return point;
+	}
+	public void setPoint(int point) {
+		this.point = point;
+	}
+    
+    
 }

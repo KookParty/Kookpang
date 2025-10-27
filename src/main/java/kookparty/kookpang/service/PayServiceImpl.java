@@ -37,7 +37,7 @@ public class PayServiceImpl implements PayService {
 	}
 
 	@Override
-	public Map<String, Object> payReady(String userNickName, long userId)
+	public Map<String, Object> payReady(String userNickName, long userId, int usedPoint)
 			throws SQLException, IOException {
 		Gson gson = new Gson();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -69,7 +69,7 @@ public class PayServiceImpl implements PayService {
 		body.addProperty("partner_user_id", partnerUserId);
 		body.addProperty("item_name", itemName);
 		body.addProperty("quantity", 1);
-		body.addProperty("total_amount", amount + deliveryFee);
+		body.addProperty("total_amount", amount + deliveryFee - usedPoint);
 		body.addProperty("tax_free_amount", 0);
 		body.addProperty("approval_url", "http://localhost:8080/Kookpang/ajax?key=pay&methodName=paySuccess");
 		body.addProperty("cancel_url", "http://localhost:8080/Kookpang/front?key=order&methodName=orderPage");
@@ -83,7 +83,7 @@ public class PayServiceImpl implements PayService {
 		String result = new BufferedReader(new InputStreamReader(is)).lines().collect(Collectors.joining());
 		System.out.println(result);
 		JsonObject kakaoRes = gson.fromJson(result, JsonObject.class);
-		PaymentDTO paymentDTO = new PaymentDTO(itemName, cid, partnerOrderId, partnerUserId, amount, deliveryFee);
+		PaymentDTO paymentDTO = new PaymentDTO(itemName, cid, partnerOrderId, partnerUserId, amount, deliveryFee, usedPoint);
 		resultMap.put("payment", paymentDTO);
 		resultMap.put("result", kakaoRes);
 		return resultMap;

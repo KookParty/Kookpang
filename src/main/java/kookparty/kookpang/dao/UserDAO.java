@@ -62,7 +62,7 @@ public class UserDAO {
     /** 로그인: 이메일 + 비밀번호 + 활성회원(status=1) */
     public Optional<UserDTO> findByEmailAndPassword(String email, String password) {
         String sql = """
-            SELECT user_id, email, name, nickname, phone, address, role, status
+            SELECT user_id, email, name, nickname, phone, address, role, point, status
             FROM users
             WHERE email=? AND password=? AND status=1
         """;
@@ -80,6 +80,7 @@ public class UserDAO {
                 u.setPhone(rs.getString("phone"));
                 u.setAddress(rs.getString("address"));
                 u.setRole(rs.getString("role"));
+                u.setPoint(rs.getInt("point"));
                 u.setStatus(rs.getInt("status"));
                 return Optional.of(u);
             }
@@ -149,5 +150,16 @@ public class UserDAO {
             ps.setLong(2, userId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) { throw new RuntimeException(e); }
+    }
+    
+    public int updatePoint(long userId, int point, Connection con) {
+    	String sql = "update users set point=? where user_id=?";
+    	int result = 0;
+    	try (PreparedStatement ps = con.prepareStatement(sql)) {
+               ps.setInt(1, point);
+               ps.setLong(2, userId);
+               result = ps.executeUpdate();
+           } catch (SQLException e) { throw new RuntimeException(e); }
+    	return result;
     }
 }

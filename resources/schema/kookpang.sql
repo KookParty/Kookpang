@@ -10,6 +10,7 @@ create table users(
     phone varchar(30) not null unique, -- 전화번호
     address varchar(200), -- 주소
     role enum("admin","user") not null, -- 권한
+    point int default 2000,
     status tinyint not null default 1, -- 회원상태(활동중, 탈퇴)
     created_at datetime not null default now(), -- 가입일
     CONSTRAINT chk_email_format CHECK (
@@ -119,6 +120,7 @@ create table orders(
     created_at datetime not null default now(),
     total_price int not null,
     delivery_fee int not null,
+    used_point int default 0,
     shipping_address varchar(200) not null,
     order_name varchar(40),
     cid varchar(30),

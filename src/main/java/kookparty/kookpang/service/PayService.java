@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kookparty.kookpang.dto.PaymentDTO;
 
 public interface PayService {
-	Map<String, Object> payReady(String userNickName, long user_id) throws SQLException, MalformedURLException, IOException;
+	Map<String, Object> payReady(String userNickName, long user_id, int usedPoint) throws SQLException, MalformedURLException, IOException;
 	
 	void payApprove(PaymentDTO paymentDTO) throws IOException;
 }
