@@ -199,6 +199,18 @@
         color: #9ca3af;
         font-size: 12px;
       }
+      /* 상태 배지 */
+      .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-left: 8px;
+      }
+      .status-paid { background: #DCFCE7; color: #064E3B; }
+      .status-cancel { background: #FEE2E2; color: #991B1B; }
+      .status-default { background: #E5E7EB; color: #111; }
       </style>
     </head>
 
@@ -357,18 +369,17 @@
         displayLikedRecipes(result);
     	  
     	  
-        //const [posts, orders] = await Promise.all([
-        const [posts] = await Promise.all([
+        const [posts, orders] = await Promise.all([
           fetch(BASE + '/ajax?key=mypage&methodName=getMyPosts&page=1&size=10', {
             credentials: 'include'
           }).then(r => r.json()),
-          //fetch(BASE + '/ajax?key=mypage&methodName=getMyOrders', {
-          //  credentials: 'include'
-          //}).then(r => r.json())
+          fetch(BASE + '/ajax?key=mypage&methodName=getMyOrders', {
+            credentials: 'include'
+          }).then(r => r.json())
         ]);
 
         if (posts.ok) displayMyPosts(posts.posts, posts.total);
-        //if (orders.ok) displayMyOrders(orders.orders);
+        if (orders && orders.ok) displayMyOrders(orders.orders);
         
         
       } catch (err) {
@@ -436,20 +447,6 @@
     	  </div>`;
       });
       container.innerHTML += str;
-      
-      /*
-      container.innerHTML = recipes.map(r => 
-        '<div class="card tile recipe-card" onclick="location.href=\'' + BASE + '/recipes/recipe-detail.jsp?recipeId=' + r.recipeId + '\'">' +
-          '<div class="thumb">' +
-            '<img src="' + (r.imageUrl || 'https://via.placeholder.com/300x200') + '" alt="' + escapeHtml(r.title) + '" />' +
-          '</div>' +
-          '<div class="body">' +
-            '<div class="title" style="font-weight:700;">' + escapeHtml(r.title) + '</div>' +
-            '<div class="muted">' + escapeHtml(r.description || '') + '</div>' +
-          '</div>' +
-        '</div>'
-      ).join('');
-      */
     }
 
     // 주문 내역 표시
@@ -462,19 +459,42 @@
         return;
       }
 
-      container.innerHTML = orders.map(o => 
-        '<div class="order-item">' +
+      container.innerHTML = orders.map(o => {
+    	const subtotal = Number(o.totalPrice || 0);
+        const delivery = Number(o.deliveryFee || 0);
+        const totalWithDelivery = subtotal + delivery;
+
+        const rawStatus = o.status;
+        let statusClass = 'status-default';
+        let statusLabel = '';
+        if (rawStatus === true) {
+          statusClass = 'status-paid';
+          statusLabel = '결제완료';
+        } else if (rawStatus === false) {
+          statusClass = 'status-cancel';
+          statusLabel = '취소';
+        } else if (typeof rawStatus === 'string' && rawStatus.trim() !== '') {
+          
+          const s = rawStatus.toString().toLowerCase();
+          if (s.indexOf('paid') !== -1 || s.indexOf('결제') !== -1) { statusClass = 'status-paid'; statusLabel = '결제완료'; }
+          else if (s.indexOf('cancel') !== -1 || s.indexOf('취소') !== -1) { statusClass = 'status-cancel'; statusLabel = '취소'; }
+          else { statusLabel = rawStatus; }
+        }
+
+        if (!statusLabel) statusLabel = rawStatus ? '결제완료' : '취소';
+
+        return '<div class="order-item">' +
           '<div class="order-left">' +
-            '<div class="order-title">주문번호 ' + o.orderId + '</div>' +
+            '<div class="order-title">주문번호 ' + o.orderId + '<span class="status-badge ' + statusClass + '">' + statusLabel + '</span>' + '</div>' +
             '<div class="order-meta">' +
-              '합계 ' + Number(o.totalPrice).toLocaleString() + '원 · ' + formatDate(o.createdAt) +
+              '합계 ' + Number(totalWithDelivery).toLocaleString() + '원 · ' + formatDate(o.createdAt) +
             '</div>' +
           '</div>' +
           '<div class="order-right">' +
-            '<a class="link" href="' + BASE + '/orders/order-detail.jsp?orderId=' + o.orderId + '">상세 보기</a>' +
+            '<a class="link" href="' + BASE + '/front?key=order&methodName=orderResult&order_id=' + o.orderId + '">상세 보기</a>' +
           '</div>' +
-        '</div>'
-      ).join('');
+        '</div>';
+      }).join('');
     }
 
     // 프로필 수정 모달 열기
