@@ -284,9 +284,9 @@
         
         <div style="flex: 1">
           <div class="title">${recipe.title}</div>
-          <div class="meta"><span>${recipe.category}</span><span>${recipe.way}</span><span>❤️ 좋아요수TODO</span></div>
+          <div class="meta"><span>${recipe.category}</span><span>${recipe.way}</span><span>❤️</span><span id="likeCnt">${recipe.likeCnt}</span></div>
           <div class="row" style="gap: 8px; margin-top: 8px">
-            <button class="btn" id="likeBtn" style="padding: 8px 12px">♡ 좋아요</button>
+            <button class="btn" id="likeBtn" style="padding: 8px 12px">${likeStatus ? "❤️" : "🤍"} 좋아요</button>
             <c:if test="${recipe.recipeType.toString().toLowerCase() == 'base'}">
               <button class="btn" id="writeBtn" style="padding: 8px 12px; background: #eef1f4; color: #111">
                 + 변형 레시피 추가
@@ -373,7 +373,16 @@
           <c:otherwise>
             <ol style="display: flex; flex-direction: column; gap: 12px;">
               <c:forEach items="${recipe.steps}" var="stepDTO">
-                <img src="${stepDTO.imageUrl}" alt="${stepDTO.description}" />
+              
+                <c:choose>
+		          <c:when test="${stepDTO.imageUrl != null and stepDTO.imageUrl.substring(0,2) == '..'}">
+		            <img src="${path}/${stepDTO.imageUrl}" alt="thumbnail" />
+		          </c:when>
+		          <c:otherwise>
+		            <img src="${stepDTO.imageUrl}" alt="thumbnail" />
+		          </c:otherwise>
+		        </c:choose>
+		        
                 <li>${stepDTO.description}</li>
               </c:forEach>
             </ol>
@@ -478,13 +487,6 @@
           if (panel) panel.classList.add("active");
         });
 
-        // Like
-        const likeBtn = document.querySelector("#likeBtn");
-        likeBtn?.addEventListener("click", () => {
-          likeBtn.classList.toggle("active");
-          likeBtn.textContent = likeBtn.classList.contains("active") ? "❤️ 좋아요" : "♡ 좋아요";
-        });
-
         // Checkboxes -> sum
         document.addEventListener("change", (e) => {
           if (e.target.matches(".ing [type=checkbox]")) sum();
@@ -540,9 +542,9 @@
               // 이미지가 있을 때만 img 태그
               if (review.imageUrl) {
                 if (review.imageUrl.substring(0,2) == '..')
-                  str += `<img src="${path}/${review.imageUrl}" alt="thumbnail"/>`;
+                  str += `<img src="${path}/${"${review.imageUrl}"}" alt="thumbnail"/>`;
                 else
-                  str += `<img src="${review.imageUrl}" alt="thumbnail"/>`;
+                  str += `<img src="${"${review.imageUrl}"}" alt="thumbnail"/>`;
               }
               str += `
                 <div class="rv">
@@ -562,6 +564,39 @@
         }
       };
 
+      // insert recipe
+      const writeBtn = document.querySelector("#writeBtn");
+      writeBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        location.href = "${path}/front?key=recipe&methodName=variantWrite&parentId=${recipe.recipeId}";
+      });
+      
+      // delete recipe
+      const deleteBtn = document.querySelector("#deleteBtn");
+      deleteBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (confirm("정말 레시피를 삭제하시겠습니까?")) {
+          location.href = "${path}/front?key=recipe&methodName=deleteRecipe&recipeId=${recipe.recipeId}";      	  
+        }
+      });
+
+      // 평점
+      const rating = document.querySelector("#rating");
+      const starBtns = rating.querySelectorAll("button");
+      
+      starBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const value = btn.dataset.star;
+          rating.dataset.rating = value;	// 평점 세팅
+          
+          starBtns.forEach(b => {
+            b.textContent = b.dataset.star <= value ? "★" : "☆";	// 별 색깔 바꾸기
+          })
+        })
+      });
+      
+      
+      /* 변형 레시피 작성 */
       // insert review
       const insertReviewBtn = document.querySelector("#insertReviewBtn");
       insertReviewBtn?.addEventListener("click", async (e) => {
@@ -629,39 +664,53 @@
           
 	    printReviews();
       }
-              
-      // insert recipe
-      const writeBtn = document.querySelector("#writeBtn");
-      writeBtn?.addEventListener("click", (e) => {
-        e.preventDefault();
-        location.href = "${path}/front?key=recipe&methodName=variantWrite&parentId=${recipe.recipeId}";
-      });
       
-      // delete recipe
-      const deleteBtn = document.querySelector("#deleteBtn");
-      deleteBtn?.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (confirm("정말 레시피를 삭제하시겠습니까?")) {
-          location.href = "${path}/front?key=recipe&methodName=deleteRecipe&recipeId=${recipe.recipeId}";      	  
+      
+      /* 좋아요 */
+      const likeBtn = document.querySelector("#likeBtn");
+      const likeCntEl = document.querySelector("#likeCnt");
+      likeBtn?.addEventListener("click", async () => {
+        let count = parseInt(likeCntEl.textContent);
+    	  
+        // UI 반영
+        if (likeBtn.classList.contains("active")) {
+          likeBtn.textContent = "🤍 좋아요";
+          likeCntEl.textContent = count - 1;
+        } else {
+          likeBtn.textContent = "❤️ 좋아요";
+          likeCntEl.textContent = count + 1;
+        }
+        likeBtn.classList.toggle("active");
+        
+        // 서버에 좋아요 등록/삭제
+        try {
+         const response = await fetch(CONTEXT_PATH + "/ajax", {
+           method: "POST",
+           body: new URLSearchParams({
+             key: "like",
+   		     methodName: "toggleLike",
+             targetType: "RECIPE",
+             targetId: recipeId,
+           }),
+         });
+         
+         if (response.status === 401) {
+        	 alert("로그인이 필요합니다.");
+        	 location.href = CONTEXT_PATH + "/front?key=user&methodName=loginForm";
+        	 return;
+         }
+         
+         if (!response.ok) {
+           throw new Error("서버 응답 에러: " + response.status);
+         }
+         
+        } catch (err) {
+       	   console.error("좋아요 토글 실패: " + err);
         }
       });
-
-      // 평점
-      const rating = document.querySelector("#rating");
-      const starBtns = rating.querySelectorAll("button");
       
-      starBtns.forEach(btn => {
-        btn.addEventListener("click", () => {
-          const value = btn.dataset.star;
-          rating.dataset.rating = value;	// 평점 세팅
-          
-          starBtns.forEach(b => {
-            b.textContent = b.dataset.star <= value ? "★" : "☆";	// 별 색깔 바꾸기
-          })
-        })
-      });
-
-
+      
+      
 
       /* 장바구니 */
       // Add to cart // Ajax로 insertCart

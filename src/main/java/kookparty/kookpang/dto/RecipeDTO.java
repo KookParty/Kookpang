@@ -27,6 +27,8 @@ public class RecipeDTO {
 	private long parentRecipeId;
 	private String createdAt;
 	
+	private int likeCnt;
+	
 	private List<IngredientDTO> ingredients;
 	private List<StepDTO> steps;
 	
@@ -34,7 +36,7 @@ public class RecipeDTO {
 	
 	/**
 	 * 회원의 변형 레시피 등록 시
-	 * recipeType: RecipeType.VARIANT
+	 * recipeType: RecipeType.VARIANT 고정
 	 */
 	public RecipeDTO(long userId, String title, String description, String thumbnailUrl, String way, String category,
 			long parentRecipeId) {
@@ -47,13 +49,12 @@ public class RecipeDTO {
 		this.category = category;
 		this.parentRecipeId = parentRecipeId;
 	}
-
+	
 	/**
-	 * ingredients와 steps 없는 생성자
+	 * 기본/변형 레시피 등록 시 (관리자용)
 	 */
-	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl,
-			RecipeType recipeType, String way, String category, long parentRecipeId, String createdAt) {
-		this.recipeId = recipeId;
+	public RecipeDTO(long userId, String title, String description, String thumbnailUrl, RecipeType recipeType,
+			String way, String category, long parentRecipeId) {
 		this.userId = userId;
 		this.title = title;
 		this.description = description;
@@ -62,18 +63,29 @@ public class RecipeDTO {
 		this.way = way;
 		this.category = category;
 		this.parentRecipeId = parentRecipeId;
-		this.createdAt = createdAt;
 	}
 	
 	/**
-	 * 모든 멤버필드 들어간 생성자
+	 * ingredients와 steps 없는 생성자 (등록 시)
+	 */
+	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl,
+			RecipeType recipeType, String way, String category, long parentRecipeId, String createdAt) {
+		this(userId, title, description, thumbnailUrl, recipeType, way, category, parentRecipeId);
+		this.recipeId = recipeId;
+		this.createdAt = createdAt;
+	}
+	
+
+	/**
+	 * 모든 멤버필드 들어간 생성자 (좋아요 포함)
 	 */
 	public RecipeDTO(long recipeId, long userId, String title, String description, String thumbnailUrl,
 			RecipeType recipeType, String way, String category, long parentRecipeId, String createdAt,
-			List<IngredientDTO> ingredients, List<StepDTO> steps) {
+			List<IngredientDTO> ingredients, List<StepDTO> steps,  int likeCnt) {
 		this(recipeId, userId, title, description, thumbnailUrl, recipeType, way, category, parentRecipeId, createdAt);
 		this.ingredients = ingredients;
 		this.steps = steps;
+		this.likeCnt = likeCnt;
 	}
 
 	public long getRecipeId() {
@@ -171,6 +183,14 @@ public class RecipeDTO {
 	
 	public void setSteps(List<StepDTO> steps) {
 		this.steps = steps;
+	}
+	
+	public int getLikeCnt() {
+		return likeCnt;
+	}
+
+	public void setLikeCnt(int likeCnt) {
+		this.likeCnt = likeCnt;
 	}
 
 	@Override

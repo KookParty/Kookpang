@@ -7,6 +7,28 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>레시피</title>
     <link rel="stylesheet" href="${path}/css/styles.css" />
+    <style>
+      .card.tile {
+	    display: flex;
+        flex-direction: column;
+        height: 100%; /* 카드 전체 높이 일정하게 */
+      }
+		
+      .card.tile .body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* 내용과 bottom을 위아래로 배치 */
+        flex-grow: 1;
+        padding: 12px;
+      }
+		
+      .card.tile .bottom {
+        margin-top: auto; /* body 안에서 맨 아래로 */
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+    </style>
     <script type="text/javascript">
       const CONTEXT_PATH = "${pageContext.request.contextPath}";
     </script>
@@ -100,10 +122,11 @@
                 </div>
                 <h3 style="margin: 8px 0">${"${recipe.RCP_NM}"}</h3>
                 <p class="small">${"${recipe.RCP_NA_TIP}"}</p>
-                <div class="meta">${"${recipe.RCP_PAT2}"} · ${"${recipe.RCP_WAY2}"} · ❤ 좋아요수TODO</div>
+                <div class="bottom">
+                <div class="meta">${"${recipe.RCP_PAT2}"} · ${"${recipe.RCP_WAY2}"} · ❤ ${"${recipe.likeCnt}"}</div>
                 <div style="display: flex; gap: 8px; align-items: center">
                   <a class="btn dark full" href='${path}/front?key=recipe&methodName=recipeDetail&recipeId=${"${recipe.recipeId}"}'>레시피 보기</a>
-                  <button class="btn small" data-like="${"${recipe.recipeId}"}">♡</button>
+                </div>
                 </div>
               </div>
             </article>`;
@@ -163,34 +186,5 @@
       }
       
     </script>
-    <!--
-      <script>
-        const likes = new Set(S.get(KP_KEYS.LIKES, [])), list = document.getElementById('list');
-        RECIPES.forEach(r => {
-          const el = document.createElement('article');
-          el.className = 'card tile';
-          el.innerHTML = `
-          <div class="thumb">
-            <img src='../${"${r.img}"}''>
-          </div>
-          <div class="body">
-            <div class="meta">
-              <span class="label">${"${r.label}"}</span>
-              <span class="label" style="background:#10b981">${"${r.difficulty}"}</span>
-            </div>
-            <h3 style="margin:8px 0">${"${r.title}"}</h3>
-            <p class="small">${"${r.desc}"}</p>
-            <div class="meta">⏱️ ${"${r.time}"} · 👥 ${"${r.serves}"} · ❤ ${"${r.likes}"}</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <a class="btn dark full" href="recipe-detail.jsp?id=${"${r.id}"}">레시피 보기</a>
-              <button class="btn" style="margin-left:8px" data-add-recipe='${"${r.id}"}'>담기</button>
-              <button class="btn small" data-like='${"${r.id}"}'>${"${likes.has(r.id) ? '♥' : '♡'}"}</button>
-            </div>
-          </div>`;
-          list.appendChild(el);
-        });
-        document.addEventListener('click', e => { const id = e.target?.dataset?.like; if (!id) return; const arr = S.get(KP_KEYS.LIKES, []); const i = arr.indexOf(id); if (i >= 0) { arr.splice(i, 1); e.target.textContent = '♡' } else { arr.push(id); e.target.textContent = '♥' } S.set(KP_KEYS.LIKES, arr) });
-      </script>
-      -->
   </body>
 </html>
