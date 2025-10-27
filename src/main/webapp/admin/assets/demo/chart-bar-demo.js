@@ -1,46 +1,67 @@
 // Set new default font family and font color to mimic Bootstrap's default styling
-Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-Chart.defaults.global.defaultFontColor = '#292b2c';
+Chart.defaults.global.defaultFontFamily =
+  '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+Chart.defaults.global.defaultFontColor = "#292b2c";
 
 // Bar Chart Example
-var ctx = document.getElementById("myBarChart");
-var myLineChart = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: ["January", "February", "March", "April", "May", "June"],
-    datasets: [{
-      label: "Revenue",
-      backgroundColor: "rgba(2,117,216,1)",
-      borderColor: "rgba(2,117,216,1)",
-      data: [4215, 5312, 6251, 7841, 9821, 14984],
-    }],
-  },
-  options: {
-    scales: {
-      xAxes: [{
-        time: {
-          unit: 'month'
+var ctx2 = document.getElementById("myBarChart");
+
+const getBestItems = async () => {
+  try {
+    const response = await fetch(path + "/ajax?key=admin&methodName=getBestItems", {
+      method: "GET",
+    });
+    const result = await response.json();
+
+    const labels = result.chartLabels;
+    const data = result.chartDatas;
+
+    await new Chart(ctx2, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Revenue",
+            backgroundColor: "rgba(2,117,216,1)",
+            borderColor: "rgba(2,117,216,1)",
+            data: data,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          xAxes: [
+            {
+              gridLines: {
+                display: false,
+              },
+              ticks: {
+                autoSkip: false,
+              },
+            },
+          ],
+          yAxes: [
+            {
+              ticks: {
+                min: 0,
+                max: Math.max(...data) + 1,
+                maxTicksLimit: 5,
+              },
+              gridLines: {
+                display: true,
+              },
+            },
+          ],
         },
-        gridLines: {
-          display: false
+        legend: {
+          display: false,
         },
-        ticks: {
-          maxTicksLimit: 6
-        }
-      }],
-      yAxes: [{
-        ticks: {
-          min: 0,
-          max: 15000,
-          maxTicksLimit: 5
-        },
-        gridLines: {
-          display: true
-        }
-      }],
-    },
-    legend: {
-      display: false
-    }
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching best items:", error);
   }
-});
+};
+
+getBestItems();

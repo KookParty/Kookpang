@@ -48,6 +48,8 @@ public interface CartDAO {
 	 */
 	int deleteCartByUserId(long userId) throws SQLException;
 	
+	int deleteCartByUserId(long userId, Connection con) throws SQLException;
+	
 	/**
 	 * 장바구니 물품 수량 수정
 	 * @param cartDTO

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.OrderItemDTO;
 import kookparty.kookpang.dto.PaymentDTO;
@@ -61,4 +62,8 @@ public interface OrderDAO {
 	int deleteOrder(long orderId) throws SQLException;
 	
 	int insertOrderItems(Connection con, List<OrderItemDTO> list) throws SQLException;
+	
+	public ChartDataDTO getDailySales() throws SQLException;
+	
+	public ChartDataDTO getBestItems() throws SQLException;
 }

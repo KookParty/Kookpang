@@ -2,7 +2,9 @@ package kookparty.kookpang.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
+import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.OrderDTO;
 import kookparty.kookpang.dto.PaymentDTO;
 
@@ -53,4 +55,18 @@ public interface OrderService {
 	 * @return
 	 */
 	int deleteOrder(long orderId) throws SQLException;
+	
+	/**
+	 * chart.js용. 일주일간의 일별 매출 가지고 오기
+	 * @return
+	 * @throws SQLException
+	 */
+	ChartDataDTO getDailySales() throws SQLException;
+	
+	/**
+	 * chart.js용. 가장 많이 팔린 상품 10가지의 이름과 팔린 개수 구해오기
+	 * @return
+	 * @throws SQLException
+	 */
+	ChartDataDTO getBestItems() throws SQLException;
 }
