@@ -44,6 +44,7 @@ public class OrderController implements Controller {
 		HttpSession session = request.getSession();
 		UserDTO user = (UserDTO)session.getAttribute("loginUser");
 		long userId = user.getUserId();
+		
 		return null;
 	}
 	
