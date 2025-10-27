@@ -9,6 +9,7 @@ import kookparty.kookpang.dto.BoardDTO;
 import kookparty.kookpang.dto.BoardDTO.Image;
 import kookparty.kookpang.dto.BoardDTO.Comment;
 import kookparty.kookpang.dto.UserDTO;
+import kookparty.kookpang.util.FilePath;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -287,50 +288,22 @@ public class BoardController implements Controller {
         return Map.of("ok", ok, "comments", mapComments(dao.listComments(postId)));
     }
 
-    /** POST /ajax?key=board&methodName=uploadImage  (multipart file upload via front controller) */
-    /** POST /ajax?key=board&methodName=uploadImage  (multipart file upload via front controller) */
     public Object uploadImage(HttpServletRequest req, HttpServletResponse resp){
-        try {
-            // === 아주 간단한 프린트 디버깅 ===
-            System.out.println("==== [uploadImage] ====");
-            System.out.println("Content-Type: " + req.getContentType());
+        try{
+            Part part = req.getPart("file");
+            if(part == null || part.getSize() == 0) return Map.of("ok", false, "error", "no-file");
 
-            Part filePart = req.getPart("file");
-            System.out.println("filePart = " + filePart);
-            if (filePart != null) {
-                System.out.println("name=" + filePart.getName());
-                System.out.println("filename=" + filePart.getSubmittedFileName());
-                System.out.println("size=" + filePart.getSize());
-                System.out.println("contentType=" + filePart.getContentType());
-            } else {
-                System.out.println("filePart가 null 입니다. (name=\"file\" 파트를 못 찾음)");
-            }
-            System.out.println("=======================");
-            // ===============================
+            String fileName = part.getSubmittedFileName();
+            fileName = Paths.get(fileName).getFileName().toString();
+            fileName = UUID.randomUUID().toString() + "_" + fileName;
 
-            if (filePart == null) return Map.of("ok", false, "msg", "no-file");
+            String savePath = FilePath.getSavePath(req, "board_upload");
+            String saveUrl = savePath + "/" + fileName;
+            part.write(saveUrl);
 
-            String submitted = filePart.getSubmittedFileName();
-            String ext = "";
-            if (submitted != null && submitted.contains(".")) {
-                ext = submitted.substring(submitted.lastIndexOf('.'));
-            }
-
-            String uploads = req.getServletContext().getRealPath("/uploads");
-            Path up = Paths.get(uploads);
-            if (!Files.exists(up)) Files.createDirectories(up);
-
-            String newName = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 6) + ext;
-            Path target = up.resolve(newName);
-
-            try (InputStream in = filePart.getInputStream()) {
-                Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            String url = req.getContextPath() + "/uploads/" + newName;
-            return Map.of("ok", true, "url", url);
-
-        } catch (Exception e) {
+            String imageUrl = "../board_upload/" + fileName;
+            return Map.of("ok", true, "url", imageUrl);
+        }catch(Exception e){
             e.printStackTrace();
             return Map.of("ok", false, "msg", e.getClass().getName() + ":" + e.getMessage());
         }
