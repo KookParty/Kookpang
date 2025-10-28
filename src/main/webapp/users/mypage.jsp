@@ -236,6 +236,8 @@
           <button class="btn edit-profile" onclick="openEditModal()">정보수정</button>
           <button class="btn logout" onclick="handleLogout()">로그아웃</button>
             </div>
+            <!-- admin button placeholder: shown only when current user role is 'admin' -->
+            <div id="admin-area" style="margin-top:8px;text-align:center"></div>
           </aside>
 
           <!-- 오른쪽: 콘텐츠 -->
@@ -400,6 +402,18 @@
       if (pointElement) {
         pointElement.textContent = (data.point || 0).toLocaleString();
       }
+
+      // 관리자 버튼 표시 (role이 'admin'일 때만)
+      try {
+        const adminArea = document.getElementById('admin-area');
+      if (adminArea) {
+          if ((data.role || '').toString().toLowerCase() === 'admin') {
+            adminArea.innerHTML = '<a class="btn" id="adminBtn" href="' + BASE + '/front?key=admin&methodName=adminPage">관리자 페이지</a>';
+          } else {
+            adminArea.innerHTML = '';
+          }
+        }
+      } catch (e) { console.error(e); }
     }
 
     // 내가 작성한 게시글 표시

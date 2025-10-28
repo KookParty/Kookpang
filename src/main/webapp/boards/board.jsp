@@ -103,8 +103,8 @@
       function renderPinned(rows){
         if(!$pinned) return;
         if(!rows||!rows.length){ $pinned.innerHTML=''; $pinned.style.display='none'; return; }
-        var html='';
-        html += '<div class="kp-pinned-header"><div style="font-weight:600">공지사항</div></div>';
+  var html='';
+  html += '<div class="kp-pinned-header"><div style="font-weight:600">📢공지사항</div></div>';
         for(var i=0;i<rows.length;i++){
           var r=rows[i];
           html+=
