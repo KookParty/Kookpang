@@ -205,6 +205,7 @@ public class AdminController implements Controller {
 		
 		try {
 			int result = recipeService.insertRecipe(recipeDTO);
+			System.out.println("recipe: " + recipeDTO);
 			if(result == 0) {
 				request.setAttribute("errMsg", "레시피가 등록되지 않았습니다.");
 				return new ModelAndView("/common/error.jsp");
@@ -226,7 +227,7 @@ public class AdminController implements Controller {
 		try {
 			Part part = request.getPart("image");
 			String fileName = part.getSubmittedFileName();
-			fileName = Paths.get(fileName).getFileName().toString();
+			fileName = UUID.randomUUID() + Paths.get(fileName).getFileName().toString();
 			String savePath = FilePath.getSavePath(request, "recipe_image");
 			
 			if(fileName!=null) {
@@ -261,6 +262,6 @@ public class AdminController implements Controller {
 			return new ModelAndView("/common/error.jsp");
 		}
 		
-		return new ModelAndView(contextPath + "/front?key=admin&methodName=productList", true);
+		return new ModelAndView(contextPath + "/front?key=admin&methodName=recipeList", true);
 	}
 }

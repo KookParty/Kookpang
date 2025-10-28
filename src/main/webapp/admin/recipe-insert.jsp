@@ -204,10 +204,44 @@ uri="jakarta.tags.core" prefix="c" %>
         box.style.marginTop = '8px';
         box.innerHTML = `<b class="small">단계 ${"${i}"}</b>
           <div class="form-row"><textarea class="step-text form-control" rows="3" placeholder="이 단계의 조리 방법을 자세히 설명해주세요"></textarea></div>
-          <div class="row"><input type="file" name="stepImg${"${i}"}" class="form-control" placeholder="이미지 URL을 입력해주세요" style="flex:1"></div>`;
+          <div class="row"><input type="file" class="form-control" onchange="getImgUrl(this, ${"${i}"})" placeholder="이미지 URL을 입력해주세요"></div>
+          <input type="hidden" id="stepImg${"${i}"}" />`;
         document.getElementById('steps').appendChild(box);
       }
       document.getElementById('addStep').onclick = addStep;
+      
+      const getImgUrl = function (input, i) {
+        const file = input.files[0];
+        console.log(file);
+        let imgUrl = "";
+        async function uploadStepImage(file) {
+          const formData = new FormData();
+          formData.append("image", file);
+
+          try {
+            const response = await fetch("${path}/ajax?key=admin&methodName=uploadRecipeImage", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!response.ok) {
+              throw new Error("이미지 업로드 실패");
+            }
+
+            const data = await response.json();
+            imgUrl = data;
+            console.log("Uploaded Image URL:", imgUrl);
+            document.getElementById("stepImg" + i).value = imgUrl;
+          } catch (error) {
+            console.error("Error uploading image:", error);
+            alert("이미지 업로드 중 오류가 발생했습니다.");
+            return null;
+          }
+        }
+        if (file) {
+          uploadStepImage(file);
+        }
+      };
       
       // form 제출
       function submitForm() {
@@ -220,7 +254,7 @@ uri="jakarta.tags.core" prefix="c" %>
         // 조리법 배열을 JSON 문자열로 변환
         const steps = Array.from(document.querySelectorAll('.step-text')).map((el, i) => ({
       	  description: el.value,
-      	  imageUrl: document.querySelector(`.step-img:nth-of-type(${i + 1})`)?.value || ''
+      	  imageUrl: document.querySelector(`#stepImg${i + 1}`)?.value || ''
         }));
 
         document.getElementById('ingredientsInput').value = JSON.stringify(ingredients);

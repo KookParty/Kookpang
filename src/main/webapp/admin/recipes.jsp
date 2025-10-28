@@ -93,6 +93,21 @@
       <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
         crossorigin="anonymous"></script>
       <script src="${path}/admin/js/datatables-simple-demo.js"></script>
+      <script>
+        const form = document.getElementById('deleteForm');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const selectedItems = form.elements['selectedItems'];
+        deleteBtn.addEventListener('click', function () {
+            if (selectedItems.length === 0) {
+                alert('삭제할 항목을 선택하세요.');
+                return;
+            }
+
+            if (confirm('선택한 항목을 삭제하시겠습니까?')) {
+                form.submit();
+            }
+        });
+    </script>
     </body>
 
     </html>
