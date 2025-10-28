@@ -13,9 +13,7 @@
       </script>
       <script src="${path}/js/config.js"></script>
       <script>const PAGE_ACTIVE = 'order'</script>
-      <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/data.js"></script>
-      <script src="${path}/js/seed.js"></script>
+
     </head>
 
     <body>
