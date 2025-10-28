@@ -1,6 +1,5 @@
 package kookparty.kookpang.controller;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import jakarta.servlet.ServletException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.Part;
 import kookparty.kookpang.dao.BoardDAO;
 import kookparty.kookpang.dto.BoardDTO;
 import kookparty.kookpang.dto.ChartDataDTO;
+import kookparty.kookpang.dto.IngredientDTO;
 import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.dto.UserDTO;
@@ -159,6 +161,7 @@ public class AdminController implements Controller {
 	}
 	
 	
+	/* 레시피 */
 	public ModelAndView recipeList(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			List<RecipeDTO> list = recipeService.selectByOptions(null, null, null, 0);

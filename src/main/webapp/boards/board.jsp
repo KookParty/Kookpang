@@ -12,14 +12,22 @@
   <script src="${path}/js/config.js"></script>
   <script src="${path}/js/app.js"></script>
   <style>
-    /* pinned notices stay visible while scrolling on desktop */
-    #kp-board-pinned { position: sticky; top:72px; z-index:1200; }
-    #kp-board-pinned .card.pinned { margin-bottom:8px; padding:12px; border-radius:8px; max-width:720px; border:2px solid #f5c542; background:#fffbe6 }
+  /* pinned notices: do NOT follow scroll (static) and match search width */
+  #kp-board-pinned { position: static; z-index:1200; }
+  #kp-board-pinned .card.pinned { width:100%; max-width:none; margin-bottom:12px; padding:16px; border-radius:8px; border:2px solid #f5c542; background:#fffbe6 }
     #kp-board-pinned .card.pinned h3{ font-size:18px; margin:0 }
     #kp-board-pinned .card.pinned .small{ font-size:13px }
     #kp-board-pinned .kp-pinned-header{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px }
-    /* small screens: disable sticky to avoid layout issues */
+    /* small screens: already static, keep same behavior */
     @media (max-width: 720px){ #kp-board-pinned { position: static; } }
+
+    /* inner wrapper to align pinned + search + actions */
+    .kp-board-inner{ max-width:1100px; margin:0 auto; padding:0 12px }
+    .board-controls{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px }
+    .board-controls .search-wrap{ flex:1; min-width:200px }
+    .board-controls .search-wrap .input{ width:100%; box-sizing:border-box }
+    .board-controls .actions{ display:flex; gap:8px; align-items:center; position:relative }
+    @media (max-width:720px){ .board-controls{ flex-direction:column; align-items:stretch } .board-controls .actions{ justify-content:flex-end } }
   </style>
 </head>
 <body>
@@ -27,28 +35,34 @@
   <script>document.addEventListener('DOMContentLoaded',()=>{ if(typeof initHeader==='function') initHeader('board'); });</script>
 
   <main class="container page">
-    <h2>자유게시판</h2>
-    <p class="small">요리 팁과 경험을 나누어보세요</p>
+  <h2 style="text-align:center; font-size:28px; font-weight:800; margin-bottom:8px">자유게시판</h2>
+  <p class="small" style="text-align:center">요리 팁과 경험을 나누어보세요</p>
 
-    <div class="form-row">
-      <input class="input" id="kp-board-search" placeholder="게시글을 검색하세요...">
-    </div>
+    <!-- pinned notices + controls aligned inside .kp-board-inner -->
+    <div class="kp-board-inner" style="margin-top:12px">
+      <section id="kp-board-pinned" class="grid" style="display:none"></section>
 
-    <div style="display:flex;justify-content:flex-end;position:relative">
-      <div class="kp-sort">
-        <button class="btn" id="kp-sort-btn">최신순 ▾</button>
-        <div id="kp-sort-menu" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid #ddd;padding:6px;box-shadow:0 2px 6px rgba(0,0,0,.08)">
-          <button class="btn" data-sort="latest">최신순</button>
-          <button class="btn" data-sort="views">조회순</button>
-          <button class="btn" data-sort="likes">좋아요순</button>
+      <div class="board-controls">
+        <div class="search-wrap">
+          <input class="input" id="kp-board-search" placeholder="게시글을 검색하세요..." value="${param.query != null? param.query: ''}">
+        </div>
+        <div class="actions">
+          <div class="kp-sort">
+            <button class="btn" id="kp-sort-btn">최신순 ▾</button>
+            <div id="kp-sort-menu" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid #ddd;padding:6px;box-shadow:0 2px 6px rgba(0,0,0,.08)">
+              <button class="btn" data-sort="latest">최신순</button>
+              <button class="btn" data-sort="views">조회순</button>
+            </div>
+          </div>
+          <!-- a태그로 fallback 제공 -->
+          <a class="btn dark" id="kp-board-write" href="${path}/front?key=board&methodName=writeForm" style="margin-left:8px">+ 글쓰기</a>
         </div>
       </div>
-      <!-- a태그로 fallback 제공 -->
-      <a class="btn dark" id="kp-board-write" href="${path}/front?key=board&methodName=writeForm" style="margin-left:8px">+ 글쓰기</a>
     </div>
 
-  <section id="kp-board-pinned" class="grid" style="margin-top:12px;display:none"></section>
-  <section id="kp-board-list" class="grid" style="margin-top:16px"></section>
+  <div class="kp-board-inner" style="margin-top:16px">
+    <section id="kp-board-list" class="grid"></section>
+  </div>
   </main>
 
   <jsp:include page="../common/footer.jsp"></jsp:include>
@@ -76,7 +90,6 @@
   var $sortMenu = document.querySelector('#kp-sort-menu');
   function setSortLabel(s){ 
     if(s==='views') $sortBtn.textContent='조회순 ▾'; 
-    else if(s==='likes') $sortBtn.textContent='좋아요순 ▾'; 
     else $sortBtn.textContent='최신순 ▾'; 
   }
   setSortLabel(sort);
@@ -90,8 +103,8 @@
       function renderPinned(rows){
         if(!$pinned) return;
         if(!rows||!rows.length){ $pinned.innerHTML=''; $pinned.style.display='none'; return; }
-        var html='';
-        html += '<div class="kp-pinned-header"><div style="font-weight:600">공지</div></div>';
+  var html='';
+  html += '<div class="kp-pinned-header"><div style="font-weight:600">📢공지사항</div></div>';
         for(var i=0;i<rows.length;i++){
           var r=rows[i];
           html+=
@@ -129,7 +142,6 @@
               '<div class="meta" style="justify-content:flex-end">'+
                 '<span>👁 '+r.viewCount+'</span>'+
                 '<span>💬 '+r.commentCount+'</span>'+
-                '<span>❤ '+(r.likeCount||0)+'</span>'+
               '</div>'+
             '</a>'+
           '</article>';
@@ -172,8 +184,7 @@
             if(extracted.length) renderPinned(extracted);
           }
           renderAppend(j.rows);
-          // 결과가 size보다 작으면 끝 도달
-          if(!j.rows || j.rows.length < size) reachedEnd = true;
+          if(!j.rows || j.rows.length === 0) reachedEnd = true;
           else page++;
         } else {
           if(page===1) $list.innerHTML="<p>게시글을 불러오지 못했습니다.</p>";
@@ -210,8 +221,6 @@
       e.preventDefault();
       location.href=BASE+"/front?key=board&methodName=writeForm";
     });
-
-    // (공지 롤백) 숨기기/복원 기능 제거 - 관련 로컬스토리지 플래그 무시됨.
   })();
   }
   </script>

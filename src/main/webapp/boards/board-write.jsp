@@ -47,9 +47,8 @@
       <div class="meta">
         <span data-nick>익명</span>
         <span data-date></span>
-        <span>👁 <b data-views>0</b></span>
-        <span>💬 <b data-cmts>0</b></span>
-        <span>❤ <b data-likes>0</b></span>
+  <span>👁 <b data-views>0</b></span>
+  <span>💬 <b data-cmts>0</b></span>
       </div>
       <div class="img-list" data-images></div>
       <!-- HTML 내용은 그대로 보여줘야 하므로 escape 제거 -->
@@ -76,10 +75,8 @@
       <form id="kp-post-form">
         <input type="hidden" name="postId" id="postId" />
         <div class="form-row">
-          <select name="category" class="input" style="width:auto">
-            <option value="free" selected>자유</option>
-            <option value="notice">공지</option>
-          </select>
+          <span style="display:inline-block;padding:8px 12px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px;color:#666;font-size:14px;">자유</span>
+          <input type="hidden" name="category" value="free" />
         </div>
         <div class="form-row"><input id="titleInput" name="title" class="input" placeholder="제목(*)"></div>
 
@@ -186,9 +183,8 @@ if(!window.__KP_BOARD_INIT__){ window.__KP_BOARD_INIT__=true;
     qs("[data-title]").textContent=p.title;
     qs("[data-nick]").textContent=p.nickname||"익명";
     qs("[data-date]").textContent=fmt(p.createdAt);
-    qs("[data-views]").textContent=p.viewCount;
-    qs("[data-cmts]").textContent=p.commentCount;
-    qs("[data-likes]").textContent=p.likeCount||0;
+  qs("[data-views]").textContent=p.viewCount;
+  qs("[data-cmts]").textContent=p.commentCount;
 
     // 보기 페이지에서는 HTML 그대로 그려주기 (XSS 방어는 서버/에디터에서 별도 처리 권장)
     qs("[data-content]").innerHTML = p.content || "";

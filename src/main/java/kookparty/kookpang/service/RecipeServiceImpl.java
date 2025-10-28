@@ -43,19 +43,21 @@ public class RecipeServiceImpl implements RecipeService {
 	}
 	
 	@Override
-	public void insertRecipe(RecipeDTO recipeDTO) throws Exception {
+	public int insertRecipe(RecipeDTO recipeDTO) throws Exception {
 		int result = recipeDAO.insertRecipe(recipeDTO);
 		
 		if (result == 0)
 			throw new DBAccessException("레시피가 등록되지 않았습니다.");
+		return result;
 	}
 	
 	@Override
-	public void deleteRecipeByRecipeId(long recipeId) throws Exception {
+	public int deleteRecipeByRecipeId(long recipeId) throws Exception {
 		int result = recipeDAO.deleteRecipeByRecipeId(recipeId);
 		
 		if (result == 0)
 			throw new DBAccessException("레시피가 삭제되지 않았습니다.");
+		return result;
 	}
 	
 	@Override

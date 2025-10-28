@@ -274,7 +274,8 @@ public class UserController implements Controller {
                 "nickname", freshUser.getNickname(),
                 "phone", freshUser.getPhone() != null ? freshUser.getPhone() : "",
                 "address", freshUser.getAddress() != null ? freshUser.getAddress() : "",
-                "role", freshUser.getRole()
+                "role", freshUser.getRole(),
+                "point", freshUser.getPoint()
             );
         } catch (Exception e) {
             e.printStackTrace();

@@ -16,6 +16,7 @@
       <script src="${path}/js/app.js"></script>
       <script src="${path}/js/seed.js"></script>
       <style>
+      	#adminBtn { font-size:12px; padding:5px 10px; }
         /* Normalize MyPage layout width to other pages */
         #mypage.container.page {
           max-width: 1040px;
@@ -227,6 +228,7 @@
         <div class="name" style="font-weight:800;" id="userName">로딩중...</div>
         <div class="email muted" id="userEmail">loading...</div>
             <div class="meta" style="margin:10px 0;">
+          <span class="muted">보유 포인트 <b style="color:#f39c12;" id="userPoint">0P</b></span>
           <span class="muted">작성한 게시글 <b id="postCount">0</b></span>
           <span class="muted">주문내역 <b id="orderCount">0</b></span>
             </div>
@@ -235,6 +237,8 @@
           <button class="btn edit-profile" onclick="openEditModal()">정보수정</button>
           <button class="btn logout" onclick="handleLogout()">로그아웃</button>
             </div>
+            <!-- admin button placeholder: shown only when current user role is 'admin' -->
+            <div id="admin-area" style="margin-top:8px;text-align:center"></div>
           </aside>
 
           <!-- 오른쪽: 콘텐츠 -->
@@ -393,6 +397,24 @@
       document.getElementById('userAvatar').textContent = initial;
       document.getElementById('userName').textContent = data.nickname || data.name || '사용자';
       document.getElementById('userEmail').textContent = data.email || '';
+      
+      // 포인트 표시
+      const pointElement = document.getElementById('userPoint');
+      if (pointElement) {
+        pointElement.textContent = (data.point || 0).toLocaleString();
+      }
+
+      // 관리자 버튼 표시 (role이 'admin'일 때만)
+      try {
+        const adminArea = document.getElementById('admin-area');
+      if (adminArea) {
+          if ((data.role || '').toString().toLowerCase() === 'admin') {
+            adminArea.innerHTML = '<a class="btn" id="adminBtn" href="' + BASE + '/front?key=admin&methodName=adminPage">관리자 페이지</a>';
+          } else {
+            adminArea.innerHTML = '';
+          }
+        }
+      } catch (e) { console.error(e); }
     }
 
     // 내가 작성한 게시글 표시

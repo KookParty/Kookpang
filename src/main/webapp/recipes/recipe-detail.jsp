@@ -375,12 +375,12 @@
               <c:forEach items="${recipe.steps}" var="stepDTO">
               
                 <c:choose>
-		          <c:when test="${stepDTO.imageUrl != null and stepDTO.imageUrl.substring(0,2) == '..'}">
+		          <c:when test="${not empty stepDTO.imageUrl and stepDTO.imageUrl.substring(0,2) == '..'}">
 		            <img src="${path}/${stepDTO.imageUrl}" alt="thumbnail" />
 		          </c:when>
-		          <c:otherwise>
+		          <c:when test="${not empty stepDTO.imageUrl}">
 		            <img src="${stepDTO.imageUrl}" alt="thumbnail" />
-		          </c:otherwise>
+		          </c:when>
 		        </c:choose>
 		        
                 <li>${stepDTO.description}</li>
