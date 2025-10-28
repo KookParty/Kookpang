@@ -1,122 +1,121 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-  <%@taglib uri="jakarta.tags.core" prefix="c" %>
-    <!DOCTYPE html>
-    <html lang="ko">
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %> <%@taglib
+uri="jakarta.tags.core" prefix="c" %>
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>식재료 쇼핑</title>
+    <link rel="stylesheet" href="${path}/css/styles.css" />
+    <script type="text/javascript">
+      const CONTEXT_PATH = "${pageContext.request.contextPath}";
+    </script>
+    <script src="${path}/js/config.js"></script>
+  </head>
 
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <title>식재료 쇼핑</title>
-      <link rel="stylesheet" href="${path}/css/styles.css" />
-      <script type="text/javascript">
-        const CONTEXT_PATH = "${pageContext.request.contextPath}";
-      </script>
-      <script src="${path}/js/config.js"></script>
-    </head>
+  <body>
+    <!-- header시작 -->
+    <jsp:include page="../common/header.jsp"></jsp:include>
+    <!-- header끝 -->
 
-    <body>
-      <!-- header시작 -->
-      <jsp:include page="../common/header.jsp"></jsp:include>
-      <!-- header끝 -->
+    <main class="container page">
+      <h1 style="text-align: center; margin: 0 0 6px">식재료 쇼핑</h1>
+      <p class="small" style="text-align: center; margin: 0 0 12px">신선하고 좋은 품질의 식재료를 만나보세요</p>
 
-      <main class="container page">
-        <h1 style="text-align: center; margin: 0 0 6px">식재료 쇼핑</h1>
-        <p class="small" style="text-align: center; margin: 0 0 12px">신선하고 좋은 품질의 식재료를 만나보세요</p>
+      <!-- 필터 -->
+      <div class="section-head" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+        <input id="q" class="input" placeholder="식재료를 검색해보세요..." style="flex: 1; min-width: 240px" />
+        <select id="cat" class="input" style="width: 160px">
+          <option value="">카테고리 전체</option>
+          <c:forEach var="item" items="${categorys}">
+            <option value="${item}">${item}</option>
+          </c:forEach>
+        </select>
+        <select id="sort" class="input" style="width: 140px">
+          <option value="asc">낮은 가격</option>
+          <option value="desc">높은 가격</option>
+        </select>
+        <button id="reset" class="btn">초기화</button>
+      </div>
 
-        <!-- 필터 -->
-        <div class="section-head" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
-          <input id="q" class="input" placeholder="식재료를 검색해보세요..." style="flex: 1; min-width: 240px" />
-          <select id="cat" class="input" style="width: 160px">
-            <option value="">카테고리 전체</option>
-            <c:forEach var="item" items="${categorys}">
-              <option value="${item}">${item}</option>
-            </c:forEach>
-          </select>
-          <select id="sort" class="input" style="width: 140px">
-            <option value="asc">낮은 가격</option>
-            <option value="desc">높은 가격</option>
-          </select>
-          <button id="reset" class="btn">초기화</button>
-        </div>
+      <!-- 그리드 -->
+      <section id="grid" class="grid cols-3"></section>
+    </main>
+    <!-- footer 시작 -->
+    <jsp:include page="../common/footer.jsp"></jsp:include>
+    <!-- footer 끝 -->
+    <script>
+      let pageNo = 1;
+      let ITEMS = [];
 
-        <!-- 그리드 -->
-        <section id="grid" class="grid cols-3"></section>
-      </main>
-      <!-- footer 시작 -->
-      <jsp:include page="../common/footer.jsp"></jsp:include>
-      <!-- footer 끝 -->
-      <script>
-        let pageNo = 1;
-        let ITEMS = [];
+      window.onload = function () {
+        initData();
+      };
+      let isLoading = false;
 
-        window.onload = function () {
-          initData();
-        };
-        let isLoading = false;
+      window.addEventListener("scroll", async () => {
+        if (isLoading) return;
 
-        window.addEventListener("scroll", async () => {
-          if (isLoading) return;
+        const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+        if (nearBottom) {
+          isLoading = true;
+          await loadNextPage();
+          isLoading = false;
+        }
+      });
 
-          const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
-          if (nearBottom) {
-            isLoading = true;
-            await loadNextPage();
-            isLoading = false;
-          }
-        });
+      const initData = async function () {
+        pageNo = 1;
+        ITEMS = await getData();
+        render(ITEMS);
+      };
 
-        const initData = async function () {
-          pageNo = 1;
-          ITEMS = await getData();
-          render(ITEMS);
-        };
+      const loadNextPage = async function () {
+        pageNo++;
+        ITEMS = await getData();
+        if (ITEMS.length === 0) return;
 
-        const loadNextPage = async function () {
-          pageNo++;
-          ITEMS = await getData();
-          if (ITEMS.length === 0) return;
+        renderAdd(ITEMS);
+      };
 
-          renderAdd(ITEMS);
-        };
+      const getData = async function () {
+        const word = document.getElementById("q").value;
+        const category = document.getElementById("cat").value;
+        const sort = document.getElementById("sort").value;
+        try {
+          const res = await fetch(CONTEXT_PATH + "/ajax", {
+            method: "POST",
+            body: new URLSearchParams({
+              key: "product",
+              methodName: "selectByOptions",
+              word: word,
+              category: category,
+              sort: sort,
+              pageNo: pageNo,
+            }),
+          });
+          if (res.ok) return await res.json();
+        } catch (e) {
+          console.error(e);
+        }
+        return [];
+      };
 
-        const getData = async function () {
-          const word = document.getElementById("q").value;
-          const category = document.getElementById("cat").value;
-          const sort = document.getElementById("sort").value;
-          try {
-            const res = await fetch(CONTEXT_PATH + "/ajax", {
-              method: "POST",
-              body: new URLSearchParams({
-                key: "product",
-                methodName: "selectByOptions",
-                word: word,
-                category: category,
-                sort: sort,
-                pageNo: pageNo,
-              }),
-            });
-            if (res.ok) return await res.json();
-          } catch (e) {
-            console.error(e);
-          }
-          return [];
-        };
+      const render = function (list) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        grid.insertAdjacentHTML("beforeend", buildHTML(list));
+      };
 
-        const render = function (list) {
-          const grid = document.getElementById("grid");
-          grid.innerHTML = "";
-          grid.insertAdjacentHTML("beforeend", buildHTML(list));
-        };
+      const renderAdd = function (list) {
+        const grid = document.getElementById("grid");
+        grid.insertAdjacentHTML("beforeend", buildHTML(list));
+      };
 
-        const renderAdd = function (list) {
-          const grid = document.getElementById("grid");
-          grid.insertAdjacentHTML("beforeend", buildHTML(list));
-        };
-
-        const buildHTML = function (list) {
-          return list
-            .map(
-              (it) => `
+      const buildHTML = function (list) {
+        return list
+          .map(
+            (it) => `
         <article class="card tile">
           <div class="thumb">
             <img src='${path}/${"${it.imageUrl}"}'>
@@ -132,92 +131,91 @@
           </div>
         </article>
       `
-            )
-            .join("");
-        };
+          )
+          .join("");
+      };
 
-        const updateCartBadgeAndToast = function () {
-          ensureBadge();
-          const n = document.createElement("div");
-          n.textContent = "장바구니에 담겼습니다.";
-          n.style.cssText =
-            "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
-          document.body.appendChild(n);
-        };
+      const updateCartBadgeAndToast = function () {
+        ensureBadge();
+        const n = document.createElement("div");
+        n.textContent = "장바구니에 담겼습니다.";
+        n.style.cssText =
+          "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
+        document.body.appendChild(n);
+      };
 
-        document.getElementById("q").addEventListener("keyup", initData);
-        document.getElementById("cat").addEventListener("change", initData);
-        document.getElementById("sort").addEventListener("change", initData);
-        document.getElementById("reset").addEventListener("click", () => {
-          document.getElementById("q").value = "";
-          document.getElementById("cat").value = "";
-          document.getElementById("sort").value = "asc";
-          initData();
-        });
-        document.addEventListener("click", async (e) => {
-          const id = e.target?.dataset?.add;
-          const count = 1;
-          if (!id) return;
-          const item = ITEMS.find((x) => x.productId == id);
-          try {
-            const duplicateChk = await fetch(CONTEXT_PATH + "/ajax", {
+      document.getElementById("q").addEventListener("keyup", initData);
+      document.getElementById("cat").addEventListener("change", initData);
+      document.getElementById("sort").addEventListener("change", initData);
+      document.getElementById("reset").addEventListener("click", () => {
+        document.getElementById("q").value = "";
+        document.getElementById("cat").value = "";
+        document.getElementById("sort").value = "asc";
+        initData();
+      });
+      document.addEventListener("click", async (e) => {
+        const id = e.target?.dataset?.add;
+        const count = 1;
+        if (!id) return;
+        try {
+          const duplicateChk = await fetch(CONTEXT_PATH + "/ajax", {
+            method: "POST",
+            body: new URLSearchParams({
+              key: "cart",
+              methodName: "duplicateCheck",
+              productId: id,
+            }),
+          });
+          const exists = await duplicateChk.json();
+          if (exists) {
+            const response = await fetch(conPath + "/ajax", {
               method: "POST",
               body: new URLSearchParams({
                 key: "cart",
-                methodName: "duplicateCheck",
+                methodName: "duplicatedCartCount",
                 productId: id,
+                newCount: exists.count + count,
               }),
             });
-            const exists = await duplicateChk.json();
-            if (exists) {
-              const response = await fetch(conPath + "/ajax", {
-                method: "POST",
-                body: new URLSearchParams({
-                  key: "cart",
-                  methodName: "duplicatedCartCount",
-                  productId: id,
-                  newCount: exists.count + count,
-                }),
-              });
-              
-              if (response.status === 401) {
-             	 alert("로그인이 필요합니다.");
-             	 location.href = CONTEXT_PATH + "/front?key=user&methodName=loginForm";
-             	 return;
-              }
-              
-              if (response.ok) {
-                updateCartBadgeAndToast();
-              } else {
-                console.error("Failed to update cart count:", response.statusText);
-              }
-            } else {
-              const res = await fetch(CONTEXT_PATH + "/ajax", {
-                method: "POST",
-                body: new URLSearchParams({
-                  key: "cart",
-                  methodName: "insertCart",
-                  productId: id,
-                  count: count,
-                }),
-              });
-              
-              if (response.status === 401) {
-             	 alert("로그인이 필요합니다.");
-             	 location.href = CONTEXT_PATH + "/front?key=user&methodName=loginForm";
-             	 return;
-              }
-              
-              if (res.ok) {
-                updateCartBadgeAndToast();
-              }
-            }
-          } catch (e) {
-            console.error(e);
-          }
 
-          // 배지 갱신 + 토스트
-          /*
+            if (response.status === 401) {
+              alert("로그인이 필요합니다.");
+              location.href = CONTEXT_PATH + "/front?key=user&methodName=loginForm";
+              return;
+            }
+
+            if (response.ok) {
+              updateCartBadgeAndToast();
+            } else {
+              console.error("Failed to update cart count:", response.statusText);
+            }
+          } else {
+            const res = await fetch(CONTEXT_PATH + "/ajax", {
+              method: "POST",
+              body: new URLSearchParams({
+                key: "cart",
+                methodName: "insertCart",
+                productId: id,
+                count: count,
+              }),
+            });
+
+            if (res.status === 401) {
+              alert("로그인이 필요합니다.");
+              location.href = CONTEXT_PATH + "/front?key=user&methodName=loginForm";
+              return;
+            }
+
+            if (res.ok) {
+              updateCartBadgeAndToast();
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
+        // 배지 갱신 + 토스트
+        /*
             try {
               window.kpUpdateCartBadge && window.kpUpdateCartBadge();
             } catch (_) {}
@@ -227,9 +225,9 @@
               "position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999";
             document.body.appendChild(n);
             setTimeout(() => n.remove(), 900);*/
-        });
+      });
 
-        /*(function () {
+      /*(function () {
                 const KP_CART = 'kp_cart';
                 const KP_ING = 'kp_ingredients';
                 const price = n => (Number(n) || 0).toLocaleString() + '원';
@@ -347,7 +345,6 @@
                 });
               })();
               */
-      </script>
-    </body>
-
-    </html>
+    </script>
+  </body>
+</html>
