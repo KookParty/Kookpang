@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
 		Connection con = null;
 		long pk = 0;
 		int point = user.getPoint();
-		point = point + (order.getTotalPrice()-order.getDeliveryFee())/20 - order.getUsedPoint();
+		point = point + (order.getTotalPrice()/20) - order.getUsedPoint();
 		user.setPoint(point);
 		try {
 			con = DbUtil.getConnection();

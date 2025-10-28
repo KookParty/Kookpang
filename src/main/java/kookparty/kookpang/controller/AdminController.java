@@ -261,7 +261,7 @@ public class AdminController implements Controller {
 		}
 		
 		for(long id : postIdList) {
-			boardService.deletePost(id, userId);
+			boardService.deletePost(id, user);
 		}
 		return new ModelAndView(contextPath + "/front?key=admin&methodName=boardList", true);
 	}

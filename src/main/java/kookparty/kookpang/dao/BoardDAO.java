@@ -299,6 +299,30 @@ public class BoardDAO {
         } catch (Exception e) { e.printStackTrace(); }
         return r > 0;
     }
+    
+    /**
+     * 관리자 전용 삭제메서드
+     * @param postId
+     * @return
+     */
+    public boolean deletePost(long postId) {
+        String sql = Q("board.post.deleteByAdmin");
+        int r = 0;
+        try (Connection con = DbUtil.getConnection()) {
+            // 1단계: 먼저 이미지 삭제 (외래 키 제약 조건 때문에 순서 중요)
+            try (PreparedStatement delImg = con.prepareStatement(Q("board.image.deleteByPost"))) {
+                delImg.setLong(1, postId);
+                delImg.executeUpdate();
+            }
+            
+            // 2단계: 게시글 삭제 (작성자 본인만 가능)
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setLong(1, postId);
+                r = ps.executeUpdate();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return r > 0;
+    }
 
     // ===== 이미지 =====
 
