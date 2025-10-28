@@ -114,8 +114,6 @@ uri="jakarta.tags.core" prefix="c" %>
     ></script>
     <script src="${path}/admin/js/scripts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="${path}/admin/assets/demo/chart-area-demo.js"></script>
-    <script src="${path}/admin/assets/demo/chart-bar-demo.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
       crossorigin="anonymous"
@@ -254,7 +252,7 @@ uri="jakarta.tags.core" prefix="c" %>
         // 조리법 배열을 JSON 문자열로 변환
         const steps = Array.from(document.querySelectorAll('.step-text')).map((el, i) => ({
       	  description: el.value,
-      	  imageUrl: document.querySelector(`#stepImg${i + 1}`)?.value || ''
+      	  imageUrl: document.querySelector(`#stepImg${"${i + 1}"}`)?.value || ''
         }));
 
         document.getElementById('ingredientsInput').value = JSON.stringify(ingredients);

@@ -4,18 +4,18 @@ uri="jakarta.tags.core" prefix="c" %>
   <div class="container bar wide">
     <div style="display: flex; align-items: center">
       <div class="brand">
-        <div class="logo">🍳</div>
+        <div class="logo" style="background-color: white">🥘</div>
         <a href="${path}/index.jsp"><strong>KookPang</strong></a>
       </div>
       <nav class="nav">
-        <a class="active" href="${path}/index.jsp">홈</a>
+        <a href="${path}/index.jsp">홈</a>
         <a href="${path}/front?key=recipe&methodName=recipes">레시피</a>
         <a href="${path}/front?key=product&methodName=ingredients">식재료</a>
         <a href="${path}/boards/board.jsp">자유게시판</a>
       </nav>
     </div>
     <div class="actions">
-      <a class="iconbtn" id="cartBtn" href="${path}/orders/cart.jsp">🛒</a>
+      <a class="iconbtn" id="cartBtn" href="${path}/front?key=cart&methodName=cart">🛒</a>
       <a id="js-mypage-link" class="iconbtn" href="${path}/users/mypage.jsp" data-need-auth>👤</a>
       <span id="js-nickname" class="badge">닉네임</span>
       <button id="js-login-btn" class="btn" onclick="location.href='${path}/users/login.jsp'">로그인</button>
@@ -25,60 +25,60 @@ uri="jakarta.tags.core" prefix="c" %>
 </header>
 
 <script>
-  let isLogin = ${sessionScope.loginUser != null};
-  const getCartHeader = async function () {
-    const res = await fetch("${path}/ajax", {
-      method: "POST",
-      body: new URLSearchParams({
-        key: "cart",
-        methodName: "countCart",
-      }),
-    });
-    if (res.status === 401) {
-      // 비로그인 상태
-      return 0;
-    }
-    if (!res.ok) {
-      throw new Error(res.status);
-    }
-    const text = await res.json();
-    console.log("cart header response:", text);
-    try {
-      return JSON.parse(text);
-    } catch (e) {
-      return Number(text) || 0;
-    }
-  };
-  const cartCount = async function () {
-    const data = await getCartHeader();
-    return data;
-  };
-  const ensureBadge = async function () {
-    var a = document.getElementById("cartBtn");
-    if (!a) return;
-    if (getComputedStyle(a).position === "static") {
-      a.style.position = "relative";
-    }
-    var b = document.getElementById("js-cart-badge");
-    if (!b) {
-      b = document.createElement("span");
-      b.id = "js-cart-badge";
-      b.className = "cart-badge";
-      a.appendChild(b);
-    }
-    var c = await cartCount();
-    console.log("cart count:", c);
-    b.textContent = c > 0 ? String(c) : "";
-    b.style.display = c > 0 ? "inline-flex" : "none";
-  };
-  (function () {
-	if(isLogin){
-		ensureBadge();
-	    window.kpUpdateCartBadge = ensureBadge;
-	    document.addEventListener("DOMContentLoaded", ensureBadge);
-	    window.addEventListener("storage", ensureBadge);
-	}
-  })();
+   let isLogin = ${sessionScope.loginUser != null};
+   const getCartHeader = async function () {
+     const res = await fetch("${path}/ajax", {
+       method: "POST",
+       body: new URLSearchParams({
+         key: "cart",
+         methodName: "countCart",
+       }),
+     });
+     if (res.status === 401) {
+       // 비로그인 상태
+       return 0;
+     }
+     if (!res.ok) {
+       throw new Error(res.status);
+     }
+     const text = await res.json();
+     console.log("cart header response:", text);
+     try {
+       return JSON.parse(text);
+     } catch (e) {
+       return Number(text) || 0;
+     }
+   };
+   const cartCount = async function () {
+     const data = await getCartHeader();
+     return data;
+   };
+   const ensureBadge = async function () {
+     var a = document.getElementById("cartBtn");
+     if (!a) return;
+     if (getComputedStyle(a).position === "static") {
+       a.style.position = "relative";
+     }
+     var b = document.getElementById("js-cart-badge");
+     if (!b) {
+       b = document.createElement("span");
+       b.id = "js-cart-badge";
+       b.className = "cart-badge";
+       a.appendChild(b);
+     }
+     var c = await cartCount();
+     console.log("cart count:", c);
+     b.textContent = c > 0 ? String(c) : "";
+     b.style.display = c > 0 ? "inline-flex" : "none";
+   };
+   (function () {
+  if(isLogin){
+  	ensureBadge();
+      window.kpUpdateCartBadge = ensureBadge;
+      document.addEventListener("DOMContentLoaded", ensureBadge);
+      window.addEventListener("storage", ensureBadge);
+  }
+   })();
 </script>
 
 <!-- 로그인/아웃-->

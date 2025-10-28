@@ -12,9 +12,7 @@
         const CONTEXT_PATH = "${pageContext.request.contextPath}";
       </script>
       <script src="${path}/js/config.js"></script>
-      <script>const PAGE_ACTIVE = "mypage"</script>
-      <script src="${path}/js/app.js"></script>
-      <script src="${path}/js/seed.js"></script>
+
       <style>
       	#adminBtn { font-size:12px; padding:5px 10px; }
         /* Normalize MyPage layout width to other pages */
@@ -219,7 +217,6 @@
       <!-- header시작 -->
       <jsp:include page="../common/header.jsp"></jsp:include>
       <!-- header끝 -->
-      <script>document.addEventListener("DOMContentLoaded", () => { initHeader("mypage"); });</script>
       <main id="mypage" class="container page">
         <div class="mpp-grid">
           <!-- 왼쪽: 프로필 카드 -->

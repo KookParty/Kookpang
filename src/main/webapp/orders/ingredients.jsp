@@ -123,7 +123,6 @@ uri="jakarta.tags.core" prefix="c" %>
           <div class="body">
             <div class="meta">
               <span class="label">${"${it.category}"}</span>
-              <span class="label" style="background:#10b981">테스트</span>
             </div>
             <b>${"${it.name || ''}"}</b>
             <div class="meta"><span>${"${it.price}"}</span><span>1개</span></div>

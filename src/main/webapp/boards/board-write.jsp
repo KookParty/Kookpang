@@ -12,8 +12,6 @@
   <script type="text/javascript">const CONTEXT_PATH = "${path}";</script>
   <script>const BASE="${pageContext.request.contextPath}";const PAGE_ACTIVE="board";</script>
   <script src="${path}/js/config.js"></script>
-  <script src="${path}/js/app.js"></script>
-  <script src="${path}/js/seed.js"></script>
   <style>
     .editor-wrap{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
     .editor-toolbar{display:flex;gap:6px;align-items:center;padding:8px 10px;border-bottom:1px solid #eee;background:#fafafa}

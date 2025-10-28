@@ -210,6 +210,13 @@ public class AdminController implements Controller {
 		List<StepDTO> steps = gson.fromJson(
 				stepsJson, new TypeToken<List<StepDTO>>() {}.getType());
 		
+		for(IngredientDTO i : ingredients) {
+			System.out.println(i);
+		}
+		for(StepDTO s : steps) {
+			System.out.println(s);
+		}
+		
 		RecipeDTO recipeDTO = new RecipeDTO(1, title, description, thumbnailUrl, RecipeType.BASE, way, category, 0);
 		recipeDTO.setIngredients(ingredients);
 		recipeDTO.setSteps(steps);

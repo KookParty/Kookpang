@@ -65,12 +65,7 @@ uri="jakarta.tags.core" prefix="c" %>
                     </div>
                     <div class="mb-3">
                       <label for="productCategory" class="form-label">카테고리</label>
-                      <select class="form-select" id="productCategory" name="category" required>
-                        <option value="">선택하세요</option>
-                        <option value="vegetable">채소</option>
-                        <option value="fruit">과일</option>
-                        <option value="meat">육류</option>
-                      </select>
+                      <input type="text" class="form-control" id="productCategory" name="category" required />
                     </div>
                     <div class="mb-3">
                       <label for="productDescription" class="form-label">설명</label>
@@ -99,8 +94,6 @@ uri="jakarta.tags.core" prefix="c" %>
     ></script>
     <script src="${path}/admin/js/scripts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="${path}/admin/assets/demo/chart-area-demo.js"></script>
-    <script src="${path}/admin/assets/demo/chart-bar-demo.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
       crossorigin="anonymous"
