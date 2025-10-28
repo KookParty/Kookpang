@@ -11,6 +11,8 @@ import com.google.gson.reflect.TypeToken;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import kookparty.kookpang.common.RecipeType;
+import kookparty.kookpang.common.TargetType;
 import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.IngredientDTO;
 import kookparty.kookpang.dto.ProductDTO;
@@ -197,7 +199,7 @@ public class AdminController implements Controller {
 		List<StepDTO> steps = gson.fromJson(
 				stepsJson, new TypeToken<List<StepDTO>>() {}.getType());
 		
-		RecipeDTO recipeDTO = new RecipeDTO(1, title, description, thumbnailUrl, way, category, 0);
+		RecipeDTO recipeDTO = new RecipeDTO(1, title, description, thumbnailUrl, RecipeType.BASE, way, category, 0);
 		recipeDTO.setIngredients(ingredients);
 		recipeDTO.setSteps(steps);
 		
@@ -224,7 +226,7 @@ public class AdminController implements Controller {
 		try {
 			Part part = request.getPart("image");
 			String fileName = part.getSubmittedFileName();
-			fileName = UUID.randomUUID() + Paths.get(fileName).getFileName().toString();
+			fileName = Paths.get(fileName).getFileName().toString();
 			String savePath = FilePath.getSavePath(request, "recipe_image");
 			
 			if(fileName!=null) {
