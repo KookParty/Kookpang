@@ -136,9 +136,9 @@
           box.className = 'card'; 
           box.style.padding = '12px'; 
           box.style.marginTop = '8px';
-          box.innerHTML = `<b class="small">단계 ${i}</b>
+          box.innerHTML = `<b class="small">단계 ${"${i}"}</b>
             <div class="form-row"><textarea class="input step-text" rows="3" placeholder="이 단계의 조리 방법을 자세히 설명해주세요"></textarea></div>
-            <div class="row"><input type="file" name="stepImg${i}" class="input step-img" placeholder="이미지 URL을 입력해주세요" style="flex:1"></div>`;
+            <div class="row"><input type="file" name="stepImg${"${i}"}" class="input step-img" placeholder="이미지 URL을 입력해주세요" style="flex:1"></div>`;
           document.getElementById('steps').appendChild(box);
         }
         document.getElementById('addStep').onclick = addStep;
