@@ -72,14 +72,14 @@ public class PayServiceImpl implements PayService {
 		body.addProperty("total_amount", amount + deliveryFee - usedPoint);
 		body.addProperty("tax_free_amount", 0);
 		//로컬환경
-		body.addProperty("approval_url", "http://localhost:8080/Kookpang/ajax?key=pay&methodName=paySuccess");
-		body.addProperty("cancel_url", "http://localhost:8080/Kookpang/front?key=order&methodName=orderPage");
-		body.addProperty("fail_url", "http://localhost:8080/Kookpang/front?key=order&methodName=orderPage");
+		//body.addProperty("approval_url", "http://localhost:8080/Kookpang/ajax?key=pay&methodName=paySuccess");
+		//body.addProperty("cancel_url", "http://localhost:8080/Kookpang/front?key=order&methodName=orderPage");
+		//body.addProperty("fail_url", "http://localhost:8080/Kookpang/front?key=order&methodName=orderPage");
 		
 		//배포환경
-		//body.addProperty("approval_url", "http://kookpang.p-e.kr/ajax?key=pay&methodName=paySuccess");
-		//body.addProperty("cancel_url", "http://kookpang.p-e.kr/front?key=order&methodName=orderPage");
-		//body.addProperty("fail_url", "http://kookpang.p-e.kr/front?key=order&methodName=orderPage");
+		body.addProperty("approval_url", "http://kookpang.p-e.kr/ajax?key=pay&methodName=paySuccess");
+		body.addProperty("cancel_url", "http://kookpang.p-e.kr/front?key=order&methodName=orderPage");
+		body.addProperty("fail_url", "http://kookpang.p-e.kr/front?key=order&methodName=orderPage");
 		try (OutputStream os = conn.getOutputStream()) {
 			os.write(gson.toJson(body).getBytes("UTF-8"));
 		}

@@ -8,6 +8,7 @@ import kookparty.kookpang.util.DbUtil;
 
 import java.io.InputStream;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -78,8 +79,8 @@ public class BoardDAO {
                     d.setViewCount(rs.getLong("view_count"));
                     d.setCommentCount(rs.getLong("comment_count"));
                     d.setLikeCount(rs.getLong("like_count"));
-                    Timestamp ts = rs.getTimestamp("created_at");
-                    if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
+                    LocalDateTime createdAt = rs.getObject("created_at", LocalDateTime.class);
+                    d.setCreatedAt(createdAt);
                     d.setNickname(rs.getString("nickname"));
                     d.setCategory(rs.getString("category"));
                     list.add(d);
@@ -132,8 +133,8 @@ public class BoardDAO {
                     d.setViewCount(rs.getLong("view_count"));
                     d.setCommentCount(rs.getLong("comment_count"));
                     d.setLikeCount(rs.getLong("like_count"));
-                    Timestamp ts = rs.getTimestamp("created_at");
-                    if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
+                    LocalDateTime createdAt = rs.getObject("created_at", LocalDateTime.class);
+                    d.setCreatedAt(createdAt);
                     d.setNickname(rs.getString("nickname"));
                     d.setCategory(rs.getString("category"));
                     list.add(d);
@@ -215,8 +216,8 @@ public class BoardDAO {
                     d.setViewCount(rs.getLong("view_count"));
                     d.setCommentCount(rs.getLong("comment_count"));
                     d.setLikeCount(rs.getLong("like_count"));
-                    Timestamp ts = rs.getTimestamp("created_at");
-                    if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
+                    LocalDateTime createdAt = rs.getObject("created_at", LocalDateTime.class);
+                    d.setCreatedAt(createdAt);
                     d.setNickname(rs.getString("nickname"));
                 }
             }
@@ -377,8 +378,8 @@ public class BoardDAO {
                     c.setPostId(rs.getLong("post_id"));
                     c.setUserId(rs.getLong("user_id"));
                     c.setContent(rs.getString("content"));
-                    Timestamp ts = rs.getTimestamp("created_at");
-                    if (ts != null) c.setCreatedAt(ts.toLocalDateTime());
+                    LocalDateTime createdAt = rs.getObject("created_at", LocalDateTime.class);
+                    c.setCreatedAt(createdAt);
                     c.setNickname(rs.getString("nickname"));
                     list.add(c);
                 }
@@ -524,8 +525,8 @@ public class BoardDAO {
                 d.setViewCount(rs.getLong("view_count"));
                 d.setCommentCount(rs.getLong("comment_count"));
                 d.setLikeCount(rs.getLong("like_count"));
-                Timestamp ts = rs.getTimestamp("created_at");
-                if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
+                LocalDateTime createdAt = rs.getObject("created_at", LocalDateTime.class);
+                d.setCreatedAt(createdAt);
                 d.setNickname(rs.getString("nickname"));
                 d.setCategory(rs.getString("category"));
                 list.add(d);

@@ -16,8 +16,8 @@ public class CartController implements Controller {
 	private final CartService cartService = new CartServiceImpl();
 
 	public ModelAndView cart(HttpServletRequest request, HttpServletResponse response) {
-
-		return new ModelAndView();
+		
+		return new ModelAndView("/orders/cart.jsp");
 	}
 	
 	/**
