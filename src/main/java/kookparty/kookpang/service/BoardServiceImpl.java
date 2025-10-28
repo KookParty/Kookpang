@@ -4,6 +4,7 @@ import kookparty.kookpang.dao.BoardDAO;
 import kookparty.kookpang.dto.BoardDTO;
 import kookparty.kookpang.dto.BoardDTO.Comment;
 import kookparty.kookpang.dto.BoardDTO.Image;
+import kookparty.kookpang.dto.UserDTO;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -107,16 +108,20 @@ public class BoardServiceImpl implements BoardService {
     }
     
     @Override
-    public boolean deletePost(Long postId, Long userId) throws SQLException {
+    public boolean deletePost(Long postId, UserDTO user) throws SQLException {
         if (postId == null) {
             throw new IllegalArgumentException("게시글 ID가 필요합니다.");
         }
-        if (userId == null) {
+        if (user == null) {
             throw new IllegalArgumentException("사용자 인증이 필요합니다.");
         }
         
+        if(user.getRole().equals("admin")) {
+        	return boardDAO.deletePost(postId);
+        }
+        
         try {
-            return boardDAO.deletePost(postId, userId);
+            return boardDAO.deletePost(postId, user.getUserId());
         } catch (Exception e) {
             throw new SQLException("게시글 삭제 중 오류가 발생했습니다.", e);
         }
@@ -189,4 +194,12 @@ public class BoardServiceImpl implements BoardService {
             throw new SQLException("댓글 삭제 중 오류가 발생했습니다.", e);
         }
     }
+
+	@Override
+	public List<BoardDTO> selectAll() throws SQLException {
+		List<BoardDTO> list = boardDAO.selectAll();
+		return list;
+	}
+    
+    
 }

@@ -5,6 +5,7 @@ import java.util.Set;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.*;
+import kookparty.kookpang.dto.UserDTO;
 
 @WebFilter(urlPatterns = {"/ajax","/front"})
 public class LoginFilter implements Filter {
@@ -87,15 +88,11 @@ public class LoginFilter implements Filter {
       needAuth = true;
     }
     
-    if("admin".equals(key)) {
-    	needAuth = false;
-    }
-    
     // ----- 인증 확인 -----
     if (needAuth) {
       HttpSession session = req.getSession(false);
-      Object loginUser = (session == null) ? null : session.getAttribute("loginUser");
-
+      UserDTO loginUser = (session == null) ? null : (UserDTO)session.getAttribute("loginUser");
+      
       if (loginUser == null) {
         if (isAjax(req)) {
           // AJAX 요청은 JSON 401로 응답 (리다이렉트 금지)
@@ -109,6 +106,12 @@ public class LoginFilter implements Filter {
           return;
         }
       }
+      
+      if(!loginUser.getRole().equals("admin") && key.equals("admin")) {
+    	  resp.sendRedirect(req.getContextPath() + "/front?key=user&methodName=loginForm");
+    	  return;
+      }
+      
     }
 
     chain.doFilter(request, response);

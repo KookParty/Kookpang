@@ -59,8 +59,8 @@
 				<div class="collapse" id="collapseLayouts3"
 					aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
 					<nav class="sb-sidenav-menu-nested nav">
-						<a class="nav-link" href="layout-static.html">게시판 조회</a> 
-						<a class="nav-link" href="layout-sidenav-light.html">게시판 등록</a>
+						<a class="nav-link" href="${path}/front?key=admin&methodName=boardList">게시판 조회</a> 
+						<a class="nav-link" href="${path}/front?key=admin&methodName=boardInsertPage">게시판 등록</a>
 					</nav>
 				</div>
 			</div>

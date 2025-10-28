@@ -2,6 +2,7 @@ package kookparty.kookpang.service;
 
 import kookparty.kookpang.dto.BoardDTO;
 import kookparty.kookpang.dto.BoardDTO.Comment;
+import kookparty.kookpang.dto.UserDTO;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -60,7 +61,7 @@ public interface BoardService {
      * @return 삭제 성공 여부
      * @throws SQLException
      */
-    boolean deletePost(Long postId, Long userId) throws SQLException;
+    boolean deletePost(Long postId, UserDTO user) throws SQLException;
     
     /**
      * 게시글 조회수 증가
@@ -94,4 +95,6 @@ public interface BoardService {
      * @throws SQLException
      */
     boolean deleteComment(Long commentId, Long userId, Long postId) throws SQLException;
+    
+    List<BoardDTO> selectAll() throws SQLException;
 }

@@ -1,6 +1,7 @@
 package kookparty.kookpang.dao;
 
 import kookparty.kookpang.dto.BoardDTO;
+import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.dto.BoardDTO.Image;
 import kookparty.kookpang.dto.BoardDTO.Comment;
 import kookparty.kookpang.util.DbUtil;
@@ -298,6 +299,30 @@ public class BoardDAO {
         } catch (Exception e) { e.printStackTrace(); }
         return r > 0;
     }
+    
+    /**
+     * 관리자 전용 삭제메서드
+     * @param postId
+     * @return
+     */
+    public boolean deletePost(long postId) {
+        String sql = Q("board.post.deleteByAdmin");
+        int r = 0;
+        try (Connection con = DbUtil.getConnection()) {
+            // 1단계: 먼저 이미지 삭제 (외래 키 제약 조건 때문에 순서 중요)
+            try (PreparedStatement delImg = con.prepareStatement(Q("board.image.deleteByPost"))) {
+                delImg.setLong(1, postId);
+                delImg.executeUpdate();
+            }
+            
+            // 2단계: 게시글 삭제 (작성자 본인만 가능)
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setLong(1, postId);
+                r = ps.executeUpdate();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return r > 0;
+    }
 
     // ===== 이미지 =====
 
@@ -478,6 +503,39 @@ public class BoardDAO {
             }
         }
         return false;
+    }
+    
+    public List<BoardDTO> selectAll() throws SQLException{
+    	Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		String sql = proFile.getProperty("board.post.selectAll");
+
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+                BoardDTO d = new BoardDTO();
+                d.setPostId(rs.getLong("post_id"));
+                d.setTitle(rs.getString("title"));
+                d.setContent(rs.getString("content"));
+                d.setViewCount(rs.getLong("view_count"));
+                d.setCommentCount(rs.getLong("comment_count"));
+                d.setLikeCount(rs.getLong("like_count"));
+                Timestamp ts = rs.getTimestamp("created_at");
+                if (ts != null) d.setCreatedAt(ts.toLocalDateTime());
+                d.setNickname(rs.getString("nickname"));
+                d.setCategory(rs.getString("category"));
+                list.add(d);
+            }
+
+		} finally {
+			DbUtil.dbClose(con, ps, rs);
+		}
+
+		return list;
     }
 
     // ===== utils =====

@@ -2,6 +2,7 @@ package kookparty.kookpang.controller;
 
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,14 +11,20 @@ import com.google.gson.reflect.TypeToken;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import kookparty.kookpang.common.RecipeType;
-import kookparty.kookpang.common.TargetType;
+import kookparty.kookpang.dao.BoardDAO;
+import kookparty.kookpang.dto.BoardDTO;
+import kookparty.kookpang.dto.BoardDTO.Image;
 import kookparty.kookpang.dto.ChartDataDTO;
 import kookparty.kookpang.dto.IngredientDTO;
 import kookparty.kookpang.dto.ProductDTO;
 import kookparty.kookpang.dto.RecipeDTO;
 import kookparty.kookpang.dto.StepDTO;
+import kookparty.kookpang.dto.UserDTO;
+import kookparty.kookpang.service.BoardService;
+import kookparty.kookpang.service.BoardServiceImpl;
 import kookparty.kookpang.service.OrderService;
 import kookparty.kookpang.service.OrderServiceImpl;
 import kookparty.kookpang.service.ProductService;
@@ -30,6 +37,10 @@ public class AdminController implements Controller {
 	ProductService productService = new ProductServiceImpl();
 	OrderService orderService = new OrderServiceImpl();
 	RecipeService recipeService = RecipeServiceImpl.getInstance();
+	BoardService boardService = new BoardServiceImpl();
+	BoardDAO dao = new BoardDAO(); 
+	private static String t(String s){ return (s==null) ? "" : s.trim(); }
+	private static Long parseLongObj(String s){ try { return Long.parseLong(s); } catch(Exception e){ return null; } }
 	
 	public ModelAndView adminPage(HttpServletRequest request, HttpServletResponse response) {
 		
@@ -264,4 +275,116 @@ public class AdminController implements Controller {
 		
 		return new ModelAndView(contextPath + "/front?key=admin&methodName=recipeList", true);
 	}
+	
+	/* 게시판 */
+	public ModelAndView boardList(HttpServletRequest request, HttpServletResponse response) {
+		List<BoardDTO> list = null;
+		try {
+			list = boardService.selectAll();
+			request.setAttribute("list", list);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("errMsg", "오류");
+			return new ModelAndView("/common/error.jsp");
+		}
+		return new ModelAndView("/admin/boards.jsp");
+	}
+	
+	public ModelAndView boardInsertPage(HttpServletRequest request, HttpServletResponse response) {
+		return new ModelAndView("/admin/board-insert.jsp");
+	}
+	
+	public ModelAndView insertBoard(HttpServletRequest req, HttpServletResponse response) {
+		HttpSession session = req.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		String contextPath = req.getContextPath();
+		long userId = user.getUserId();
+
+        String postIdStr = req.getParameter("postId");
+        String category  = "notice";
+        String title     = req.getParameter("title");
+        String contentH  = req.getParameter("content");          // HTML
+        String contentT  = t(req.getParameter("contentText"));   // 순수 텍스트 (선택)
+
+        // NPE 방지 및 로깅
+        String safeTitle = (title == null) ? "" : title;
+        String safeContentH = (contentH == null) ? "" : contentH;
+        System.out.println("Board.save >> title=" + safeTitle + " | content.len=" + safeContentH.length());
+
+        // 텍스트로 검증
+        String contentForCheck;
+        if (contentT != null && !contentT.isBlank()) {
+            contentForCheck = contentT;
+        } else {
+            // contentH가 null일 수 있으니 안전 처리
+            String raw = (contentH == null) ? "" : contentH;
+            contentForCheck = raw.replaceAll("\\<[^>]*>", "")
+                                 .replace('\u00A0',' ')
+                                 .trim();
+        }
+
+        if (safeTitle.isBlank() || contentForCheck.isBlank()) {
+            req.setAttribute("errMsg", "제목과 내용이 비어있음");
+            return new ModelAndView("/common/error.jsp");
+        }
+
+        BoardDTO d = new BoardDTO();
+        d.setUserId(userId);
+        d.setCategory(category.isBlank() ? "free" : category);
+        d.setTitle(safeTitle);
+        d.setContent(safeContentH); // 저장은 HTML 그대로
+
+        // imageUrl 여러 개 수신
+        List<Image> images = parseImages(req.getParameterValues("imageUrl"));
+
+        if (postIdStr == null || postIdStr.isBlank()){
+            long newId = dao.insertPost(d, images);
+        } else {
+            Long pid = parseLongObj(postIdStr);
+            d.setPostId(pid);
+            boolean ok = dao.updatePost(d, images);
+        }
+        return new ModelAndView(contextPath + "/front?key=admin&methodName=boardList", true);
+	}
+	
+	public ModelAndView deleteBoards(HttpServletRequest req, HttpServletResponse res) throws SQLException {
+		HttpSession session = req.getSession();
+		UserDTO user = (UserDTO)session.getAttribute("loginUser");
+		String contextPath = req.getContextPath();
+		long userId = user.getUserId();
+		
+		List<Long> postIdList = new ArrayList<Long>();
+		
+		String[] items = req.getParameterValues("selectedItems");
+		
+		if(items == null || items.length == 0) {
+			req.setAttribute("errMsg", "선택된 항목이 없습니다.");
+		    return new ModelAndView("/common/error.jsp");
+		}
+		
+		for(String s : items) {
+			postIdList.add(Long.parseLong(s));	
+		}
+		
+		for(long id : postIdList) {
+			boardService.deletePost(id, user);
+		}
+		return new ModelAndView(contextPath + "/front?key=admin&methodName=boardList", true);
+	}
+	
+	
+	// ====================== boardController 재사용메서드 가지고 오기...
+	private static List<Image> parseImages(String[] urls){
+        List<Image> list = new ArrayList<>();
+        if(urls == null) return list;
+        int order = 0;
+        for(String u : urls){
+            if(u == null || u.isBlank()) continue;
+            Image im = new Image();
+            im.setImageUrl(u.trim());
+            im.setImageOrder(order++);
+            list.add(im);
+        }
+        return list;
+    }
 }

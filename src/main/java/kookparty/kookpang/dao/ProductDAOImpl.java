@@ -36,7 +36,6 @@ public class ProductDAOImpl implements ProductDAO {
 
 		try {
 			con = DbUtil.getConnection();
-			con.setAutoCommit(false);
 			ps = con.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {

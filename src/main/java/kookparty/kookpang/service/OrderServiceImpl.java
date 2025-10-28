@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
 		Connection con = null;
 		long pk = 0;
 		int point = user.getPoint();
-		point = point + (order.getTotalPrice()-order.getUsedPoint())/20 - order.getUsedPoint();
+		point = point + (order.getTotalPrice()/20) - order.getUsedPoint();
 		user.setPoint(point);
 		try {
 			con = DbUtil.getConnection();
@@ -100,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
 			con.setAutoCommit(false);
 			int point = user.getPoint();
 			OrderDTO order = orderDAO.selectByOrderId(orderId, con);
-			point = point + order.getUsedPoint();
+			point = point + order.getUsedPoint() - order.getTotalPrice()/20;
 			user.setPoint(point);
 			result = orderDAO.deleteOrder(con, orderId);
 			userDAO.updatePoint(user.getUserId(), user.getPoint(), con);
