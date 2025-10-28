@@ -89,7 +89,7 @@ public class UserDAO {
 
     public Optional<UserDTO> findById(long userId) {
         String sql = """
-            SELECT user_id, email, name, nickname, phone, address, role, status
+            SELECT user_id, email, name, nickname, phone, address, role, point, status
             FROM users
             WHERE user_id=? AND status=1
         """;
@@ -106,6 +106,7 @@ public class UserDAO {
                 u.setPhone(rs.getString("phone"));
                 u.setAddress(rs.getString("address"));
                 u.setRole(rs.getString("role"));
+                u.setPoint(rs.getInt("point"));
                 u.setStatus(rs.getInt("status"));
                 return Optional.of(u);
             }
