@@ -16,6 +16,7 @@
       <script src="${path}/js/app.js"></script>
       <script src="${path}/js/seed.js"></script>
       <style>
+      	#adminBtn { font-size:12px; padding:5px 10px; }
         /* Normalize MyPage layout width to other pages */
         #mypage.container.page {
           max-width: 1040px;
