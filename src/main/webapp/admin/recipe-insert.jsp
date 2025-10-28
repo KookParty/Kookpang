@@ -252,7 +252,7 @@ uri="jakarta.tags.core" prefix="c" %>
         // 조리법 배열을 JSON 문자열로 변환
         const steps = Array.from(document.querySelectorAll('.step-text')).map((el, i) => ({
       	  description: el.value,
-      	  imageUrl: document.querySelector(`#stepImg${i + 1}`)?.value || ''
+      	  imageUrl: document.querySelector(`#stepImg${"${i + 1}"}`)?.value || ''
         }));
 
         document.getElementById('ingredientsInput').value = JSON.stringify(ingredients);

@@ -120,11 +120,12 @@ public class RecipeController implements Controller {
 		List<StepDTO> steps = gson.fromJson(
 				stepsJson, new TypeToken<List<StepDTO>>() {}.getType());
 		
+		
 		for (int i = 0; i < steps.size(); i++) {
 		    StepDTO step = steps.get(i);
 		    Part stepPart = request.getPart("stepImg" + (i + 1)); // stepImg1, stepImg2, ...
 		    if (stepPart != null && stepPart.getSize() > 0) {
-		    	String fileName = part.getSubmittedFileName();
+		    	String fileName = stepPart.getSubmittedFileName();
 				if (fileName != null && !fileName.isEmpty()) {
 					fileName = Paths.get(fileName).getFileName().toString();
 					stepPart.write(FilePath.getSavePath(request, "recipe_upload") + "/" + fileName);
@@ -133,6 +134,7 @@ public class RecipeController implements Controller {
 					step.setImageUrl(null);
 				}
 		    }
+		    
 		}
 
 		

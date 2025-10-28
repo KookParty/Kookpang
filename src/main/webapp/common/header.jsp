@@ -8,7 +8,7 @@ uri="jakarta.tags.core" prefix="c" %>
         <a href="${path}/index.jsp"><strong>KookPang</strong></a>
       </div>
       <nav class="nav">
-        <a class="active" href="${path}/index.jsp">홈</a>
+        <a href="${path}/index.jsp">홈</a>
         <a href="${path}/front?key=recipe&methodName=recipes">레시피</a>
         <a href="${path}/front?key=product&methodName=ingredients">식재료</a>
         <a href="${path}/boards/board.jsp">자유게시판</a>
